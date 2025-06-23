@@ -1,0 +1,44 @@
+[package]
+name = "simple_warfare"
+version = "0.1.0"
+edition = "2024"
+exclude = ["assets/"]
+
+
+[dependencies]
+thiserror = "2.0.12"
+rand = "0.9.1"
+bevy-inspector-egui = "0.31.0"
+serde = "1.0.219"
+toml = "0.8.23"
+tokio = { version = "1.45.1", features = ["full"] }
+mlua = { version = "0.10.5", features = [
+  "lua54",
+  "async",
+  "vendored",
+  "anyhow",
+  "macros",
+  "mlua_derive",
+  'serialize',
+  "send",
+] }
+anyhow = "1.0.82"
+boa_engine = "0.20.0"
+boa_runtime = "0.20.0"
+boa_gc = "0.20.0"
+crossbeam-channel = "0.5.15"
+
+
+[dependencies.bevy]
+version = "0.16.1"
+features = ["jpeg"]
+
+
+[profile.dev]
+opt-level = 0           # 使用稍高一些的优化级别，最低是0，最高是3
+overflow-checks = false # 关闭整数溢出检查
+
+[profile.release]
+opt-level = 3           # 使用稍高一些的优化级别，最低是0，最高是3
+overflow-checks = false # 关闭整数溢出检查
+lto = true
