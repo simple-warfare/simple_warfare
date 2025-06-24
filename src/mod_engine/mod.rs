@@ -5,7 +5,7 @@ use mlua::{Lua, ObjectLike};
 
 use crate::{
     app_state::AppState,
-    assets::mods::{info::*, lua::*},
+    assets::mods::{info::*, js::JsAsset, lua::*},
     js_engine::event::{JsEngineEvent, ModEvent},
 };
 
@@ -42,6 +42,7 @@ fn load_main_lua(
     lua_assets: Res<Assets<LuaAsset>>,
     asset_server: Res<AssetServer>,
     mod_infos: Res<Assets<ModInfo>>,
+    js_assets: Res<Assets<JsAsset>>,
     mut next_state: ResMut<NextState<AppState>>,
     mut js_engine_event_writer: EventWriter<JsEngineEvent>,
 ) -> Result {
@@ -72,23 +73,20 @@ fn load_main_lua(
             global.call_function::<()>("Main", ())?;
 
             let mod_info_form_lua: ModInfo = global.get("mod_info")?;
-            let code_js = r#"
-            import { CustomUnit, Core } from "./simple_warfare_engine.js"
-
-            class Tank extends CustomUnit {
-                constructor() {
-                    let core = new Core("坦克", 1000, 1000)
-                    super(core)
-                };
-            };
-
-            export{Tank};
-            "#;
-            js_engine_event_writer.write(JsEngineEvent::ModEvent(ModEvent::LoadJs(
-                crate::assets::mods::js::JsAsset {
-                    context: code_js.to_string(),
-                },
-            )));
+            let js_handle = asset_server
+                .get_handle(
+                    asset_server
+                        .get_path(mod_info_id)
+                        .unwrap()
+                        .parent()
+                        .unwrap()
+                        .resolve(&mod_info_form_lua.enable_class[0])?,
+                )
+                .unwrap();
+            if let Some(js_asset) = js_assets.get(js_handle.id()) {
+                js_engine_event_writer
+                    .write(JsEngineEvent::ModEvent(ModEvent::LoadJs(js_asset.clone())));
+            }
         }
     }
 
