@@ -1,6 +1,6 @@
 class CustomUnit {
     constructor(core) {
-        this.core = core
+        this.name = core.name
     };
 };
 

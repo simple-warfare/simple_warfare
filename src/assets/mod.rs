@@ -1,7 +1,7 @@
 pub mod mods;
 use bevy::prelude::*;
 
-use crate::assets::mods::{info::*, lua::*};
+use crate::assets::mods::{info::*, js::*, lua::*};
 
 pub struct AssetsPlugin;
 
@@ -10,6 +10,8 @@ impl Plugin for AssetsPlugin {
         app.init_asset::<ModInfo>()
             .init_asset_loader::<ModInfoLoader>()
             .init_asset::<LuaAsset>()
-            .init_asset_loader::<LuaAssetLoader>();
+            .init_asset_loader::<LuaAssetLoader>()
+            .init_asset::<JsAsset>()
+            .init_asset_loader::<JsAssetLoader>();
     }
 }

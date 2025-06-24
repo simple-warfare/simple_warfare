@@ -34,7 +34,11 @@ impl UserData for ModInfo {
     }
 
     fn add_methods<M: UserDataMethods<Self>>(methods: &mut M) {
-        methods.add_method_mut("enable_class", |_, ud, string: String| {
+        methods.add_method_mut("load_class", |_, ud, string: String| {
+            ud.enable_class.push(string);
+            Ok(())
+        });
+        methods.add_method_mut("enable_unit", |_, ud, string: String| {
             ud.enable_class.push(string);
             Ok(())
         });

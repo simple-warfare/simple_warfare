@@ -4,10 +4,10 @@ pub mod bevy_ext;
 pub mod mod_engine;
 pub mod unit;
 pub mod utils;
-pub mod smilodon_engine;
+pub mod js_engine;
 
 use bevy::{app::PluginGroupBuilder, prelude::*};
-use smilodon_engine::SmilodonEnginePlugin;
+use js_engine::SmilodonEnginePlugin;
 
 use crate::{app_state::AppState, assets::AssetsPlugin, mod_engine::ModEnginePlugin};
 

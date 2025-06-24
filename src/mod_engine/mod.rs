@@ -6,6 +6,7 @@ use mlua::{Lua, ObjectLike};
 use crate::{
     app_state::AppState,
     assets::mods::{info::*, lua::*},
+    js_engine::event::{JsEngineEvent, ModEvent},
 };
 
 pub struct ModEnginePlugin;
@@ -42,6 +43,7 @@ fn load_main_lua(
     asset_server: Res<AssetServer>,
     mod_infos: Res<Assets<ModInfo>>,
     mut next_state: ResMut<NextState<AppState>>,
+    mut js_engine_event_writer: EventWriter<JsEngineEvent>,
 ) -> Result {
     //获取lua环境
 
@@ -70,6 +72,23 @@ fn load_main_lua(
             global.call_function::<()>("Main", ())?;
 
             let mod_info_form_lua: ModInfo = global.get("mod_info")?;
+            let code_js = r#"
+            import { CustomUnit, Core } from "./simple_warfare_engine.js"
+
+            class Tank extends CustomUnit {
+                constructor() {
+                    let core = new Core("坦克", 1000, 1000)
+                    super(core)
+                };
+            };
+
+            export{Tank};
+            "#;
+            js_engine_event_writer.write(JsEngineEvent::ModEvent(ModEvent::LoadJs(
+                crate::assets::mods::js::JsAsset {
+                    context: code_js.to_string(),
+                },
+            )));
         }
     }
 
