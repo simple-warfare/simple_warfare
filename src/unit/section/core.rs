@@ -12,7 +12,7 @@ impl Class for Core {
 
     const LENGTH: usize = 3;
     fn data_constructor(
-        new_target: &JsValue,
+        _new_target: &JsValue,
         args: &[JsValue],
         context: &mut Context,
     ) -> JsResult<Self> {

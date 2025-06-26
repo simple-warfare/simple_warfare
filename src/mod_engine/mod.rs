@@ -90,7 +90,6 @@ fn load_main_lua(
 
             global.call_function::<()>("Main", ())?;
 
-            let mod_info_form_lua: ModInfo = global.get("mod_info")?;
             let mod_enable_form_lua: ModEnableLua = global.get("mod_enable")?;
 
             let mod_enables: Vec<(JsAsset, Vec<String>)> = mod_enable_form_lua
@@ -100,12 +99,10 @@ fn load_main_lua(
                     let js_handle = asset_server
                         .get_handle(
                             asset_server
-                                .get_path(mod_info_id)
-                                .unwrap()
-                                .parent()
-                                .unwrap()
+                                .get_path(mod_info_id)?
+                                .parent()?
                                 .resolve(&mod_class_lua.js_file)
-                                .unwrap(),
+                                .ok()?,
                         )
                         .unwrap();
                     if let Some(js_asset) = js_assets.get(js_handle.id()) {
