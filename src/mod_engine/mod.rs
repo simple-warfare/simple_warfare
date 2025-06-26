@@ -1,7 +1,6 @@
 mod module;
-pub mod r#struct;
 use bevy::{asset::LoadedFolder, prelude::*};
-use mlua::{Lua, ObjectLike};
+use mlua::{Lua, ObjectLike, Table};
 
 use crate::{
     app_state::AppState,
@@ -9,11 +8,30 @@ use crate::{
     js_engine::event::{JsEngineEvent, ModEvent},
 };
 
+#[derive(Resource)]
+pub struct LuaRuntime {
+    engine: Lua,
+    global: Table,
+}
+
+impl Default for LuaRuntime {
+    fn default() -> Self {
+        let engine = Lua::new();
+        let global = engine.globals();
+        //添加默认module
+        if let Ok(simple_warfare) = module::mod_engine(&engine) {
+            global.set("simple_warfare", simple_warfare).expect("");
+        }
+        Self { engine, global }
+    }
+}
+
 pub struct ModEnginePlugin;
 
 impl Plugin for ModEnginePlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(OnEnter(AppState::ModInfoLoading), load_mod_infos)
+        app.init_resource::<LuaRuntime>()
+            .add_systems(OnEnter(AppState::ModInfoLoading), load_mod_infos)
             .add_systems(
                 Update,
                 check_mod_infos.run_if(in_state(AppState::ModInfoLoading)),
@@ -45,12 +63,13 @@ fn load_main_lua(
     js_assets: Res<Assets<JsAsset>>,
     mut next_state: ResMut<NextState<AppState>>,
     mut js_engine_event_writer: EventWriter<JsEngineEvent>,
+    lua_runtime: Res<LuaRuntime>,
 ) -> Result {
     //获取lua环境
 
     next_state.set(AppState::MainLuaExecuting);
-    let lua = get_lua()?;
-    let global = lua.globals();
+    let global = &lua_runtime.global;
+    let engine = &lua_runtime.engine;
     for (mod_info_id, mod_info) in mod_infos.iter() {
         let lua_handle = asset_server
             .get_handle(
@@ -65,28 +84,42 @@ fn load_main_lua(
 
         //载入main.lua
         if let Some(lua_asset) = lua_assets.get(lua_handle.id()) {
-            let mod_info_lua = lua.create_ser_userdata(mod_info.clone())?;
             //添加该mod信息
-            global.set("mod_info", mod_info_lua)?;
-            lua.load(lua_asset.context.clone()).exec()?;
+            add_default_value(engine, global, mod_info).expect("add default value error");
+            engine.load(lua_asset.context.clone()).exec()?;
 
             global.call_function::<()>("Main", ())?;
 
             let mod_info_form_lua: ModInfo = global.get("mod_info")?;
-            let js_handle = asset_server
-                .get_handle(
-                    asset_server
-                        .get_path(mod_info_id)
-                        .unwrap()
-                        .parent()
-                        .unwrap()
-                        .resolve(&mod_info_form_lua.enable_class[0])?,
-                )
-                .unwrap();
-            if let Some(js_asset) = js_assets.get(js_handle.id()) {
-                js_engine_event_writer
-                    .write(JsEngineEvent::ModEvent(ModEvent::LoadJs(js_asset.clone())));
-            }
+            let mod_enable_form_lua: ModEnableLua = global.get("mod_enable")?;
+
+            let mod_enables: Vec<(JsAsset, Vec<String>)> = mod_enable_form_lua
+                .enable
+                .iter()
+                .filter_map(|mod_class_lua| {
+                    let js_handle = asset_server
+                        .get_handle(
+                            asset_server
+                                .get_path(mod_info_id)
+                                .unwrap()
+                                .parent()
+                                .unwrap()
+                                .resolve(&mod_class_lua.js_file)
+                                .unwrap(),
+                        )
+                        .unwrap();
+                    if let Some(js_asset) = js_assets.get(js_handle.id()) {
+                        Some((js_asset.clone(), mod_class_lua.classes.clone()))
+                    } else {
+                        None
+                    }
+                })
+                .collect();
+
+            js_engine_event_writer.write(JsEngineEvent::ModEvent(ModEvent::LoadMod(
+                ModEnable::new(mod_enables),
+                mod_info.clone(),
+            )));
         }
     }
 
@@ -94,14 +127,12 @@ fn load_main_lua(
     Ok(())
 }
 
-fn get_lua() -> Result<Lua> {
-    let lua = Lua::new();
-    let global = lua.globals();
-    //添加默认module
-    if let Ok(simple_warfare) = module::mod_engine(&lua) {
-        global.set("simple_warfare", simple_warfare)?;
-    }
-    Ok(lua)
+fn add_default_value(engine: &Lua, global: &Table, mod_info: &ModInfo) -> Result {
+    let mod_info_lua = engine.create_ser_userdata(mod_info.clone())?;
+    let mod_enable_lua = engine.create_ser_userdata(ModEnableLua::default())?;
+    global.set("mod_info", mod_info_lua)?;
+    global.set("mod_enable", mod_enable_lua)?;
+    Ok(())
 }
 
 fn init_smilodon_engine() {}

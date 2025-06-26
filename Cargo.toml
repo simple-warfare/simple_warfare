@@ -26,19 +26,28 @@ anyhow = "1.0.82"
 boa_engine = "0.20.0"
 boa_runtime = "0.20.0"
 boa_gc = "0.20.0"
-crossbeam-channel = "0.5.15"
-
-
+sha2 = "0.10.9"
 [dependencies.bevy]
 version = "0.16.1"
 features = ["jpeg"]
-
+[dev-dependencies.bevy]
+version = "0.16.1"
+features = ["jpeg", "dynamic_linking"]
 
 [profile.dev]
-opt-level = 0           # 使用稍高一些的优化级别，最低是0，最高是3
+opt-level = 1           # 使用稍高一些的优化级别，最低是0，最高是3
 overflow-checks = false # 关闭整数溢出检查
 
 [profile.release]
 opt-level = 3           # 使用稍高一些的优化级别，最低是0，最高是3
 overflow-checks = false # 关闭整数溢出检查
-lto = true
+codegen-units = 1
+lto = "thin"
+
+# Enable a large amount of optimization in the dev profile for dependencies.
+[profile.dev.package."*"]
+opt-level = 3
+
+# for Windows
+[target.x86_64-pc-windows-msvc]
+linker = "rust-lld.exe"

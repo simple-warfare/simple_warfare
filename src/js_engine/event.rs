@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::assets::mods::js::JsAsset;
+use crate::assets::mods::info::{ModEnable, ModInfo};
 
 #[derive(Event, Clone)]
 pub enum JsEngineEvent {
@@ -14,6 +14,6 @@ pub enum BuilderEvent {}
 
 #[derive(Clone)]
 pub enum ModEvent {
-    LoadJs(JsAsset),
+    LoadMod(ModEnable, ModInfo),
     EnableUnit(String),
 }

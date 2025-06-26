@@ -3,6 +3,7 @@
     "Lua.diagnostics.globals": [
         "SimpleWarfare",
         "simple_warfare",
-        "mod_info"
+        "mod_info",
+        "mod_enable"
     ]
 }

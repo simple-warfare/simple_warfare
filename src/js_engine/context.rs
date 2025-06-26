@@ -1,3 +1,7 @@
+use crate::{
+    js_engine::{engine::JsEngine, event::*},
+    unit::section::core::Core,
+};
 use bevy::platform::collections::HashMap;
 use bevy::prelude::*;
 use boa_engine::{
@@ -5,14 +9,13 @@ use boa_engine::{
     property::Attribute,
 };
 use boa_runtime::Console;
-use std::{path::Path, rc::Rc};
-
-use crate::{js_engine::event::*, unit::section::core::Core};
+use sha2::{Digest, Sha256};
+use std::{path::Path, rc::Rc, sync::mpsc::Sender};
 
 pub(super) fn load_mod_libs(
     context: &mut Context,
     loader: Rc<SimpleModuleLoader>,
-    simple_warfare_engine_js: String,
+    simple_warfare_engine_js: &str,
 ) -> Result<Module, Box<dyn std::error::Error>> {
     let source = Source::from_reader(
         simple_warfare_engine_js.as_bytes(),
@@ -89,27 +92,38 @@ pub(super) fn register_class(context: &mut Context) {
 }
 
 pub(super) fn process_js_event(
-    context: &mut Context,
-    module_map: &mut HashMap<&str, Module>,
+    engine: &mut JsEngine,
     event: JsEngineEvent,
+    sender: &Sender<JsEngineEvent>,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    if let Some(libs_module) = module_map.get("simple_warfare_engine") {
-        match event {
-            JsEngineEvent::EngineInited => todo!(),
-            JsEngineEvent::BuilderEvent(builder_event) => todo!(),
-            JsEngineEvent::ModEvent(mod_event) => match mod_event {
-                ModEvent::LoadJs(js_asset) => {
+    let context = &mut engine.context;
+    let module_map = &mut engine.module_map;
+
+    let libs_module = match module_map.get("simple_warfare_engine") {
+        Some(module) => module.clone(),
+        None => {
+            return Err("libs didn't found".into()); // 或者执行其他恢复逻辑
+        }
+    };
+
+    match event {
+        JsEngineEvent::EngineInited => todo!(),
+        JsEngineEvent::BuilderEvent(builder_event) => todo!(),
+        JsEngineEvent::ModEvent(mod_event) => match mod_event {
+            ModEvent::LoadMod(mod_enable, mod_info) => {
+                for (js_asset, classes) in mod_enable.enable {
                     let module = Module::parse(
                         Source::from_reader(
                             js_asset.context.as_bytes(),
-                            Some(Path::new("./tank.mjs")),
+                            Some(Path::new(&js_asset.file_name)),
                         ),
                         Some(libs_module.realm().clone()),
                         context,
                     )
                     .unwrap();
+
                     let promise = module.load_link_evaluate(context);
-                    //tx.send(SmilodonEngineEvent::EngineInited)?;
+
                     context.run_jobs();
 
                     assert_eq!(
@@ -117,23 +131,28 @@ pub(super) fn process_js_event(
                         PromiseState::Fulfilled(JsValue::undefined())
                     );
 
-                    let binding = module
-                        .namespace(context)
-                        .get(js_string!("Tank"), context)
-                        .unwrap();
-                    let tank_obj = binding.as_object().ok_or("not found obj").unwrap();
+                    let module_sha = format!("{:?}", &Sha256::digest(mod_info.name.as_bytes())[..]);
 
-                    let tank = tank_obj.construct(&[], None, context).unwrap();
-                    info!("{:?}", tank.get(js_string!("name"), context)?);
+                    for class in classes {
+                        let class = module
+                            .namespace(context)
+                            .get(js_string!(class), context)
+                            .unwrap();
+                        let tank_obj = class.as_object().ok_or("not found obj").unwrap();
 
-                    tank.set(js_string!("name"), js_string!("超级坦克"), true, context)?;
-                    info!("{:?}", tank.get(js_string!("name"), context)?);
+                        let tank = tank_obj.construct(&[], None, context).unwrap();
+                        info!(
+                            "加载单位:{:?}",
+                            tank.get(js_string!("name"), context)?
+                                .as_string()
+                                .expect("not a string")
+                        );
+                    }
+                    module_map.insert(module_sha, module);
                 }
-                ModEvent::EnableUnit(_) => todo!(),
-            },
-        }
-        Ok(())
-    } else {
-        Err("libs didn't found".into())
+            }
+            ModEvent::EnableUnit(_) => todo!(),
+        },
     }
+    Ok(())
 }

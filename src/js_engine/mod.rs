@@ -1,19 +1,21 @@
 mod context;
+mod engine;
 pub mod event;
-use std::rc::Rc;
+pub mod object;
+
+use std::{
+    rc::Rc,
+    sync::{Mutex, mpsc},
+};
 
 use crate::{
     app_state::AppState,
     assets::mods::js::JsAsset,
-    js_engine::{context::*, event::JsEngineEvent},
+    js_engine::{context::*, engine::JsEngine, event::JsEngineEvent},
 };
-use bevy::{
-    platform::collections::HashMap,
-    prelude::*,
-    tasks::{AsyncComputeTaskPool, IoTaskPool},
-};
+use bevy::{platform::collections::HashMap, prelude::*, tasks::AsyncComputeTaskPool};
 use boa_engine::{module::SimpleModuleLoader, prelude::*};
-use crossbeam_channel::{Receiver, Sender, select};
+use std::sync::mpsc::{Receiver, Sender};
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -44,7 +46,7 @@ pub struct SimpleWarfareEngineHandle(pub Handle<JsAsset>);
 #[derive(Resource)]
 struct JsEngineEventSender(Sender<JsEngineEvent>);
 #[derive(Resource)]
-struct JsEngineEventReciver(Receiver<JsEngineEvent>);
+struct JsEngineEventReciver(Mutex<Receiver<JsEngineEvent>>);
 
 fn load_libs(mut commands: Commands, asset_server: Res<AssetServer>) {
     //加载基本的Js Modules
@@ -82,37 +84,26 @@ fn init_js_context(
         let engine_js_code = engine_js.context.clone();
 
         //与js线程的双向通道
-        let (sender, rx) = crossbeam_channel::bounded(100);
-        let (tx, receiver) = crossbeam_channel::bounded(100);
+        let (sender, rx) = mpsc::channel();
+        let (tx, receiver) = mpsc::channel();
 
         commands.insert_resource(JsEngineEventSender(sender));
-        commands.insert_resource(JsEngineEventReciver(receiver));
-        std::thread::spawn(move || {
-            let rx = rx;
-            let tx = tx;
-            let module_map = &mut HashMap::new();
+        commands.insert_resource(JsEngineEventReciver(Mutex::new(receiver)));
+        AsyncComputeTaskPool::get()
+            .spawn::<Result>(async move {
+                let rx = rx;
+                let tx = tx;
+                let engine = &mut JsEngine::new(&engine_js_code);
 
-            let context_builder = Context::builder();
-            let loader =
-                Rc::new(SimpleModuleLoader::new("./assets/mod_libs").expect("load mod_libs error"));
-
-            let context = &mut context_builder
-                .module_loader(loader.clone())
-                .build()
-                .expect("Build Js Context error!");
-            add_runtime(context);
-            register_class(context);
-
-            let module =
-                load_mod_libs(context, loader.clone(), engine_js_code).expect("load module error");
-            module_map.insert("simple_warfare_engine", module);
-            // 开始监听
-            // 由bevy的EventWriter写入事件并经js_event_bridge中转到此
-            tx.send(JsEngineEvent::EngineInited).expect("sd");
-            while let Ok(event) = rx.recv() {
-                process_js_event(context, module_map, event).expect("process_js_event error")
-            }
-        });
+                // 开始监听
+                // 由bevy的EventWriter写入事件并经js_event_bridge中转到此
+                tx.send(JsEngineEvent::EngineInited).expect("sd");
+                while let Ok(event) = rx.recv() {
+                    process_js_event(engine, event, &tx).expect("process_js_event error")
+                }
+                Ok(())
+            })
+            .detach();
         //Js运行时单独在一个线程内运行
         Ok(())
     } else {
@@ -138,7 +129,7 @@ fn engine_inited(
     event_receiver: Option<Res<JsEngineEventReciver>>,
 ) -> Result<()> {
     if let Some(event_receiver) = event_receiver {
-        if let Ok(event) = event_receiver.0.recv() {
+        if let Ok(event) = event_receiver.0.lock().expect("").recv() {
             if let JsEngineEvent::EngineInited = event {
                 next_state.set(AppState::ModInfoLoading);
             }
