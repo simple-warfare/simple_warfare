@@ -1,6 +1,6 @@
 use crate::{
     js_engine::{engine::JsEngine, event::*},
-    unit::section::core::Core,
+    unit::section::{core::Core, graphics::Graphics},
 };
 use bevy::platform::collections::HashMap;
 use bevy::prelude::*;
@@ -89,6 +89,9 @@ pub(super) fn register_class(context: &mut Context) {
     context
         .register_global_class::<Core>()
         .expect("the Core builtin shouldn't exist");
+    context
+        .register_global_class::<Graphics>()
+        .expect("the Graphics builtin shouldn't exist");
 }
 
 pub(super) fn process_js_event(
