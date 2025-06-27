@@ -18,7 +18,7 @@ impl Class for Core {
     ) -> JsResult<Self> {
         let name = args.get_or_undefined(0).to_string(context)?;
         let hp = args.get_or_undefined(1).to_u32(context)?;
-        let price = args.get_or_undefined(1).to_u32(context)?;
+        let price = args.get_or_undefined(2).to_u32(context)?;
         let core = Self { name, hp, price };
         Ok(core)
     }

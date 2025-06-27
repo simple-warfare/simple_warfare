@@ -1,4 +1,5 @@
 pub mod mods;
+pub mod assets;
 use bevy::prelude::*;
 
 use crate::assets::mods::{info::*, js::*, lua::*};

@@ -1,4 +1,4 @@
-import { Core } from "./section/core/core.mjs"
-import { CustomUnit } from "./custom_unit/custom_unit.js"
+import { CoreBuilder } from "./section/core/core.mjs"
+import { CustomUnitBuilder } from "./custom_unit/custom_unit.js"
 
-export { Core, CustomUnit };
+export { CoreBuilder, CustomUnitBuilder };

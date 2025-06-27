@@ -3,10 +3,13 @@ use bevy::prelude::*;
 #[derive(States, Debug, Hash, PartialEq, Eq, PartialOrd, Ord, Clone, Copy,Default)]
 pub enum AppState {
     #[default]
-    LibsLoding,
-    LibsLoded,
+    AssetsLoading,
+    AssetsProcessing,
+    AssetsProcessed,
+    LibsLoading,
+    LibsLoaded,
     ModInfoLoading,
     ModInfoLoaded,
     MainLuaExecuting,
-    MainLuaExecuted
+    MainLuaExecuted,
 }

@@ -1,7 +1,7 @@
 mod context;
 mod engine;
+pub mod module;
 pub mod event;
-pub mod object;
 
 use std::{
     rc::Rc,
@@ -33,10 +33,10 @@ impl Plugin for SmilodonEnginePlugin {
     fn build(&self, app: &mut App) {
         app.add_event::<JsEngineEvent>()
             .add_systems(PreStartup, load_libs)
-            .add_systems(Update, check_libs.run_if(in_state(AppState::LibsLoding)))
-            .add_systems(OnEnter(AppState::LibsLoded), init_js_context)
+            .add_systems(Update, check_libs.run_if(in_state(AppState::LibsLoading)))
+            .add_systems(OnEnter(AppState::LibsLoaded), init_js_context)
             .add_systems(Update, smilodon_event_bridge)
-            .add_systems(Update, engine_inited.run_if(in_state(AppState::LibsLoded)));
+            .add_systems(Update, engine_inited.run_if(in_state(AppState::LibsLoaded)));
     }
 }
 
@@ -63,7 +63,7 @@ fn check_libs(
     for event in events.read() {
         if event.is_loaded_with_dependencies(&simple_warfare_engine_file.0) {
             //开始建立Js运行时
-            next_state.set(AppState::LibsLoded);
+            next_state.set(AppState::LibsLoaded);
         }
     }
 }

@@ -1,8 +1,7 @@
-class CustomUnit {
-    constructor(core) {
-        this.name = core.name
+class CustomUnitBuilder {
+    constructor() {
     };
 };
 
 
-export { CustomUnit };
+export { CustomUnitBuilder };

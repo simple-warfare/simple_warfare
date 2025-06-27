@@ -1,15 +1,13 @@
 use crate::{
-    js_engine::{engine::JsEngine, event::*},
+    js_engine::{engine::JsEngine, event::*, module::ModModule},
     unit::section::core::Core,
 };
-use bevy::platform::collections::HashMap;
 use bevy::prelude::*;
 use boa_engine::{
     builtins::promise::PromiseState, js_string, module::SimpleModuleLoader, prelude::*,
     property::Attribute,
 };
 use boa_runtime::Console;
-use sha2::{Digest, Sha256};
 use std::{path::Path, rc::Rc, sync::mpsc::Sender};
 
 pub(super) fn load_mod_libs(
@@ -100,7 +98,7 @@ pub(super) fn process_js_event(
     let module_map = &mut engine.module_map;
 
     let libs_module = match module_map.get("simple_warfare_engine") {
-        Some(module) => module.clone(),
+        Some(mod_module) => mod_module.module.clone(),
         None => {
             return Err("libs didn't found".into()); // 或者执行其他恢复逻辑
         }
@@ -130,25 +128,23 @@ pub(super) fn process_js_event(
                         promise.state(),
                         PromiseState::Fulfilled(JsValue::undefined())
                     );
-
-                    let module_sha = format!("{:?}", &Sha256::digest(mod_info.name.as_bytes())[..]);
-
-                    for class in classes {
+                    for class in &classes {
                         let class = module
                             .namespace(context)
-                            .get(js_string!(class), context)
+                            .get(js_string!(class.clone()), context)
                             .unwrap();
-                        let tank_obj = class.as_object().ok_or("not found obj").unwrap();
+                        let class_obj = class.as_object().ok_or("not found obj").unwrap();
 
-                        let tank = tank_obj.construct(&[], None, context).unwrap();
-                        info!(
-                            "加载单位:{:?}",
-                            tank.get(js_string!("name"), context)?
-                                .as_string()
-                                .expect("not a string")
-                        );
+                        //let tank = tank_obj.construct(&[], None, context).unwrap();
+                        //info!(
+                        //    "加载单位:{:?}",
+                        //    tank
+                        //);
                     }
-                    module_map.insert(module_sha, module);
+                    module_map.insert(
+                        format!("{}/{}", mod_info.name, js_asset.file_name),
+                        ModModule::new(module, classes),
+                    );
                 }
             }
             ModEvent::EnableUnit(_) => todo!(),

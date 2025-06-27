@@ -5,11 +5,12 @@ pub mod mod_engine;
 pub mod unit;
 pub mod utils;
 pub mod js_engine;
+pub mod scenes;
 
 use bevy::{app::PluginGroupBuilder, prelude::*};
 use js_engine::SmilodonEnginePlugin;
 
-use crate::{app_state::AppState, assets::AssetsPlugin, mod_engine::ModEnginePlugin};
+use crate::{app_state::AppState, assets::AssetsPlugin, mod_engine::ModEnginePlugin, scenes::ScenePlugin};
 
 pub struct SimpleWarfarePlugins;
 
@@ -19,7 +20,8 @@ impl PluginGroup for SimpleWarfarePlugins {
         group = group
             .add(AssetsPlugin)
             .add(SmilodonEnginePlugin)
-            .add(ModEnginePlugin);
+            .add(ModEnginePlugin)
+            .add(ScenePlugin);
         group
     }
 }

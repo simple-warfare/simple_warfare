@@ -2,7 +2,7 @@ use bevy::{
     asset::{AssetLoader, AsyncReadExt, LoadContext, LoadedFolder, io::Reader},
     prelude::*,
 };
-use mlua::{FromLua, IntoLua, MetaMethod, UserData, UserDataFields, UserDataMethods};
+use mlua::{FromLua, MetaMethod, UserData, UserDataFields, UserDataMethods};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
