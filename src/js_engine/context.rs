@@ -96,9 +96,10 @@ pub(super) fn process_js_event(
 ) -> Result<(), Box<dyn std::error::Error>> {
     let context = &mut engine.context;
     let module_map = &mut engine.module_map;
+    let unit_map = &mut engine.unit_map;
 
     let libs_module = match module_map.get("simple_warfare_engine") {
-        Some(mod_module) => mod_module.module.clone(),
+        Some(mod_module) => mod_module[0].module.clone(),
         None => {
             return Err("libs didn't found".into()); // 或者执行其他恢复逻辑
         }
@@ -128,26 +129,39 @@ pub(super) fn process_js_event(
                         promise.state(),
                         PromiseState::Fulfilled(JsValue::undefined())
                     );
-                    for class in &classes {
-                        let class = module
-                            .namespace(context)
-                            .get(js_string!(class.clone()), context)
-                            .unwrap();
-                        let class_obj = class.as_object().ok_or("not found obj").unwrap();
 
-                        //let tank = tank_obj.construct(&[], None, context).unwrap();
-                        //info!(
-                        //    "加载单位:{:?}",
-                        //    tank
-                        //);
+                    if let Some(modules) = module_map.get_mut(&mod_info.name) {
+                        modules.push(ModModule::new(module.clone(), classes));
+                    } else {
+                        module_map.insert(
+                            mod_info.name.clone(),
+                            vec![ModModule::new(module.clone(), classes)],
+                        );
                     }
-                    module_map.insert(
-                        format!("{}/{}", mod_info.name, js_asset.file_name),
-                        ModModule::new(module, classes),
-                    );
                 }
             }
-            ModEvent::EnableUnit(_) => todo!(),
+            ModEvent::SpawnUnit(unit_class) => {
+                let unit_from: Vec<&str> = unit_class.split(':').collect();
+                if let Some(modules) = module_map.get(unit_from[0]) {
+                    for module in modules {
+                        if module.classes.contains(&unit_from[1].to_string()) {
+                            let class = module
+                                .module
+                                .namespace(context)
+                                .get(js_string!(unit_from[1]), context)
+                                .unwrap();
+                            let class_obj = class.as_object().ok_or("not found obj").unwrap();
+                            let index = unit_map.len();
+                            unit_map.insert(
+                                index as u64,
+                                class_obj
+                                    .construct(&[], None, context)
+                                    .expect("construct error"),
+                            );
+                        }
+                    }
+                }
+            }
         },
     }
     Ok(())

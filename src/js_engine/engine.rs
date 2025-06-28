@@ -7,7 +7,8 @@ use crate::js_engine::{add_runtime, load_mod_libs, module::ModModule, register_c
 
 pub struct JsEngine {
     pub(super) context: Context,
-    pub(super) module_map: HashMap<String, ModModule>,
+    pub(super) module_map: HashMap<String, Vec<ModModule>>,
+    pub(super) unit_map: HashMap<u64, JsObject>,
 }
 
 impl JsEngine {
@@ -30,11 +31,16 @@ impl JsEngine {
 
         module_map.insert(
             "simple_warfare_engine".to_string(),
-            ModModule::new(module, vec!["Core".to_string(), "CustomUnit".to_string()]),
+            vec![ModModule::new(
+                module,
+                vec!["Core".to_string(), "CustomUnit".to_string()],
+            )],
         );
+
         Self {
             context,
             module_map,
+            unit_map: HashMap::new(),
         }
     }
 }

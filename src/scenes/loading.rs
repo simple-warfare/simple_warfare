@@ -31,19 +31,21 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             width: Val::Percent(100.),
             height: Val::Percent(100.),
             justify_self: JustifySelf::Center,
+            justify_content: JustifyContent::Center,
             align_items: AlignItems::Center,
             position_type: PositionType::Absolute,
             ..Default::default()
         },
         BackgroundColor(Color::BLACK),
         children![(
-            Node{
-                height:Val::Percent(150.),
+            Node {
+                height: Val::Percent(150.),
                 ..Default::default()
             },
             ImageNode {
-            image: asset_server.load("interface/loadscreen.png"),
-            ..Default::default()
-        },)],
+                image: asset_server.load("interface/loading_screen.png"),
+                ..Default::default()
+            },
+        )],
     ));
 }
