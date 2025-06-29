@@ -1,6 +1,3 @@
-use bevy::{color::palettes::css::*, prelude::*};
-use serde::{Deserialize, Serialize};
-
 use crate::{
     assets::{
         GameAsset,
@@ -8,6 +5,10 @@ use crate::{
     },
     bevy_ext::app::AppExt,
 };
+use bevy::{color::palettes::css::*, prelude::*, render::view::RenderLayers};
+use bevy_ecs_ldtk::prelude::*;
+use bevy_fly_camera::FlyCamera2d;
+use serde::{Deserialize, Serialize};
 
 use super::{Scene, SceneState};
 
@@ -29,17 +30,30 @@ pub enum ButtonLabel {
 
 impl Scene for MainScene {
     fn build(&self, app: &mut App) {
-        app.add_scene_system::<MainSceneMark, _, _>(SceneState::MainScene, setup)
+        app.add_scene_system::<MainSceneMark, _, _>(SceneState::MainScene, (background_map, setup))
             .add_observer(button_click);
     }
 }
+fn background_map(mut commands: Commands, asset_server: Res<AssetServer>) {
+    let ldtk_handle = asset_server
+        .load("map/BaiCai's Water Ring Lake/BaiCai's Water Ring Lake.ldtk")
+        .into();
 
+    commands.spawn((
+        LdtkWorldBundle {
+            ldtk_handle,
+            ..Default::default()
+        },
+    ));
+}
 fn setup(
     mut commands: Commands,
     game_asset: Res<GameAsset>,
     texture_atlas_layout_handles: Res<TextureAtlasLayoutHandles>,
     dialog_texture_slicer: Res<DialogTextureSlicer>,
 ) {
+    commands.spawn((Camera2d, IsDefaultUiCamera, FlyCamera2d::default()));
+
     let layout = &texture_atlas_layout_handles.dialog;
     let dialog = &game_asset.interface.dialog;
     let main_menu_slicer = &dialog_texture_slicer.main_menu_slicer;

@@ -30,7 +30,7 @@ fn setup(mut commands: Commands, game_asset: Res<GameAsset>) {
             width: Val::Percent(100.),
             height: Val::Percent(100.),
             justify_self: JustifySelf::Center,
-            align_items: AlignItems::End,
+            align_items: AlignItems::Center,
             position_type: PositionType::Absolute,
             ..Default::default()
         },

@@ -26,7 +26,7 @@ anyhow = "1.0.82"
 boa_engine = "0.20.0"
 boa_runtime = "0.20.0"
 boa_gc = "0.20.0"
-bevy_ecs_ldtk = "0.12.0"
+bevy_ecs_ldtk = { version = "0.12.0", features = ["atlas"] }
 rand_core = "0.9"
 bevy_rand = "0.11"
 bevy_prng = { version = "0.11", features = ["rand_chacha", "wyrand"] }
@@ -34,16 +34,18 @@ bevy_light_2d = "0.6.0"
 bevy_fly_camera = "0.16.0"
 bevy-panic-handler = "5.0.0"
 bevy_rapier2d = "0.30.0"
-bevy_spritesheet_animation = { git = "https://github.com/merwaaan/bevy_spritesheet_animation", features = ["custom_cursor"] }
+bevy_spritesheet_animation = { git = "https://github.com/merwaaan/bevy_spritesheet_animation", features = [
+  "custom_cursor",
+] }
 bevy_tween = "0.8.0"
 serde_json = "1.0.140"
 
 [dependencies.bevy]
 version = "0.16.1"
 features = ["jpeg"]
-[dev-dependencies.bevy]
-version = "0.16.1"
-features = ["jpeg", "dynamic_linking"]
+#[dev-dependencies.bevy]
+#version = "0.16.1"
+#features = ["jpeg", "dynamic_linking"]
 
 [profile.dev]
 opt-level = 1           # 使用稍高一些的优化级别，最低是0，最高是3

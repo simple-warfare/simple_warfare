@@ -37,11 +37,11 @@ pub struct SimpleWarfarePlugin;
 impl Plugin for SimpleWarfarePlugin {
     fn build(&self, app: &mut App) {
         app.init_state::<AppState>()
-            .add_plugins(SimpleWarfarePlugins)
             .add_plugins(FlyCameraPlugin)
             .add_plugins(bevy_panic_handler::PanicHandler::new().build())
             .add_plugins(LdtkPlugin)
-            .insert_resource(LevelSelection::default())
-            .add_plugins(Light2dPlugin);
+            .insert_resource(LevelSelection::iid("14f0fdc1-3740-11f0-9e67-db98e5aadab4"))
+            .add_plugins(Light2dPlugin)
+            .add_plugins(SimpleWarfarePlugins);
     }
 }
