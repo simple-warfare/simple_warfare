@@ -6,7 +6,7 @@ use bevy::prelude::*;
 
 use crate::{
     bevy_ext::app::AppExt,
-    scenes::{loading::LoadingScene, mian::MainScene},
+    scenes::{loading::LoadingScene, mian::MainScene, select_map::SelectMapScene},
 };
 
 pub trait Scene: Default {
@@ -27,6 +27,7 @@ impl Plugin for ScenePlugin {
     fn build(&self, app: &mut App) {
         app.init_state::<SceneState>()
             .init_scene::<LoadingScene>()
-            .init_scene::<MainScene>();
+            .init_scene::<MainScene>()
+            .init_scene::<SelectMapScene>();
     }
 }

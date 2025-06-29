@@ -62,7 +62,7 @@ impl AssetLoader for LdtkMapLoader {
 
         let file_name = load_context
             .path()
-            .file_name()
+            .file_stem()
             .ok_or_else(|| {
                 Self::Error::FileNameNotFound(load_context.path().display().to_string())
             })?

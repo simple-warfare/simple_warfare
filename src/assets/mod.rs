@@ -9,8 +9,7 @@ use crate::{
         map::ldtk::{LdtkMap, LdtkMapLoader},
         mods::{info::*, js::*, lua::*},
         texture::{
-            TextureAtlasLayoutHandles,
-            interface::{ChromeTextureSlicer, DialogTextureSlicer},
+            TextureAtlasLayoutHandles, chrome::ChromeTextureSlicer, interface::DialogTextureSlicer,
             process_textures,
         },
     },
@@ -52,6 +51,7 @@ define_asset_group!(Interfaces<Image>{
 #[derive(Debug, Default, Resource)]
 pub struct GameAsset {
     pub interface: Interfaces,
+    pub maps: Vec<Handle<LdtkMap>>,
     pub all_untyped_handle: Vec<UntypedHandle>,
 }
 pub struct AssetsPlugin;
@@ -70,26 +70,36 @@ impl Plugin for AssetsPlugin {
             .init_resource::<DialogTextureSlicer>()
             .init_resource::<ChromeTextureSlicer>()
             .init_resource::<TextureAtlasLayoutHandles>()
-            .add_systems(
-                OnEnter(AppState::AssetsLoading),
-                |mut game_assets: ResMut<GameAsset>, asset_server: Res<AssetServer>| {
-                    game_assets.interface.load(&asset_server);
-
-                    // 收集所有资源句柄
-                    game_assets.all_untyped_handle = game_assets
-                        .interface
-                        .all_untyped()
-                        .iter()
-                        .cloned()
-                        .collect();
-                },
-            )
+            .add_systems(OnEnter(AppState::AssetsLoading), load_assets)
             .add_systems(
                 PreUpdate,
                 check_assets_ready.run_if(in_state(AppState::AssetsLoading)),
             )
             .add_systems(OnEnter(AppState::AssetsProcessing), process_textures);
     }
+}
+
+fn load_assets(mut game_assets: ResMut<GameAsset>, asset_server: Res<AssetServer>) {
+    game_assets.interface.load(&asset_server);
+
+    game_assets
+        .maps
+        .push(asset_server.load("maps/BaiCai's Water Ring Lake/BaiCai's Water Ring Lake.ldtk"));
+
+    // 收集所有资源句柄
+    game_assets.all_untyped_handle = game_assets
+        .interface
+        .all_untyped()
+        .iter()
+        .cloned()
+        .chain(
+            game_assets
+                .maps
+                .iter()
+                .map(|typed_handle| typed_handle.clone().untyped())
+                .collect::<Vec<UntypedHandle>>(),
+        )
+        .collect();
 }
 
 fn check_assets_ready(

@@ -1,7 +1,10 @@
 use crate::{
     assets::{
         GameAsset,
-        texture::{TextureAtlasLayoutHandles, interface::DialogTextureSlicer},
+        texture::{
+            TextureAtlasLayoutHandles,
+            interface::{DialogAtlasKind, DialogTextureSlicer},
+        },
     },
     bevy_ext::app::AppExt,
 };
@@ -36,10 +39,11 @@ impl Scene for MainScene {
 }
 fn background_map(mut commands: Commands, asset_server: Res<AssetServer>) {
     let ldtk_handle = asset_server
-        .load("map/BaiCai's Water Ring Lake/BaiCai's Water Ring Lake.ldtk")
+        .load("maps/BaiCai's Water Ring Lake/BaiCai's Water Ring Lake.ldtk")
         .into();
 
     commands.spawn((
+        MainSceneMark,
         LdtkWorldBundle {
             ldtk_handle,
             ..Default::default()
@@ -52,12 +56,27 @@ fn setup(
     texture_atlas_layout_handles: Res<TextureAtlasLayoutHandles>,
     dialog_texture_slicer: Res<DialogTextureSlicer>,
 ) {
-    commands.spawn((Camera2d, IsDefaultUiCamera, FlyCamera2d::default()));
-
-    let layout = &texture_atlas_layout_handles.dialog;
+    commands.spawn((
+        MainSceneMark,
+        Camera2d,
+        IsDefaultUiCamera,
+        RenderLayers::layer(1),
+        FlyCamera2d::default(),
+    ));
+    let map_camera = commands
+        .spawn((
+            MainSceneMark,
+            Camera2d,
+            Camera {
+                order: 1,
+                ..default()
+            },
+        ))
+        .id();
+    let dialog_layout = &texture_atlas_layout_handles.dialog;
     let dialog = &game_asset.interface.dialog;
-    let main_menu_slicer = &dialog_texture_slicer.main_menu_slicer;
-    let main_button_slicer = &dialog_texture_slicer.main_button_slicer;
+    let main_menu_slicer = &dialog_texture_slicer.main_menu;
+    let gray_button_slicer = &dialog_texture_slicer.gray_button;
 
     let text_style = TextFont::default();
 
@@ -73,11 +92,11 @@ fn setup(
             ImageNode::from_atlas_image(
                 dialog.clone(),
                 TextureAtlas {
-                    layout: layout.clone(),
-                    index: 1,
+                    layout: dialog_layout.clone(),
+                    index: DialogAtlasKind::GrayButton as usize,
                 },
             )
-            .with_mode(NodeImageMode::Sliced(main_button_slicer.clone())),
+            .with_mode(NodeImageMode::Sliced(gray_button_slicer.clone())),
             children![(
                 Text::new(text),
                 text_style.clone(),
@@ -96,37 +115,41 @@ fn setup(
             ..Default::default()
         },
         BackgroundColor(Color::Srgba(GRAY)),
-        children![(
-            Node {
-                align_items: AlignItems::Stretch,
-                justify_content: JustifyContent::SpaceAround,
-                flex_direction: FlexDirection::Column,
-                border: UiRect::all(Val::Px(10.)),
-                padding: UiRect::all(Val::Px(10.)),
-                margin: UiRect {
-                    left: Val::Percent(3.),
-                    bottom: Val::Percent(10.),
-                    ..Default::default()
-                },
-                row_gap: Val::Px(20.),
+    ));
+
+    commands.spawn((
+        MainSceneMark,
+        UiTargetCamera(map_camera),
+        Node {
+            align_items: AlignItems::Stretch,
+            justify_content: JustifyContent::SpaceAround,
+            align_self: AlignSelf::FlexEnd,
+            flex_direction: FlexDirection::Column,
+            border: UiRect::all(Val::Px(10.)),
+            padding: UiRect::all(Val::Px(10.)),
+            margin: UiRect {
+                left: Val::Px(50.),
+                bottom: Val::Percent(5.),
                 ..Default::default()
             },
-            ImageNode::from_atlas_image(
-                dialog.clone(),
-                TextureAtlas {
-                    layout: layout.clone(),
-                    index: 0
-                },
-            )
-            .with_mode(NodeImageMode::Sliced(main_menu_slicer.clone())),
-            children![
-                create_button("SinglePlayer", ButtonLabel::SinglePlayer),
-                create_button("MultipPlayer", ButtonLabel::MultipPlayer),
-                create_button("Setting", ButtonLabel::Setting),
-                create_button("News", ButtonLabel::News),
-                create_button("Quit", ButtonLabel::Quit)
-            ]
-        ),],
+            row_gap: Val::Px(20.),
+            ..Default::default()
+        },
+        ImageNode::from_atlas_image(
+            dialog.clone(),
+            TextureAtlas {
+                layout: dialog_layout.clone(),
+                index: DialogAtlasKind::MainMenu as usize,
+            },
+        )
+        .with_mode(NodeImageMode::Sliced(main_menu_slicer.clone())),
+        children![
+            create_button("SinglePlayer", ButtonLabel::SinglePlayer),
+            create_button("MultipPlayer", ButtonLabel::MultipPlayer),
+            create_button("Setting", ButtonLabel::Setting),
+            create_button("News", ButtonLabel::News),
+            create_button("Quit", ButtonLabel::Quit)
+        ],
     ));
 }
 

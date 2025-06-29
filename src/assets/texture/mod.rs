@@ -1,10 +1,13 @@
+pub mod chrome;
+pub mod interface;
+
 use bevy::prelude::*;
 
 use crate::{
     app_state::AppState,
-    assets::{GameAsset, texture::interface::*},
+    assets::{texture::{chrome::ChromeTextureSlicer, interface::*}, GameAsset},
 };
-pub mod interface;
+
 pub struct TexturePlugin;
 
 #[derive(Default, Resource)]
@@ -28,6 +31,12 @@ pub fn process_textures(
         &mut texture_atlas_layout_handles,
         &images,
         &mut dialog_texture_slicer,
+    );
+    chrome::process(
+        &game_asset,
+        &mut texture_atlases,
+        &mut texture_atlas_layout_handles,
+        &images,
         &mut chrome_texture_slicer,
     );
     system_state.set(AppState::LibsLoading);

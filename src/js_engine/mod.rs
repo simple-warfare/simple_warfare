@@ -13,7 +13,10 @@ use crate::{
     assets::mods::js::JsAsset,
     js_engine::{context::*, engine::JsEngine, event::JsEngineEvent},
 };
-use bevy::{prelude::*, tasks::AsyncComputeTaskPool};
+use bevy::{
+    prelude::*,
+    tasks::{AsyncComputeTaskPool, Task, block_on, futures_lite::future},
+};
 use boa_engine::prelude::*;
 use std::sync::mpsc::{Receiver, Sender};
 use thiserror::Error;
@@ -35,6 +38,10 @@ impl Plugin for SmilodonEnginePlugin {
             .add_systems(PreStartup, load_libs)
             .add_systems(Update, check_libs.run_if(in_state(AppState::LibsLoading)))
             .add_systems(OnEnter(AppState::LibsLoaded), init_js_context)
+            .add_systems(
+                Update,
+                handle_task.run_if(resource_exists::<ComputeJsContext>),
+            )
             .add_systems(Update, smilodon_event_bridge)
             .add_systems(Update, engine_inited.run_if(in_state(AppState::LibsLoaded)));
     }
@@ -75,6 +82,9 @@ pub enum JsEngineError {
     Io(#[from] Box<dyn std::error::Error>),
 }
 
+#[derive(Resource)]
+struct ComputeJsContext(Task<Result>);
+
 fn init_js_context(
     mut commands: Commands,
     engine_handle: Res<SimpleWarfareEngineHandle>,
@@ -89,26 +99,32 @@ fn init_js_context(
 
         commands.insert_resource(JsEngineEventSender(sender));
         commands.insert_resource(JsEngineEventReciver(Mutex::new(receiver)));
-        AsyncComputeTaskPool::get()
-            .spawn::<Result>(async move {
-                let rx = rx;
-                let tx = tx;
-                let engine = &mut JsEngine::new(&engine_js_code);
+        let task = AsyncComputeTaskPool::get().spawn::<Result>(async move {
+            let rx = rx;
+            let tx = tx;
+            let engine = &mut JsEngine::new(&engine_js_code);
 
-                // 开始监听
-                // 由bevy的EventWriter写入事件并经js_event_bridge中转到此
-                tx.send(JsEngineEvent::EngineInited).expect("sd");
-                while let Ok(event) = rx.recv() {
-                    process_js_event(engine, event, &tx).expect("process_js_event error")
-                }
-                Ok(())
-            })
-            .detach();
+            // 开始监听
+            // 由bevy的EventWriter写入事件并经js_event_bridge中转到此
+            tx.send(JsEngineEvent::EngineInited).expect("sd");
+            while let Ok(event) = rx.recv() {
+                process_js_event(engine, event, &tx).expect("process_js_event error")
+            }
+            Ok(())
+        });
+        commands.insert_resource(ComputeJsContext(task));
         //Js运行时单独在一个线程内运行
         Ok(())
     } else {
         Err(BevyError::from("the js libs didn't found"))
     }
+}
+
+fn handle_task(mut js_ontext_task: ResMut<ComputeJsContext>) -> Result {
+    if let Some(Err(e)) = block_on(future::poll_once(&mut js_ontext_task.0)) {
+        return Err(e);
+    }
+    Ok(())
 }
 
 fn smilodon_event_bridge(
