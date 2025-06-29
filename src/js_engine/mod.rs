@@ -1,7 +1,7 @@
 mod context;
 mod engine;
-pub mod module;
 pub mod event;
+pub mod module;
 
 use std::{
     rc::Rc,
@@ -13,8 +13,8 @@ use crate::{
     assets::mods::js::JsAsset,
     js_engine::{context::*, engine::JsEngine, event::JsEngineEvent},
 };
-use bevy::{platform::collections::HashMap, prelude::*, tasks::AsyncComputeTaskPool};
-use boa_engine::{module::SimpleModuleLoader, prelude::*};
+use bevy::{prelude::*, tasks::AsyncComputeTaskPool};
+use boa_engine::prelude::*;
 use std::sync::mpsc::{Receiver, Sender};
 use thiserror::Error;
 

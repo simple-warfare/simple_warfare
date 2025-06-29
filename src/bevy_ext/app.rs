@@ -1,24 +1,21 @@
 use crate::{
-    bevy_ext::{
-        condition::pressed_button,
-        panel::{Panel, PanelState},
-        system::despawn_screen,
-    },
+    bevy_ext::{condition::pressed_button, system::despawn_screen},
+    panel::Panel,
     scenes::{Scene, SceneState},
 };
 use bevy::{ecs::system::ScheduleSystem, prelude::*};
 
 pub trait AppExt {
     fn init_scene<T: Scene>(&mut self) -> &mut Self;
-    fn add_scene_system<T: Component, M>(
+    fn add_scene_system<T: Component, S: States + Copy, M>(
         &mut self,
-        states: SceneState,
+        states: S,
         systems: impl IntoScheduleConfigs<ScheduleSystem, M>,
     ) -> &mut Self;
     fn init_panel<T: Panel>(&mut self) -> &mut Self;
-    fn add_panel_system<T: Component, M>(
+    fn add_panel_system<T: Component, S: States + Copy, M>(
         &mut self,
-        states: PanelState,
+        states: S,
         systems: impl IntoScheduleConfigs<ScheduleSystem, M>,
     ) -> &mut Self;
 }
@@ -33,31 +30,21 @@ impl AppExt for App {
         self
     }
 
-    fn add_scene_system<T: Component, M>(
+    fn add_scene_system<T: Component, S: States + Copy, M>(
         &mut self,
-        states: SceneState,
+        states: S,
         systems: impl IntoScheduleConfigs<ScheduleSystem, M>,
     ) -> &mut Self {
         self.add_systems(OnEnter(states), systems)
             .add_systems(OnExit(states), despawn_screen::<T>)
     }
 
-    fn add_panel_system<T: Component, M>(
+    fn add_panel_system<T: Component, S: States + Copy, M>(
         &mut self,
-        states: PanelState,
+        states: S,
         systems: impl IntoScheduleConfigs<ScheduleSystem, M>,
     ) -> &mut Self {
         self.add_systems(OnEnter(states), systems)
             .add_systems(OnExit(states), despawn_screen::<T>)
-            .add_systems(
-                Update,
-                (
-                    despawn_screen::<T>,
-                    |mut panel_state: ResMut<NextState<PanelState>>| {
-                        panel_state.set(PanelState::None);
-                    },
-                )
-                    .run_if(in_state(states).and(pressed_button(KeyCode::Escape))),
-            )
     }
 }

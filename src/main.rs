@@ -1,4 +1,5 @@
 use bevy::{prelude::*, window::WindowMode};
+use bevy_fly_camera::FlyCamera2d;
 use bevy_inspector_egui::{bevy_egui::EguiPlugin, quick::WorldInspectorPlugin};
 use simple_warfare::SimpleWarfarePlugin;
 
@@ -23,7 +24,8 @@ fn main() {
     .add_systems(Startup, setup)
     .run();
 }
- 
+
 fn setup(mut commands: Commands) {
-    commands.spawn(Camera2d);
+    commands.spawn((
+        Camera2d, FlyCamera2d::default()));
 }

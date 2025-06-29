@@ -1,3 +1,4 @@
+pub mod map;
 pub mod mods;
 pub mod texture;
 use bevy::prelude::*;
@@ -5,8 +6,13 @@ use bevy::prelude::*;
 use crate::{
     app_state::AppState,
     assets::{
+        map::ldtk::{LdtkMap, LdtkMapLoader},
         mods::{info::*, js::*, lua::*},
-        texture::{TextureAtlasLayoutHandles, interface::DialogTextureSlicer, process_textures},
+        texture::{
+            TextureAtlasLayoutHandles,
+            interface::{ChromeTextureSlicer, DialogTextureSlicer},
+            process_textures,
+        },
     },
 };
 
@@ -38,8 +44,9 @@ macro_rules! define_asset_group {
 }
 
 define_asset_group!(Interfaces<Image>{
-    loading_screen: "interface/loading_screen.png",
-    dialog:"interface/dialog.png",
+    loading_screen: "texture/interface/loading_screen.png",
+    dialog:"texture/interface/dialog.png",
+    chrome:"texture/interface/chrome.png",
 });
 
 #[derive(Debug, Default, Resource)]
@@ -57,8 +64,11 @@ impl Plugin for AssetsPlugin {
             .init_asset_loader::<LuaAssetLoader>()
             .init_asset::<JsAsset>()
             .init_asset_loader::<JsAssetLoader>()
+            .init_asset::<LdtkMap>()
+            .init_asset_loader::<LdtkMapLoader>()
             .init_resource::<GameAsset>()
             .init_resource::<DialogTextureSlicer>()
+            .init_resource::<ChromeTextureSlicer>()
             .init_resource::<TextureAtlasLayoutHandles>()
             .add_systems(
                 OnEnter(AppState::AssetsLoading),

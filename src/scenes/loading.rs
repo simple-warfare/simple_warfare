@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::{app_state::AppState, bevy_ext::app::AppExt};
+use crate::{app_state::AppState, assets::GameAsset, bevy_ext::app::AppExt};
 
 use super::{Scene, SceneState};
 
@@ -12,7 +12,7 @@ struct LoadingSceneMark;
 
 impl Scene for LoadingScene {
     fn build(&self, app: &mut App) {
-        app.add_scene_system::<LoadingSceneMark, _>(SceneState::LoadingScene, setup)
+        app.add_scene_system::<LoadingSceneMark, _, _>(SceneState::LoadingScene, setup)
             .add_systems(
                 Update,
                 (|mut scene_state: ResMut<NextState<SceneState>>| {
@@ -23,8 +23,7 @@ impl Scene for LoadingScene {
     }
 }
 
-fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
-    info!("Loading Scene");
+fn setup(mut commands: Commands, game_asset: Res<GameAsset>) {
     commands.spawn((
         LoadingSceneMark,
         Node {
@@ -43,7 +42,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                 ..Default::default()
             },
             ImageNode {
-                image: asset_server.load("interface/loading_screen.png"),
+                image: game_asset.interface.loading_screen.clone(),
                 ..Default::default()
             },
         )],

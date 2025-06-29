@@ -1,7 +1,7 @@
 use bevy::{color::palettes::css::*, prelude::*};
+use serde::{Deserialize, Serialize};
 
 use crate::{
-    app_state::AppState,
     assets::{
         GameAsset,
         texture::{TextureAtlasLayoutHandles, interface::DialogTextureSlicer},
@@ -17,9 +17,20 @@ pub struct MainScene;
 #[derive(Component)]
 struct MainSceneMark;
 
+#[derive(Debug, Component, Reflect, Serialize, Deserialize)]
+#[reflect(Component, Serialize, Deserialize)]
+pub enum ButtonLabel {
+    SinglePlayer,
+    MultipPlayer,
+    Setting,
+    News,
+    Quit,
+}
+
 impl Scene for MainScene {
     fn build(&self, app: &mut App) {
-        app.add_scene_system::<MainSceneMark, _>(SceneState::MainScene, setup);
+        app.add_scene_system::<MainSceneMark, _, _>(SceneState::MainScene, setup)
+            .add_observer(button_click);
     }
 }
 
@@ -36,13 +47,14 @@ fn setup(
 
     let text_style = TextFont::default();
 
-    let create_button = |text: &str| {
+    let create_button = |text: &str, lable: ButtonLabel| {
         (
             Node {
                 border: UiRect::all(Val::Px(10.)),
                 justify_content: JustifyContent::Center,
                 ..Default::default()
             },
+            lable,
             Button,
             ImageNode::from_atlas_image(
                 dialog.clone(),
@@ -82,7 +94,7 @@ fn setup(
                     bottom: Val::Percent(10.),
                     ..Default::default()
                 },
-                row_gap:Val::Px(20.),
+                row_gap: Val::Px(20.),
                 ..Default::default()
             },
             ImageNode::from_atlas_image(
@@ -94,12 +106,35 @@ fn setup(
             )
             .with_mode(NodeImageMode::Sliced(main_menu_slicer.clone())),
             children![
-                create_button("Single Player"),
-                create_button("Multip Player"),
-                create_button("Setting"),
-                create_button("News"),
-                create_button("Quit")
+                create_button("SinglePlayer", ButtonLabel::SinglePlayer),
+                create_button("MultipPlayer", ButtonLabel::MultipPlayer),
+                create_button("Setting", ButtonLabel::Setting),
+                create_button("News", ButtonLabel::News),
+                create_button("Quit", ButtonLabel::Quit)
             ]
         ),],
     ));
+}
+
+/// An observer to rotate an entity when it is dragged
+fn button_click(
+    click: Trigger<Pointer<Click>>,
+    buttons: Query<&ButtonLabel, With<Button>>,
+    mut exit_event: EventWriter<AppExit>,
+    mut scene_state: ResMut<NextState<SceneState>>,
+) {
+    if let Ok(lable) = buttons.get(click.target()) {
+        match lable {
+            ButtonLabel::SinglePlayer => {
+                scene_state.set(SceneState::SelectMapScene);
+            }
+            ButtonLabel::MultipPlayer => todo!(),
+            ButtonLabel::Setting => todo!(),
+            ButtonLabel::News => todo!(),
+            ButtonLabel::Quit => {
+                info!("AppExit");
+                exit_event.write(AppExit::Success);
+            }
+        }
+    }
 }

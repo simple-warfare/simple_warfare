@@ -17,8 +17,8 @@ pub enum JsAssetLoaderError {
     /// An [IO](std::io) Error
     #[error("Could not load file: {0}")]
     Io(#[from] std::io::Error),
-    #[error("Could not get the file name")]
-    NotFileName,
+    #[error("Could not get the file name: {0}")]
+    FileNameNotFound(String),
 }
 
 #[derive(Default)]
@@ -37,18 +37,23 @@ impl AssetLoader for JsAssetLoader {
         _settings: &(),
         load_context: &mut LoadContext<'_>,
     ) -> Result<Self::Asset, Self::Error> {
-        let mut context = String::new();
-        if let Some(file_name) = load_context.path().file_name() {
-            reader.read_to_string(&mut context).await?;
+        let file_name = load_context
+            .path()
+            .file_name()
+            .ok_or(Self::Error::FileNameNotFound(
+                load_context.path().display().to_string(),
+            ))?
+            .to_string_lossy()
+            .into_owned();
 
-            Ok(Self::Asset {
-                file_name: file_name.to_string_lossy().to_string(),
-                context,
-                ..Default::default()
-            })
-        } else {
-            Err(Self::Error::NotFileName)
-        }
+        let mut context = String::new();
+        reader.read_to_string(&mut context).await?;
+
+        Ok(Self::Asset {
+            file_name,
+            context,
+            ..Default::default()
+        })
     }
 
     fn extensions(&self) -> &[&str] {
