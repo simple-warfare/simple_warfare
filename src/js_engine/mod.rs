@@ -3,11 +3,6 @@ mod engine;
 pub mod event;
 pub mod module;
 
-use std::{
-    rc::Rc,
-    sync::{Mutex, mpsc},
-};
-
 use crate::{
     app_state::AppState,
     assets::mods::js::JsAsset,
@@ -18,8 +13,8 @@ use bevy::{
     tasks::{AsyncComputeTaskPool, Task, block_on, futures_lite::future},
 };
 use boa_engine::prelude::*;
-use std::sync::mpsc::{Receiver, Sender};
 use thiserror::Error;
+use tokio::sync::mpsc::{self, UnboundedReceiver as Receiver, UnboundedSender as Sender};
 
 #[derive(Error, Debug)]
 pub enum SmilodonEngineError {
@@ -53,7 +48,7 @@ pub struct SimpleWarfareEngineHandle(pub Handle<JsAsset>);
 #[derive(Resource)]
 struct JsEngineEventSender(Sender<JsEngineEvent>);
 #[derive(Resource)]
-struct JsEngineEventReciver(Mutex<Receiver<JsEngineEvent>>);
+struct JsEngineEventReciver(Receiver<JsEngineEvent>);
 
 fn load_libs(mut commands: Commands, asset_server: Res<AssetServer>) {
     //加载基本的Js Modules
@@ -94,20 +89,23 @@ fn init_js_context(
         let engine_js_code = engine_js.context.clone();
 
         //与js线程的双向通道
-        let (sender, rx) = mpsc::channel();
-        let (tx, receiver) = mpsc::channel();
+        let (sender, rx) = mpsc::unbounded_channel();
+        let (tx, receiver) = mpsc::unbounded_channel();
 
         commands.insert_resource(JsEngineEventSender(sender));
-        commands.insert_resource(JsEngineEventReciver(Mutex::new(receiver)));
-        let task = AsyncComputeTaskPool::get().spawn::<Result>(async move {
-            let rx = rx;
+        commands.insert_resource(JsEngineEventReciver(receiver));
+        let task = AsyncComputeTaskPool::get().spawn_local::<Result>(async move {
+            let mut rx = rx;
             let tx = tx;
+
             let engine = &mut JsEngine::new(&engine_js_code);
 
             // 开始监听
             // 由bevy的EventWriter写入事件并经js_event_bridge中转到此
-            tx.send(JsEngineEvent::EngineInited).expect("sd");
-            while let Ok(event) = rx.recv() {
+            tx.send(JsEngineEvent::EngineInited)
+                .expect("Faied to send EngineInited event");
+
+            while let Some(event) = rx.recv().await {
                 process_js_event(engine, event, &tx).expect("process_js_event error")
             }
             Ok(())
@@ -142,13 +140,11 @@ fn smilodon_event_bridge(
 
 fn engine_inited(
     mut next_state: ResMut<NextState<AppState>>,
-    event_receiver: Option<Res<JsEngineEventReciver>>,
+    event_receiver: Option<ResMut<JsEngineEventReciver>>,
 ) -> Result<()> {
-    if let Some(event_receiver) = event_receiver {
-        if let Ok(event) = event_receiver.0.lock().expect("").recv() {
-            if let JsEngineEvent::EngineInited = event {
-                next_state.set(AppState::ModInfoLoading);
-            }
+    if let Some(mut event_receiver) = event_receiver {
+        if let Ok(JsEngineEvent::EngineInited) = event_receiver.0.try_recv() {
+            next_state.set(AppState::ModInfoLoading);
         }
     }
 

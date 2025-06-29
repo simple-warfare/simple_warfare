@@ -8,7 +8,8 @@ use boa_engine::{
     property::Attribute,
 };
 use boa_runtime::Console;
-use std::{path::Path, rc::Rc, sync::mpsc::Sender};
+use std::{path::Path, rc::Rc};
+use tokio::sync::mpsc::UnboundedSender as Sender;
 
 pub(super) fn load_mod_libs(
     context: &mut Context,
