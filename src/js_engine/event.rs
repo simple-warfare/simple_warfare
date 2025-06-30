@@ -15,5 +15,5 @@ pub enum BuilderEvent {}
 #[derive(Clone)]
 pub enum ModEvent {
     LoadMod(ModEnable, ModInfo),
-    SpawnUnit(String),
+    SpawnUnit(Entity,String),
 }

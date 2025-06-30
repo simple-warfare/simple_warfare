@@ -2,6 +2,7 @@ pub mod app_state;
 pub mod assets;
 pub mod bevy_ext;
 pub mod js_engine;
+pub mod lua_engine;
 pub mod mod_engine;
 pub mod panel;
 pub mod scenes;
@@ -11,11 +12,13 @@ pub mod utils;
 use bevy::{app::PluginGroupBuilder, prelude::*};
 use bevy_ecs_ldtk::prelude::*;
 use bevy_fly_camera::FlyCameraPlugin;
+use bevy_inspector_egui::quick::{ResourceInspectorPlugin, StateInspectorPlugin};
 use bevy_light_2d::prelude::*;
-use js_engine::SmilodonEnginePlugin;
+use bevy_panic_handler::PanicHandler;
+use js_engine::JsEnginePlugin;
 
 use crate::{
-    app_state::AppState, assets::AssetsPlugin, mod_engine::ModEnginePlugin, scenes::ScenePlugin,
+    app_state::AppState, assets::AssetsPlugin, lua_engine::LuaEnginePlugin, mod_engine::ModEnginePlugin, scenes::ScenePlugin
 };
 
 pub struct SimpleWarfarePlugins;
@@ -25,9 +28,10 @@ impl PluginGroup for SimpleWarfarePlugins {
         let mut group = PluginGroupBuilder::start::<Self>();
         group = group
             .add(AssetsPlugin)
-            .add(SmilodonEnginePlugin)
-            .add(ModEnginePlugin)
-            .add(ScenePlugin);
+            .add(JsEnginePlugin)
+            .add(LuaEnginePlugin)
+            .add(ScenePlugin)
+            .add(ModEnginePlugin);
         group
     }
 }
@@ -37,10 +41,12 @@ pub struct SimpleWarfarePlugin;
 impl Plugin for SimpleWarfarePlugin {
     fn build(&self, app: &mut App) {
         app.init_state::<AppState>()
+            .register_type::<AppState>()
+            .add_plugins(StateInspectorPlugin::<AppState>::default())
             .add_plugins(FlyCameraPlugin)
-            .add_plugins(bevy_panic_handler::PanicHandler::new().build())
+            .add_plugins(PanicHandler::new().build())
             .add_plugins(LdtkPlugin)
-            .insert_resource(LevelSelection::iid("14f0fdc1-3740-11f0-9e67-db98e5aadab4"))
+            .insert_resource(LevelSelection::default())
             .add_plugins(Light2dPlugin)
             .add_plugins(SimpleWarfarePlugins);
     }

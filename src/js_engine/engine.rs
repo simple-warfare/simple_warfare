@@ -1,14 +1,15 @@
 use std::rc::Rc;
 
-use bevy::platform::collections::HashMap;
-use boa_engine::{module::SimpleModuleLoader, prelude::*};
+use bevy::{ecs::entity::Entity, platform::collections::HashMap};
+use boa_engine::{module::SimpleModuleLoader, object::builtins::JsProxy, prelude::*};
 
 use crate::js_engine::{add_runtime, load_mod_libs, module::ModModule, register_class};
+
 
 pub struct JsEngine {
     pub(super) context: Context,
     pub(super) module_map: HashMap<String, Vec<ModModule>>,
-    pub(super) unit_map: HashMap<u64, JsObject>,
+    pub(super) unit_map: HashMap<Entity, JsProxy>,
 }
 
 impl JsEngine {

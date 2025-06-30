@@ -4,7 +4,11 @@ use crate::{
 };
 use bevy::prelude::*;
 use boa_engine::{
-    builtins::promise::PromiseState, js_string, module::SimpleModuleLoader, prelude::*,
+    builtins::{promise::PromiseState, proxy::Proxy},
+    js_string,
+    module::SimpleModuleLoader,
+    object::builtins::JsProxy,
+    prelude::*,
     property::Attribute,
 };
 use boa_runtime::Console;
@@ -130,7 +134,7 @@ pub(super) fn process_js_event(
                         promise.state(),
                         PromiseState::Fulfilled(JsValue::undefined())
                     );
-
+                    info!("{}", mod_info.name);
                     if let Some(modules) = module_map.get_mut(&mod_info.name) {
                         modules.push(ModModule::new(module.clone(), classes));
                     } else {
@@ -141,9 +145,11 @@ pub(super) fn process_js_event(
                     }
                 }
             }
-            ModEvent::SpawnUnit(unit_class) => {
-                let unit_from: Vec<&str> = unit_class.split(':').collect();
+            ModEvent::SpawnUnit(entity, unit_str) => {
+                info!("SpawnUnit:{}", unit_str);
+                let unit_from: Vec<&str> = unit_str.split(':').collect();
                 if let Some(modules) = module_map.get(unit_from[0]) {
+                    info!("found the module:{}", unit_from[0]);
                     for module in modules {
                         if module.classes.contains(&unit_from[1].to_string()) {
                             let class = module
@@ -151,14 +157,33 @@ pub(super) fn process_js_event(
                                 .namespace(context)
                                 .get(js_string!(unit_from[1]), context)
                                 .unwrap();
-                            let class_obj = class.as_object().ok_or("not found obj").unwrap();
-                            let index = unit_map.len();
-                            unit_map.insert(
-                                index as u64,
+
+                            let class_obj = class
+                                .as_object()
+                                .ok_or("not found obj")
+                                .unwrap()
+                                .construct(&[], None, context)
+                                .expect("construct error");
+
+                            info!("class_obj:{:?}", class_obj);
+
+                            let unit_proxy = JsProxy::from_object(
                                 class_obj
-                                    .construct(&[], None, context)
-                                    .expect("construct error"),
-                            );
+                                    .get(js_string!("get_proxy"), context)
+                                    .unwrap()
+                                    .as_callable()
+                                    .unwrap()
+                                    .call(&JsValue::Object(class_obj), &[], context)
+                                    .unwrap()
+                                    .as_object()
+                                    .unwrap()
+                                    .clone(),
+                            )
+                            .unwrap();
+
+                            info!("{:?}", unit_proxy.get(js_string!("name"), context).unwrap());
+
+                            unit_map.insert(entity, unit_proxy);
                         }
                     }
                 }

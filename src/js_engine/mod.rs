@@ -3,6 +3,8 @@ mod engine;
 pub mod event;
 pub mod module;
 
+use std::sync::Arc;
+
 use crate::{
     app_state::AppState,
     assets::mods::js::JsAsset,
@@ -17,7 +19,7 @@ use thiserror::Error;
 use tokio::sync::mpsc::{self, UnboundedReceiver as Receiver, UnboundedSender as Sender};
 
 #[derive(Error, Debug)]
-pub enum SmilodonEngineError {
+pub enum JsEngineError {
     /// An [IO](std::io) Error
     #[error("Could not load file: {0}")]
     Io(#[from] std::io::Error),
@@ -25,20 +27,30 @@ pub enum SmilodonEngineError {
     BoaEngine(#[from] JsError),
 }
 
-pub struct SmilodonEnginePlugin;
+pub struct JsEnginePlugin;
 
-impl Plugin for SmilodonEnginePlugin {
+impl Plugin for JsEnginePlugin {
     fn build(&self, app: &mut App) {
         app.add_event::<JsEngineEvent>()
             .add_systems(PreStartup, load_libs)
-            .add_systems(Update, check_libs.run_if(in_state(AppState::LibsLoading)))
+            .add_systems(
+                Update,
+                check_libs.run_if(
+                    in_state(AppState::LibsLoading)
+                        .and(resource_exists::<SimpleWarfareEngineHandle>),
+                ),
+            )
             .add_systems(OnEnter(AppState::LibsLoaded), init_js_context)
             .add_systems(
                 Update,
                 handle_task.run_if(resource_exists::<ComputeJsContext>),
             )
-            .add_systems(Update, smilodon_event_bridge)
-            .add_systems(Update, engine_inited.run_if(in_state(AppState::LibsLoaded)));
+            .add_systems(
+                Update,
+                engine_inited.run_if(
+                    in_state(AppState::LibsLoaded).and(resource_exists::<JsEngineEventReciver>),
+                ),
+            );
     }
 }
 
@@ -46,9 +58,9 @@ impl Plugin for SmilodonEnginePlugin {
 pub struct SimpleWarfareEngineHandle(pub Handle<JsAsset>);
 
 #[derive(Resource)]
-struct JsEngineEventSender(Sender<JsEngineEvent>);
+pub struct JsEngineEventSender(pub Arc<Sender<JsEngineEvent>>);
 #[derive(Resource)]
-struct JsEngineEventReciver(Receiver<JsEngineEvent>);
+pub struct JsEngineEventReciver(pub Receiver<JsEngineEvent>);
 
 fn load_libs(mut commands: Commands, asset_server: Res<AssetServer>) {
     //加载基本的Js Modules
@@ -63,18 +75,13 @@ fn check_libs(
     mut events: EventReader<AssetEvent<JsAsset>>,
 ) {
     for event in events.read() {
+        info!("LibsLoading");
         if event.is_loaded_with_dependencies(&simple_warfare_engine_file.0) {
             //开始建立Js运行时
+            info!("LibsLoaded");
             next_state.set(AppState::LibsLoaded);
         }
     }
-}
-
-#[derive(Debug, Error)]
-pub enum JsEngineError {
-    /// An [IO](std::io) Error
-    #[error("Could not load file: {0}")]
-    Io(#[from] Box<dyn std::error::Error>),
 }
 
 #[derive(Resource)]
@@ -92,7 +99,7 @@ fn init_js_context(
         let (sender, rx) = mpsc::unbounded_channel();
         let (tx, receiver) = mpsc::unbounded_channel();
 
-        commands.insert_resource(JsEngineEventSender(sender));
+        commands.insert_resource(JsEngineEventSender(Arc::new(sender)));
         commands.insert_resource(JsEngineEventReciver(receiver));
         let task = AsyncComputeTaskPool::get().spawn_local::<Result>(async move {
             let mut rx = rx;
@@ -125,27 +132,12 @@ fn handle_task(mut js_ontext_task: ResMut<ComputeJsContext>) -> Result {
     Ok(())
 }
 
-fn smilodon_event_bridge(
-    mut event_reader: EventReader<JsEngineEvent>,
-    event_sender: Option<Res<JsEngineEventSender>>,
-) -> Result<()> {
-    if let Some(event_sender) = event_sender {
-        for event in event_reader.read() {
-            event_sender.0.send(event.clone())?
-        }
-    }
-
-    Ok(())
-}
-
 fn engine_inited(
     mut next_state: ResMut<NextState<AppState>>,
-    event_receiver: Option<ResMut<JsEngineEventReciver>>,
+    mut event_receiver: ResMut<JsEngineEventReciver>,
 ) -> Result<()> {
-    if let Some(mut event_receiver) = event_receiver {
-        if let Ok(JsEngineEvent::EngineInited) = event_receiver.0.try_recv() {
-            next_state.set(AppState::ModInfoLoading);
-        }
+    if let Ok(JsEngineEvent::EngineInited) = event_receiver.0.try_recv() {
+        next_state.set(AppState::ModInfoLoading);
     }
 
     Ok(())

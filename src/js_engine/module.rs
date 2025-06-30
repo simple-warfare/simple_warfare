@@ -1,5 +1,6 @@
 use boa_engine::prelude::*;
 
+#[derive(Debug)]
 pub struct ModModule {
     pub module: Module,
     pub classes: Vec<String>,

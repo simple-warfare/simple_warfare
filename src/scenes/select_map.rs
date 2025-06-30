@@ -43,7 +43,7 @@ fn setup(
     let chrome = &game_asset.interface.chrome;
     let chrome_layout = &texture_atlas_layout_handles.chrome;
     let map_viewer_slicer = &chrome_texture_slicer.map_viewer;
-
+    let text_style = TextFont::default();
     let map = ldtk_maps
         .get(
             game_asset
@@ -55,13 +55,15 @@ fn setup(
 
     let map_test = (
         Node {
+            display: Display::Grid,
             border: UiRect::all(Val::Px(10.)),
-            width: Val::Px(100.),
+            align_content: AlignContent::Center,
             justify_content: JustifyContent::Center,
             ..Default::default()
         },
         ImageNode::new(map.thumbnail.clone()),
     );
+
     commands.spawn((SelectMapSceneMark, Camera2d));
     commands.spawn((
         SelectMapSceneMark,
@@ -76,9 +78,15 @@ fn setup(
         BackgroundColor(Color::Srgba(GRAY)),
         children![(
             Node {
-                align_items: AlignItems::Stretch,
                 width: Val::Percent(80.),
-                height:Val::Percent(80.),
+                height: Val::Percent(80.),
+                display: Display::Grid,
+                grid_template_columns: vec![GridTrack::flex(2.0), GridTrack::flex(1.0)],
+                grid_template_rows: vec![
+                    GridTrack::flex(1.0),
+                    GridTrack::flex(1.0),
+                    GridTrack::flex(1.0),
+                ],
                 ..Default::default()
             },
             ImageNode::from_atlas_image(
@@ -92,21 +100,40 @@ fn setup(
             children![
                 (
                     Node {
-                        align_items: AlignItems::Stretch,
-                        justify_content: JustifyContent::SpaceAround,
-                        align_self: AlignSelf::FlexEnd,
-                        flex_direction: FlexDirection::Column,
-                        width: Val::Percent(65.3),
+                        aspect_ratio: Some(1.0),
+                        width: Val::Percent(100.),
+                        height: Val::Percent(100.),
+                        display: Display::Grid,
+                        padding: UiRect::all(Val::Px(24.0)),
+                        grid_template_columns: RepeatedGridTrack::flex(3, 1.0),
+                        grid_template_rows: RepeatedGridTrack::flex(3, 1.0),
+                        grid_row: GridPlacement::span(3),
+                        row_gap: Val::Px(12.0),
+                        column_gap: Val::Px(12.0),
                         ..Default::default()
                     },
-                    children![map_test.clone(), map_test.clone(), map_test.clone()]
+                    children![
+                        map_test.clone(),
+                        map_test.clone(),
+                        map_test.clone(),
+                        map_test.clone(),
+                        map_test.clone(),
+                        map_test.clone(),
+                        map_test.clone(),
+                        map_test.clone(),
+                        map_test.clone(),
+                    ]
                 ),
                 (Node {
-                    align_items: AlignItems::Stretch,
-                    justify_content: JustifyContent::SpaceAround,
-                    align_self: AlignSelf::FlexEnd,
-                    flex_direction: FlexDirection::Column,
-                    width: Val::Percent(34.7),
+                    align_items: AlignItems::Start,
+                    justify_items: JustifyItems::Center,
+                    padding: UiRect::all(Val::Px(10.)),
+                    grid_template_rows: vec![
+                        GridTrack::auto(),
+                        GridTrack::auto(),
+                        GridTrack::fr(1.0)
+                    ],
+                    row_gap: Val::Px(10.),
                     ..Default::default()
                 },)
             ],

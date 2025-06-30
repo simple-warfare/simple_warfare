@@ -44,7 +44,7 @@ impl AssetLoader for JsAssetLoader {
                 load_context.path().display().to_string(),
             ))?
             .to_string_lossy()
-            .into_owned();
+            .to_string();
 
         let mut context = String::new();
         reader.read_to_string(&mut context).await?;

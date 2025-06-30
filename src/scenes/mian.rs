@@ -7,6 +7,8 @@ use crate::{
         },
     },
     bevy_ext::app::AppExt,
+    js_engine::event::{JsEngineEvent, ModEvent},
+    mod_engine::server::ModServer,
 };
 use bevy::{color::palettes::css::*, prelude::*, render::view::RenderLayers};
 use bevy_ecs_ldtk::prelude::*;
@@ -55,6 +57,7 @@ fn setup(
     game_asset: Res<GameAsset>,
     texture_atlas_layout_handles: Res<TextureAtlasLayoutHandles>,
     dialog_texture_slicer: Res<DialogTextureSlicer>,
+    mod_server: Res<ModServer>,
 ) {
     commands.spawn((
         MainSceneMark,
@@ -151,6 +154,8 @@ fn setup(
             create_button("Quit", ButtonLabel::Quit)
         ],
     ));
+
+    mod_server.spawn_unit(commands.spawn_empty().id(), "example:Tank");
 }
 
 /// An observer to rotate an entity when it is dragged
