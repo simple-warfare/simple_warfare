@@ -28,37 +28,38 @@ use futures_util::stream::FuturesUnordered;
 use rustc_hash::FxHashMap;
 use std::fmt::Debug;
 use tokio::sync::{
-    Mutex,
-    mpsc::{UnboundedReceiver as Receiver, UnboundedSender as Sender},
+    broadcast::{self, Receiver, Sender},
+    mpsc::{self, UnboundedReceiver},
 };
+
 use url::Url;
-#[derive(Event)]
+#[derive(Debug, Event, Clone)]
 pub enum SwModuleLoaderRequestEvent {
     LoadJsAsset(String),
 }
-
+#[derive(Debug, Event, Clone)]
 pub enum SwModuleLoaderResponeEvent {
     LoadedJsAsset(JsAsset),
 }
 
 #[derive(Resource)]
-pub struct SwModuleLoaderRequestReceiver(pub Receiver<SwModuleLoaderRequestEvent>);
+pub struct SwModuleLoaderRequestReceiver(pub UnboundedReceiver<SwModuleLoaderRequestEvent>);
 
-#[derive(Resource)]
+#[derive(Resource, Clone)]
 pub struct SwModuleLoaderResponeSender(pub Arc<Sender<SwModuleLoaderResponeEvent>>);
 
 #[derive(Debug)]
 pub struct SimpleWarfareModuleLoader {
     module_map: GcRefCell<FxHashMap<String, Module>>,
     path_url: FxHashMap<&'static str, &'static str>,
-    sender: Arc<Sender<SwModuleLoaderRequestEvent>>,
-    receiver: Arc<Mutex<Receiver<SwModuleLoaderResponeEvent>>>,
+    request_sender: Arc<mpsc::UnboundedSender<SwModuleLoaderRequestEvent>>,
+    respone_sender: broadcast::Sender<SwModuleLoaderResponeEvent>,
 }
 
 impl SimpleWarfareModuleLoader {
     pub fn new(
-        sender: Sender<SwModuleLoaderRequestEvent>,
-        receiver: Receiver<SwModuleLoaderResponeEvent>,
+        request_sender: Arc<mpsc::UnboundedSender<SwModuleLoaderRequestEvent>>,
+        respone_sender: broadcast::Sender<SwModuleLoaderResponeEvent>,
     ) -> JsResult<Self> {
         let _timer = Profiler::global().start_event("Loader::new", "Loader");
         if cfg!(target_family = "wasm") {
@@ -73,8 +74,8 @@ impl SimpleWarfareModuleLoader {
         Ok(Self {
             module_map: GcRefCell::default(),
             path_url,
-            sender: Arc::new(sender),
-            receiver: Arc::new(Mutex::new(receiver)),
+            request_sender,
+            respone_sender,
         })
     }
 
@@ -103,8 +104,8 @@ impl SimpleWarfareModuleLoader {
     }
 }
 pub async fn load(
-    sender: Arc<Sender<SwModuleLoaderRequestEvent>>,
-    receiver: Arc<Mutex<Receiver<SwModuleLoaderResponeEvent>>>,
+    sender: Arc<mpsc::UnboundedSender<SwModuleLoaderRequestEvent>>,
+    mut receiver: broadcast::Receiver<SwModuleLoaderResponeEvent>,
     real_path: String,
 ) -> JsResult<JsAsset> {
     sender
@@ -115,14 +116,13 @@ pub async fn load(
 
     info!("real_path:{:?}", real_path);
 
-    match receiver.lock().await.recv().await {
-        Some(event) => match event {
-            SwModuleLoaderResponeEvent::LoadedJsAsset(js_asset) => Ok(js_asset),
+    match receiver.recv().await {
+        Ok(event) => match event {
+            SwModuleLoaderResponeEvent::LoadedJsAsset(js_asset) => return Ok(js_asset),
         },
-        None => {
-            info!("recv error none the channel is closed");
-            Err(JsError::from_opaque(js_string!("errr").into()))
-        }
+        Err(err) => match err {
+            _ => panic!("error"),
+        },
     }
 }
 
@@ -141,10 +141,10 @@ impl ModuleLoader for SimpleWarfareModuleLoader {
             finish_load(Ok(module), context);
         } else {
             let real_path = self.get_real_path(&specifier_url).unwrap();
-            let sender = self.sender.clone();
-            let receiver = self.receiver.clone();
+            let request_sender = self.request_sender.clone();
+            let respone_sender = self.respone_sender.subscribe();
             let fetch = async move {
-                let js_asset = load(sender, receiver, real_path).await;
+                let js_asset = load(request_sender, respone_sender, real_path).await;
                 NativeJob::new(move |context| -> JsResult<JsValue> {
                     let js_asset = match js_asset {
                         Ok(js_asset) => js_asset,
@@ -204,13 +204,17 @@ pub(super) fn receiver_request(
     js_assets: Res<Assets<JsAsset>>,
     sender: Res<SwModuleLoaderResponeSender>,
 ) -> Result {
+    info!("sss");
     if let Ok(SwModuleLoaderRequestEvent::LoadJsAsset(path)) = event_receiver.0.try_recv() {
         info!("try load module:{}", path);
         let asset = asset_server.load(path);
         if asset_server.is_loaded_with_dependencies(asset.id()) {
-            sender.0.send(SwModuleLoaderResponeEvent::LoadedJsAsset(
-                js_assets.get(asset.id()).unwrap().clone(),
-            ))?;
+            sender
+                .0
+                .send(SwModuleLoaderResponeEvent::LoadedJsAsset(
+                    js_assets.get(asset.id()).unwrap().clone(),
+                ))
+                .unwrap();
         } else {
             js_asset_handles.0.push(asset);
         }
@@ -313,6 +317,12 @@ impl JobQueue for SwModuleJobQueue {
                         self.enqueue_promise_job(job, &mut context.borrow_mut());
                         future::yield_now().await;
                     }
+                    //while let Some(job) = futures.next().await {
+                    //    // Important to schedule the returned `job` into the job queue, since that's
+                    //    // what allows updating the `Promise` seen by ECMAScript for when the future
+                    //    // completes.
+                    //    self.enqueue_promise_job(job, &mut context.borrow_mut());
+                    //}
                 }
             };
             let job_queue = async {

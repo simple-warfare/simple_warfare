@@ -23,7 +23,10 @@ use bevy::{
 };
 use boa_engine::prelude::*;
 use thiserror::Error;
-use tokio::sync::mpsc::{self, UnboundedReceiver as Receiver, UnboundedSender as Sender};
+use tokio::sync::{
+    broadcast::{self, Receiver, Sender},
+    mpsc::{self, UnboundedReceiver, UnboundedSender},
+};
 
 #[derive(Error, Debug)]
 pub enum JsEngineError {
@@ -56,9 +59,9 @@ impl Plugin for JsEnginePlugin {
 }
 
 #[derive(Resource)]
-pub struct JsEngineEventRequestSender(pub Arc<Sender<JsEngineRequestEvent>>);
+pub struct JsEngineEventRequestSender(pub Arc<UnboundedSender<JsEngineRequestEvent>>);
 #[derive(Resource)]
-pub struct JsEngineEventResponeReciver(pub Receiver<JsEngineResponeEvent>);
+pub struct JsEngineEventResponeReciver(pub UnboundedReceiver<JsEngineResponeEvent>);
 
 #[derive(Resource)]
 struct ComputeJsContext(Task<Result>);
@@ -72,40 +75,45 @@ fn init_js_context(mut commands: Commands) -> Result {
     commands.insert_resource(JsEngineEventResponeReciver(je_respone_receiver));
 
     let (sw_module_request_sender, sw_module_request_receiver) = mpsc::unbounded_channel();
-    let (sw_module_respone_sender, sw_module_respone_receiver) = mpsc::unbounded_channel();
+    let (sw_module_respone_sender, _sw_module_respone_receiver) = broadcast::channel(10);
     commands.insert_resource(SwModuleLoaderResponeSender(Arc::new(
-        sw_module_respone_sender,
+        sw_module_respone_sender.clone(),
     )));
     commands.insert_resource(SwModuleLoaderRequestReceiver(sw_module_request_receiver));
 
-    let task = AsyncComputeTaskPool::get().spawn_local::<Result>(async move {
-        let engine = &mut JsEngine::new(
-            SimpleWarfareModuleLoader::new(sw_module_request_sender, sw_module_respone_receiver)
+    let task = AsyncComputeTaskPool::get()
+        .spawn_local::<Result>(async move {
+            let engine = &mut JsEngine::new(
+                SimpleWarfareModuleLoader::new(
+                    Arc::new(sw_module_request_sender),
+                    sw_module_respone_sender,
+                )
                 .unwrap(),
-        );
+            );
 
-        // 开始监听
-        // 由bevy的EventWriter写入事件并经js_event_bridge中转到此
-        je_respone_sender
-            .send(JsEngineResponeEvent::EngineInited)
-            .expect("Faied to send EngineInited event");
+            // 开始监听
+            // 由bevy的EventWriter写入事件并经js_event_bridge中转到此
+            je_respone_sender
+                .send(JsEngineResponeEvent::EngineInited)
+                .expect("Faied to send EngineInited event");
 
-        while let Some(event) = je_request_receiver.recv().await {
-            process_js_event(engine, event, &je_respone_sender)
-                .await
-                .expect("process_js_event error")
-        }
-        Ok(())
-    }).detach();
+            while let Some(event) = je_request_receiver.recv().await {
+                process_js_event(engine, event, &je_respone_sender)
+                    .await
+                    .expect("process_js_event error")
+            }
+            Ok(())
+        })
+        .detach();
     //commands.insert_resource(ComputeJsContext(task));
     //Js运行时单独在一个线程内运行
     Ok(())
 }
 
 fn handle_task(mut js_ontext_task: ResMut<ComputeJsContext>) -> Result {
-    if let Some(Err(e)) = block_on(future::poll_once(&mut js_ontext_task.0)) {
-        return Err(e);
-    }
+    //if let Some(Err(e)) = block_on(future::poll_once(&mut js_ontext_task.0)) {
+    //    return Err(e);
+    //}
 
     Ok(())
 }

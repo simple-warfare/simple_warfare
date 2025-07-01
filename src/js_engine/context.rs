@@ -51,11 +51,16 @@ pub(super) async fn process_js_event(
 
                     context.run_jobs_async().await;
 
-                    assert_eq!(
-                        promise.state(),
-                        PromiseState::Fulfilled(JsValue::undefined())
-                    );
-                    
+                    match promise.state() {
+                        PromiseState::Pending => panic!("module didn't execute!"),
+                        PromiseState::Fulfilled(v) => {
+                            assert_eq!(v, JsValue::undefined())
+                        }
+                        PromiseState::Rejected(err) => {
+                            panic!("{}", err.display());
+                        }
+                    }
+
                     if let Some(modules) = module_map.get_mut(&mod_info.name) {
                         modules.push(ModModule::new(module.clone(), classes));
                     } else {
