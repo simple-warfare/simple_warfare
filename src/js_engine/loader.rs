@@ -204,7 +204,6 @@ pub(super) fn receiver_request(
     js_assets: Res<Assets<JsAsset>>,
     sender: Res<SwModuleLoaderResponeSender>,
 ) -> Result {
-    info!("sss");
     if let Ok(SwModuleLoaderRequestEvent::LoadJsAsset(path)) = event_receiver.0.try_recv() {
         info!("try load module:{}", path);
         let asset = asset_server.load(path);
@@ -312,17 +311,12 @@ impl JobQueue for SwModuleJobQueue {
                     // Blocks on all the enqueued futures, driving them all to completion.
                     let futures = &mut std::mem::take(&mut *self.futures.borrow_mut());
 
-                    for fut in futures {
-                        let job = fut.await;
+                    while let Some(job) = futures.next().await {
+                        // Important to schedule the returned `job` into the job queue, since that's
+                        // what allows updating the `Promise` seen by ECMAScript for when the future
+                        // completes.
                         self.enqueue_promise_job(job, &mut context.borrow_mut());
-                        future::yield_now().await;
                     }
-                    //while let Some(job) = futures.next().await {
-                    //    // Important to schedule the returned `job` into the job queue, since that's
-                    //    // what allows updating the `Promise` seen by ECMAScript for when the future
-                    //    // completes.
-                    //    self.enqueue_promise_job(job, &mut context.borrow_mut());
-                    //}
                 }
             };
             let job_queue = async {
