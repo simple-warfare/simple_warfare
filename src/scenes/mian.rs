@@ -154,7 +154,7 @@ fn setup(
         ],
     ));
 
-    //mod_server.spawn_unit(commands.spawn_empty().id(), "example:Tank");
+    mod_server.spawn_unit(commands.spawn_empty().id(), "example:Tank");
 }
 
 /// An observer to rotate an entity when it is dragged

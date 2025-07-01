@@ -8,8 +8,10 @@ use boa_engine::{
     property::Attribute,
 };
 use boa_runtime::Console;
-use std::path::Path;
-use tokio::sync::mpsc::UnboundedSender as Sender;
+use std::{
+    path::Path,
+    sync::{Arc, mpsc::Sender},
+};
 
 pub(super) fn add_runtime(context: &mut Context) {
     let console = Console::init(context);
@@ -24,10 +26,10 @@ pub(super) fn register_class(context: &mut Context) {
         .expect("the Core builtin shouldn't exist");
 }
 
-pub(super) async fn process_js_event(
+pub(super) fn process_js_event(
     engine: &mut JsEngine,
     event: JsEngineRequestEvent,
-    sender: &Sender<JsEngineResponeEvent>,
+    sender: Arc<Sender<JsEngineResponeEvent>>,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let context = &mut engine.context;
     let module_map = &mut engine.module_map;
@@ -44,12 +46,11 @@ pub(super) async fn process_js_event(
                         ),
                         None,
                         context,
-                    )
-                    .unwrap();
+                    )?;
 
                     let promise = module.load_link_evaluate(context);
 
-                    context.run_jobs_async().await;
+                    context.run_jobs();
 
                     match promise.state() {
                         PromiseState::Pending => panic!("module didn't execute!"),
@@ -81,13 +82,11 @@ pub(super) async fn process_js_event(
                             let class = module
                                 .module
                                 .namespace(context)
-                                .get(js_string!(unit_from[1]), context)
-                                .unwrap();
+                                .get(js_string!(unit_from[1]), context)?;
 
                             let class_obj = class
                                 .as_object()
-                                .ok_or("not found obj")
-                                .unwrap()
+                                .ok_or("not found obj")?
                                 .construct(&[], None, context)
                                 .expect("construct error");
 
@@ -95,8 +94,7 @@ pub(super) async fn process_js_event(
 
                             let unit_proxy = JsProxy::from_object(
                                 class_obj
-                                    .get(js_string!("get_proxy"), context)
-                                    .unwrap()
+                                    .get(js_string!("get_proxy"), context)?
                                     .as_callable()
                                     .unwrap()
                                     .call(&JsValue::Object(class_obj), &[], context)

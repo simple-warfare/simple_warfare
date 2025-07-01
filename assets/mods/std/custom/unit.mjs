@@ -3,7 +3,6 @@ class CustomUnitBuilder {
         this._proxy = new Proxy(this, CustomUnitHandle);
     }
 
-    // 始终返回同一个 Proxy 实例
     get_proxy() {
         return this._proxy;
     }

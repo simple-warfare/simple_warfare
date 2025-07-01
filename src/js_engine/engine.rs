@@ -1,13 +1,10 @@
 use std::rc::Rc;
 
 use bevy::{ecs::entity::Entity, platform::collections::HashMap};
-use boa_engine::{module::SimpleModuleLoader, object::builtins::JsProxy, prelude::*};
+use boa_engine::{object::builtins::JsProxy, prelude::*};
 
 use crate::js_engine::{
-    add_runtime,
-    loader::{SimpleWarfareModuleLoader, SwModuleJobQueue},
-    module::ModModule,
-    register_class,
+    add_runtime, loader::SimpleWarfareModuleLoader, module::ModModule, register_class,
 };
 
 pub struct JsEngine {
@@ -18,7 +15,7 @@ pub struct JsEngine {
 
 impl JsEngine {
     pub fn new(loader: SimpleWarfareModuleLoader) -> Self {
-        let context_builder = Context::builder().job_queue(Rc::new(SwModuleJobQueue::new()));
+        let context_builder = Context::builder();
         let loader = Rc::new(loader);
 
         let mut context = context_builder

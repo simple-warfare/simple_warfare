@@ -1,12 +1,14 @@
-use std::sync::Arc;
+use std::sync::{Arc, mpsc::Sender};
 
 use bevy::prelude::*;
 
 use crate::{
-    assets::mods::{info::{ModEnable, ModInfo}, js::JsAsset},
+    assets::mods::{
+        info::{ModEnable, ModInfo},
+        js::JsAsset,
+    },
     js_engine::event::{JsEngineRequestEvent, ModEvent},
 };
-use tokio::sync::mpsc::{self, UnboundedReceiver as Receiver, UnboundedSender as Sender};
 
 #[derive(Resource)]
 pub struct ModServer {
@@ -28,10 +30,11 @@ impl ModServer {
     }
 
     pub fn load_mod(&self, enables: Vec<(JsAsset, Vec<String>)>, info: ModInfo) -> Result<()> {
-        self.sender.send(JsEngineRequestEvent::ModEvent(ModEvent::LoadMod(
-            ModEnable::new(enables),
-            info.clone(),
-        )))?;
+        self.sender
+            .send(JsEngineRequestEvent::ModEvent(ModEvent::LoadMod(
+                ModEnable::new(enables),
+                info.clone(),
+            )))?;
         Ok(())
     }
 }

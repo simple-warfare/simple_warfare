@@ -11,7 +11,6 @@ rand = "0.9.1"
 bevy-inspector-egui = "0.31.0"
 serde = "1.0.219"
 toml = "0.8.23"
-tokio = { version = "1.45.1", features = ["full"] }
 mlua = { version = "0.10.5", features = [
   "lua54",
   "async",
@@ -28,9 +27,9 @@ boa_runtime = "0.20.0"
 boa_gc = "0.20.0"
 boa_profiler = "0.20.0"
 bevy_ecs_ldtk = { version = "0.12.0", features = ["atlas"] }
-rand_core = "0.9"
+rand_core = "0.9.3"
 bevy_rand = "0.11"
-bevy_prng = { version = "0.11", features = ["rand_chacha", "wyrand"] }
+bevy_prng = { version = "0.11.1", features = ["rand_chacha", "wyrand"] }
 bevy_light_2d = "0.6.0"
 bevy_fly_camera = "0.16.0"
 bevy-panic-handler = "5.0.0"
@@ -42,7 +41,7 @@ bevy_tween = "0.8.0"
 serde_json = "1.0.140"
 rustc-hash = "2.1.1"
 url = "2.5.4"
-futures-util = "0.3.31"
+
 [dependencies.bevy]
 version = "0.16.1"
 features = ["jpeg"]
