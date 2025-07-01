@@ -1,10 +1,8 @@
-use std::path::Path;
-
 use bevy::{
-    asset::{AssetLoader, AsyncReadExt, LoadContext, io::Reader},
+    asset::{AssetLoader, LoadContext, io::Reader},
     prelude::*,
 };
-use bevy_ecs_ldtk::{ldtk::LdtkJson, prelude::*};
+use bevy_ecs_ldtk::prelude::*;
 use thiserror::Error;
 
 #[derive(Asset, TypePath)]
@@ -37,7 +35,7 @@ impl AssetLoader for LdtkMapLoader {
 
     async fn load(
         &self,
-        reader: &mut dyn Reader,
+        _reader: &mut dyn Reader,
         _settings: &Self::Settings,
         load_context: &mut LoadContext<'_>,
     ) -> Result<Self::Asset, Self::Error> {

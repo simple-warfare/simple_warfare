@@ -39,5 +39,5 @@ pub fn process_textures(
         &images,
         &mut chrome_texture_slicer,
     );
-    system_state.set(AppState::LibsLoading);
+    system_state.set(AppState::InitJsContext);
 }

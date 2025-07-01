@@ -3,8 +3,12 @@ use std::rc::Rc;
 use bevy::{ecs::entity::Entity, platform::collections::HashMap};
 use boa_engine::{module::SimpleModuleLoader, object::builtins::JsProxy, prelude::*};
 
-use crate::js_engine::{add_runtime, load_mod_libs, module::ModModule, register_class};
-
+use crate::js_engine::{
+    add_runtime,
+    loader::{SimpleWarfareModuleLoader, SwModuleJobQueue},
+    module::ModModule,
+    register_class,
+};
 
 pub struct JsEngine {
     pub(super) context: Context,
@@ -13,12 +17,9 @@ pub struct JsEngine {
 }
 
 impl JsEngine {
-    pub fn new(default_module_code: &str) -> Self {
-        let mut module_map = HashMap::new();
-
-        let context_builder = Context::builder();
-        let loader =
-            Rc::new(SimpleModuleLoader::new("./assets/mod_libs").expect("load mod_libs error"));
+    pub fn new(loader: SimpleWarfareModuleLoader) -> Self {
+        let context_builder = Context::builder().job_queue(Rc::new(SwModuleJobQueue::new()));
+        let loader = Rc::new(loader);
 
         let mut context = context_builder
             .module_loader(loader.clone())
@@ -27,20 +28,9 @@ impl JsEngine {
         add_runtime(&mut context);
         register_class(&mut context);
 
-        let module = load_mod_libs(&mut context, loader.clone(), default_module_code)
-            .expect("load module error");
-
-        module_map.insert(
-            "simple_warfare_engine".to_string(),
-            vec![ModModule::new(
-                module,
-                vec!["Core".to_string(), "CustomUnit".to_string()],
-            )],
-        );
-
         Self {
             context,
-            module_map,
+            module_map: HashMap::new(),
             unit_map: HashMap::new(),
         }
     }

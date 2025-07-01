@@ -1,8 +1,4 @@
-use crate::{
-    bevy_ext::{condition::pressed_button, system::despawn_screen},
-    panel::Panel,
-    scenes::{Scene, SceneState},
-};
+use crate::{bevy_ext::system::despawn_screen, panel::Panel, scenes::Scene};
 use bevy::{ecs::system::ScheduleSystem, prelude::*};
 
 pub trait AppExt {

@@ -5,8 +5,7 @@ pub enum AppState {
     #[default]
     AssetsLoading,
     AssetsProcessing,
-    LibsLoading,
-    LibsLoaded,
+    InitJsContext,
     ModInfoLoading,
     ModInfoLoaded,
     MainLuaExecuting,

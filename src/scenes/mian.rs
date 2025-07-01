@@ -7,7 +7,6 @@ use crate::{
         },
     },
     bevy_ext::app::AppExt,
-    js_engine::event::{JsEngineEvent, ModEvent},
     mod_engine::server::ModServer,
 };
 use bevy::{color::palettes::css::*, prelude::*, render::view::RenderLayers};
@@ -155,7 +154,7 @@ fn setup(
         ],
     ));
 
-    mod_server.spawn_unit(commands.spawn_empty().id(), "example:Tank");
+    //mod_server.spawn_unit(commands.spawn_empty().id(), "example:Tank");
 }
 
 /// An observer to rotate an entity when it is dragged
@@ -174,7 +173,6 @@ fn button_click(
             ButtonLabel::Setting => todo!(),
             ButtonLabel::News => todo!(),
             ButtonLabel::Quit => {
-                info!("AppExit");
                 exit_event.write(AppExit::Success);
             }
         }

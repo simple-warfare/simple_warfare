@@ -57,6 +57,6 @@ impl AssetLoader for JsAssetLoader {
     }
 
     fn extensions(&self) -> &[&str] {
-        &["js"]
+        &["js","mjs"]
     }
 }

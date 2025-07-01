@@ -5,7 +5,7 @@ use mlua::{Lua, ObjectLike, Table};
 use crate::{
     app_state::AppState,
     assets::mods::{info::*, js::JsAsset, lua::*},
-    js_engine::event::{JsEngineEvent, ModEvent}, mod_engine::server::ModServer,
+    mod_engine::server::ModServer,
 };
 
 #[derive(Resource)]
@@ -42,7 +42,7 @@ impl Plugin for LuaEnginePlugin {
 }
 
 fn load_mod_infos(mut command: Commands, asset_server: Res<AssetServer>) {
-    command.insert_resource(ModsFolderHandle(asset_server.load_folder("mods")));
+    command.insert_resource(ModsFolderHandle(asset_server.load_folder("mods/custom")));
 }
 fn check_mod_infos(
     mut next_state: ResMut<NextState<AppState>>,

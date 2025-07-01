@@ -1,4 +1,4 @@
-import { CustomUnitBuilder, CoreBuilder } from "./simple_warfare_engine.js"
+import { CustomUnitBuilder, CoreBuilder } from "std:section/core.mjs"
 
 class Tank extends CustomUnitBuilder {
     constructor() {

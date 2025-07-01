@@ -26,6 +26,7 @@ anyhow = "1.0.82"
 boa_engine = "0.20.0"
 boa_runtime = "0.20.0"
 boa_gc = "0.20.0"
+boa_profiler = "0.20.0"
 bevy_ecs_ldtk = { version = "0.12.0", features = ["atlas"] }
 rand_core = "0.9"
 bevy_rand = "0.11"
@@ -39,17 +40,15 @@ bevy_spritesheet_animation = { git = "https://github.com/merwaaan/bevy_spriteshe
 ] }
 bevy_tween = "0.8.0"
 serde_json = "1.0.140"
-
+rustc-hash = "2.1.1"
+url = "2.5.4"
+futures-util = "0.3.31"
 [dependencies.bevy]
 version = "0.16.1"
 features = ["jpeg"]
 #[dev-dependencies.bevy]
 #version = "0.16.1"
 #features = ["jpeg", "dynamic_linking"]
-
-[profile.dev]
-opt-level = 1           # 使用稍高一些的优化级别，最低是0，最高是3
-overflow-checks = false # 关闭整数溢出检查
 
 [profile.release]
 opt-level = 3           # 使用稍高一些的优化级别，最低是0，最高是3
