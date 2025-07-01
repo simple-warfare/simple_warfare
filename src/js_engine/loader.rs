@@ -115,14 +115,16 @@ pub async fn load(
         )))?;
 
     info!("real_path:{:?}", real_path);
+    loop {
+        info!("loop");
 
-    match receiver.recv().await {
-        Ok(event) => match event {
-            SwModuleLoaderResponeEvent::LoadedJsAsset(js_asset) => return Ok(js_asset),
-        },
-        Err(err) => match err {
-            _ => panic!("error"),
-        },
+        if let Ok(event) = receiver.recv().await {
+            match event {
+                SwModuleLoaderResponeEvent::LoadedJsAsset(js_asset) => return Ok(js_asset),
+            }
+        }
+
+        future::yield_now().await;
     }
 }
 
@@ -229,6 +231,7 @@ fn check_js_asset_ready(
     mut events: EventReader<AssetEvent<JsAsset>>,
     sender: Res<SwModuleLoaderResponeSender>,
 ) -> Result {
+    info!("check_js_asset_ready");
     for event in events.read() {
         match event {
             AssetEvent::LoadedWithDependencies { id } => {
