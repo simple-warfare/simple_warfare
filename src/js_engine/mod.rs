@@ -13,10 +13,11 @@ use crate::{
     app_state::AppState,
     js_engine::{
         context::*,
-        engine::{JsEngine, SwRequireLoaderRequestReceiver, SwRequireLoaderResponeSender},
-        event::{JsEngineRequestEvent, JsEngineResponeEvent},
+        engine::JsEngine,
+        event::{JsEngineRequestEvent, JsEngineResponseEvent},
         loader::{
-            SimpleWarfareModuleLoader, SwModuleLoaderRequestReceiver, SwModuleLoaderResponeSender,
+            SimpleWarfareModuleLoader, SwModuleLoaderRequestReceiver, SwModuleLoaderResponseSender,
+            SwRequireLoaderRequestReceiver, SwRequireLoaderResponseSender,
         },
         plugin::SwLoaderPlugin,
     },
@@ -40,12 +41,18 @@ impl Plugin for JsEnginePlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(SwLoaderPlugin)
             .add_event::<JsEngineRequestEvent>()
+            .add_event::<JsEngineResponseEvent>()
             .add_systems(OnEnter(AppState::InitJsContext), init_js_context)
             .add_systems(
                 Update,
-                engine_inited.run_if(
+                broadcast_js_engine_response_event
+                    .run_if(resource_exists::<JsEngineEventResponseReciver>),
+            )
+            .add_systems(
+                Update,
+                inited_js_engine.run_if(
                     in_state(AppState::InitJsContext)
-                        .and(resource_exists::<JsEngineEventResponeReciver>),
+                        .and(resource_exists::<JsEngineEventResponseReciver>),
                 ),
             );
     }
@@ -54,31 +61,31 @@ impl Plugin for JsEnginePlugin {
 #[derive(Resource)]
 pub struct JsEngineEventRequestSender(pub Arc<Sender<JsEngineRequestEvent>>);
 #[derive(Resource)]
-pub struct JsEngineEventResponeReciver(pub Arc<Mutex<Receiver<JsEngineResponeEvent>>>);
+pub struct JsEngineEventResponseReciver(pub Arc<Mutex<Receiver<JsEngineResponseEvent>>>);
 
 fn init_js_context(mut commands: Commands) -> Result {
     //与js线程的双向通道
     let (je_request_sender, je_request_receiver) = mpsc::channel();
-    let (je_respone_sender, je_respone_receiver) = mpsc::channel();
+    let (je_Response_sender, je_Response_receiver) = mpsc::channel();
 
     commands.insert_resource(JsEngineEventRequestSender(Arc::new(je_request_sender)));
-    commands.insert_resource(JsEngineEventResponeReciver(Arc::new(Mutex::new(
-        je_respone_receiver,
+    commands.insert_resource(JsEngineEventResponseReciver(Arc::new(Mutex::new(
+        je_Response_receiver,
     ))));
 
     let (sw_module_request_sender, sw_module_request_receiver) = mpsc::channel();
-    let (sw_module_respone_sender, sw_module_respone_receiver) = mpsc::channel();
-    commands.insert_resource(SwModuleLoaderResponeSender(Arc::new(
-        sw_module_respone_sender.clone(),
+    let (sw_module_Response_sender, sw_module_Response_receiver) = mpsc::channel();
+    commands.insert_resource(SwModuleLoaderResponseSender(Arc::new(
+        sw_module_Response_sender.clone(),
     )));
     commands.insert_resource(SwModuleLoaderRequestReceiver(Arc::new(Mutex::new(
         sw_module_request_receiver,
     ))));
 
     let (sw_require_request_sender, sw_require_request_receiver) = mpsc::channel();
-    let (sw_require_respone_sender, sw_require_respone_receiver) = mpsc::channel();
-    commands.insert_resource(SwRequireLoaderResponeSender(Arc::new(
-        sw_require_respone_sender.clone(),
+    let (sw_require_Response_sender, sw_require_Response_receiver) = mpsc::channel();
+    commands.insert_resource(SwRequireLoaderResponseSender(Arc::new(
+        sw_require_Response_sender.clone(),
     )));
     commands.insert_resource(SwRequireLoaderRequestReceiver(Arc::new(Mutex::new(
         sw_require_request_receiver,
@@ -88,39 +95,50 @@ fn init_js_context(mut commands: Commands) -> Result {
         let engine = &mut JsEngine::new(
             SimpleWarfareModuleLoader::new(
                 Arc::new(sw_module_request_sender),
-                Arc::new(Mutex::new(sw_module_respone_receiver)),
+                Arc::new(Mutex::new(sw_module_Response_receiver)),
             )
             .unwrap(),
             Arc::new(sw_require_request_sender),
-            Arc::new(Mutex::new(sw_require_respone_receiver))
+            Arc::new(Mutex::new(sw_require_Response_receiver)),
         );
-        let je_respone_sender = Arc::new(je_respone_sender);
+        let je_Response_sender = Arc::new(je_Response_sender);
         // 开始监听
         // 由bevy的EventWriter写入事件并经js_event_bridge中转到此
-        je_respone_sender
-            .send(JsEngineResponeEvent::EngineInited)
+        je_Response_sender
+            .send(JsEngineResponseEvent::EngineInited)
             .expect("Faied to send EngineInited event");
 
         while let Ok(event) = je_request_receiver.recv() {
-            process_js_event(engine, event, je_respone_sender.clone())
+            process_js_event(engine, event, je_Response_sender.clone())
                 .expect("process_js_event error")
         }
     });
     Ok(())
 }
 
-fn engine_inited(
-    mut next_state: ResMut<NextState<AppState>>,
-    event_receiver: Res<JsEngineEventResponeReciver>,
+fn broadcast_js_engine_response_event(
+    mut event_writer: EventWriter<JsEngineResponseEvent>,
+    event_receiver: Res<JsEngineEventResponseReciver>,
 ) -> Result<()> {
-    if let Ok(JsEngineResponeEvent::EngineInited) = event_receiver
+    if let Ok(event) = event_receiver
         .0
         .lock()
-        .expect("lock js respone receiver error in the system `engine_inited`")
+        .expect("lock js Response receiver error in the system `engine_inited`")
         .try_recv()
     {
-        next_state.set(AppState::ModInfoLoading);
+        event_writer.write(event);
     }
 
     Ok(())
+}
+
+fn inited_js_engine(
+    mut next_state: ResMut<NextState<AppState>>,
+    mut event_reader: EventReader<JsEngineResponseEvent>,
+) {
+    for event in event_reader.read() {
+        if *event == JsEngineResponseEvent::EngineInited {
+            next_state.set(AppState::ModInfoLoading);
+        }
+    }
 }

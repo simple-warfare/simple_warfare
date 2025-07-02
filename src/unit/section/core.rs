@@ -1,29 +1,14 @@
-use boa_engine::{JsArgs, JsResult, class::*, prelude::*, value::TryFromJs};
+use boa_engine::value::TryFromJs;
 
-#[derive(Debug, Trace, Finalize, JsData, TryFromJs)]
+#[derive(Debug, TryFromJs)]
 pub struct Core {
-    pub name: JsString,
+    pub name: String,
     pub hp: u32,
     pub price: u32,
-}
-
-impl Class for Core {
-    const NAME: &'static str = "Core";
-
-    const LENGTH: usize = 3;
-    fn data_constructor(
-        _new_target: &JsValue,
-        args: &[JsValue],
-        context: &mut Context,
-    ) -> JsResult<Self> {
-        let name = args.get_or_undefined(0).to_string(context)?;
-        let hp = args.get_or_undefined(1).to_u32(context)?;
-        let price = args.get_or_undefined(2).to_u32(context)?;
-        let core = Self { name, hp, price };
-        Ok(core)
-    }
-
-    fn init(class: &mut ClassBuilder<'_>) -> JsResult<()> {
-        Ok(())
-    }
+    pub mass: u32,
+    #[boa(rename = "buildSpeed")]
+    pub build_peed: f64,
+    pub radius: f64,
+    #[boa(rename = "maxHp")]
+    pub max_hp: u32,
 }

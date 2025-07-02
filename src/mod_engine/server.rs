@@ -7,7 +7,7 @@ use crate::{
         info::{ModEnable, ModInfo},
         js::JsAsset,
     },
-    js_engine::event::{JsEngineRequestEvent, ModEvent},
+    js_engine::event::JsEngineRequestEvent,
 };
 
 #[derive(Resource)]
@@ -21,20 +21,19 @@ impl ModServer {
     }
     pub fn spawn_unit(&self, entity: Entity, unit_str: &str) -> Entity {
         self.sender
-            .send(JsEngineRequestEvent::ModEvent(ModEvent::SpawnUnit(
+            .send(JsEngineRequestEvent::SpawnUnit(
                 entity,
                 unit_str.to_string(),
-            )))
+            ))
             .unwrap();
         entity
     }
 
     pub fn load_mod(&self, enables: Vec<(JsAsset, Vec<String>)>, info: ModInfo) -> Result<()> {
-        self.sender
-            .send(JsEngineRequestEvent::ModEvent(ModEvent::LoadMod(
-                ModEnable::new(enables),
-                info.clone(),
-            )))?;
+        self.sender.send(JsEngineRequestEvent::LoadMod(
+            ModEnable::new(enables),
+            info.clone(),
+        ))?;
         Ok(())
     }
 }

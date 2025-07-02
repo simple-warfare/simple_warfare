@@ -3,7 +3,7 @@ use crate::{
         GameAsset,
         texture::{
             TextureAtlasLayoutHandles,
-            interface::{DialogAtlasKind, DialogTextureSlicer},
+            dialog::{DialogAtlasKind, DialogTextureSlicer},
         },
     },
     bevy_ext::app::AppExt,
@@ -78,7 +78,7 @@ fn setup(
     let dialog_layout = &texture_atlas_layout_handles.dialog;
     let dialog = &game_asset.interface.dialog;
     let main_menu_slicer = &dialog_texture_slicer.main_menu;
-    let gray_button_slicer = &dialog_texture_slicer.gray_button;
+    let gray_rect_slicer = &dialog_texture_slicer.gray_rect;
 
     let text_style = TextFont::default();
 
@@ -95,10 +95,10 @@ fn setup(
                 dialog.clone(),
                 TextureAtlas {
                     layout: dialog_layout.clone(),
-                    index: DialogAtlasKind::GrayButton as usize,
+                    index: DialogAtlasKind::GrayRect as usize,
                 },
             )
-            .with_mode(NodeImageMode::Sliced(gray_button_slicer.clone())),
+            .with_mode(NodeImageMode::Sliced(gray_rect_slicer.clone())),
             children![(
                 Text::new(text),
                 text_style.clone(),

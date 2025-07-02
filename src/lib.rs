@@ -18,7 +18,8 @@ use bevy_panic_handler::PanicHandler;
 use js_engine::JsEnginePlugin;
 
 use crate::{
-    app_state::AppState, assets::AssetsPlugin, lua_engine::LuaEnginePlugin, mod_engine::ModEnginePlugin, scenes::ScenePlugin
+    app_state::AppState, assets::AssetsPlugin, lua_engine::LuaEnginePlugin,
+    mod_engine::ModEnginePlugin, scenes::ScenePlugin, unit::UnitPlugin,
 };
 
 pub struct SimpleWarfarePlugins;
@@ -31,7 +32,8 @@ impl PluginGroup for SimpleWarfarePlugins {
             .add(JsEnginePlugin)
             .add(LuaEnginePlugin)
             .add(ScenePlugin)
-            .add(ModEnginePlugin);
+            .add(ModEnginePlugin)
+            .add(UnitPlugin);
         group
     }
 }

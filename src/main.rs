@@ -8,6 +8,9 @@ fn main() {
         DefaultPlugins
             .set(WindowPlugin {
                 primary_window: Some(Window {
+                    title: "SimpleWarfare".into(),
+                    resolution: (1024.0, 768.0).into(),
+                    resizable: false,
                     mode: WindowMode::Windowed,
                     ..default()
                 }),
@@ -22,5 +25,3 @@ fn main() {
     .add_plugins(SimpleWarfarePlugin)
     .run();
 }
-
- 

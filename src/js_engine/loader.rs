@@ -3,7 +3,7 @@ use std::sync::{
     mpsc::{Receiver, Sender},
 };
 
-use crate::assets::mods::js::JsAsset;
+use crate::{assets::mods::js::JsAsset, js_engine::event::{SwModuleLoaderRequestEvent, SwModuleLoaderResponseEvent, SwRequireLoaderRequestEvent, SwRequireLoaderResponseEvent}};
 use bevy::prelude::*;
 use boa_engine::{
     JsResult, js_string,
@@ -16,33 +16,31 @@ use rustc_hash::FxHashMap;
 use std::fmt::Debug;
 
 use url::Url;
-#[derive(Debug, Event, Clone)]
-pub enum SwModuleLoaderRequestEvent {
-    LoadJsAsset(String),
-}
-#[derive(Debug, Event, Clone)]
-pub enum SwModuleLoaderResponeEvent {
-    LoadedJsAsset(JsAsset),
-}
 
 #[derive(Resource)]
 pub struct SwModuleLoaderRequestReceiver(pub Arc<Mutex<Receiver<SwModuleLoaderRequestEvent>>>);
 
 #[derive(Resource, Clone)]
-pub struct SwModuleLoaderResponeSender(pub Arc<Sender<SwModuleLoaderResponeEvent>>);
+pub struct SwModuleLoaderResponseSender(pub Arc<Sender<SwModuleLoaderResponseEvent>>);
+
+#[derive(Resource)]
+pub struct SwRequireLoaderRequestReceiver(pub Arc<Mutex<Receiver<SwRequireLoaderRequestEvent>>>);
+
+#[derive(Resource, Clone)]
+pub struct SwRequireLoaderResponseSender(pub Arc<Sender<SwRequireLoaderResponseEvent>>);
 
 #[derive(Debug)]
 pub struct SimpleWarfareModuleLoader {
     module_map: GcRefCell<FxHashMap<String, Module>>,
     path_url: Arc<FxHashMap<&'static str, &'static str>>,
     request_sender: Arc<Sender<SwModuleLoaderRequestEvent>>,
-    respone_receiver: Arc<Mutex<Receiver<SwModuleLoaderResponeEvent>>>,
+    Response_receiver: Arc<Mutex<Receiver<SwModuleLoaderResponseEvent>>>,
 }
 
 impl SimpleWarfareModuleLoader {
     pub fn new(
         request_sender: Arc<Sender<SwModuleLoaderRequestEvent>>,
-        respone_receiver: Arc<Mutex<Receiver<SwModuleLoaderResponeEvent>>>,
+        Response_receiver: Arc<Mutex<Receiver<SwModuleLoaderResponseEvent>>>,
     ) -> JsResult<Self> {
         let _timer = Profiler::global().start_event("Loader::new", "Loader");
         if cfg!(target_family = "wasm") {
@@ -57,7 +55,7 @@ impl SimpleWarfareModuleLoader {
             module_map: GcRefCell::default(),
             path_url: Arc::new(path_url),
             request_sender,
-            respone_receiver,
+            Response_receiver,
         })
     }
 
@@ -93,12 +91,12 @@ impl SimpleWarfareModuleLoader {
             )))?;
 
         match self
-            .respone_receiver
+            .Response_receiver
             .lock()
             .map_err(|err| {
                 JsNativeError::typ()
                     .with_message(format!(
-                        "could lock the respone receiver when load `{real_path}`"
+                        "could lock the Response receiver when load `{real_path}`"
                     ))
                     .with_cause(JsError::from_opaque(JsValue::String(js_string!(
                         err.to_string()
@@ -107,11 +105,11 @@ impl SimpleWarfareModuleLoader {
             .recv()
         {
             Ok(event) => match event {
-                SwModuleLoaderResponeEvent::LoadedJsAsset(js_asset) => return Ok(js_asset),
+                SwModuleLoaderResponseEvent::LoadedJsAsset(js_asset) => return Ok(js_asset),
             },
             Err(err) => Err(JsNativeError::typ()
                 .with_message(format!(
-                    "could lock the respone receiver when load `{real_path}`"
+                    "could lock the Response receiver when load `{real_path}`"
                 ))
                 .with_cause(JsError::from_opaque(JsValue::String(js_string!(
                     err.to_string()

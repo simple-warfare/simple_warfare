@@ -17,24 +17,13 @@ use url::Url;
 
 use crate::{
     assets::mods::js::JsAsset,
-    js_engine::{loader::SimpleWarfareModuleLoader, module::ModModule},
+    js_engine::{
+        event::{SwRequireLoaderRequestEvent, SwRequireLoaderResponseEvent},
+        loader::SimpleWarfareModuleLoader,
+        module::ModModule,
+    },
     unit::section::core::Core,
 };
-
-#[derive(Debug, Event, Clone)]
-pub enum SwRequireLoaderRequestEvent {
-    LoadJsAsset(String),
-}
-#[derive(Debug, Event, Clone)]
-pub enum SwRequireLoaderResponeEvent {
-    LoadedJsAsset(JsAsset),
-}
-
-#[derive(Resource)]
-pub struct SwRequireLoaderRequestReceiver(pub Arc<Mutex<Receiver<SwRequireLoaderRequestEvent>>>);
-
-#[derive(Resource, Clone)]
-pub struct SwRequireLoaderResponeSender(pub Arc<Sender<SwRequireLoaderResponeEvent>>);
 
 pub struct JsEngine {
     pub(super) context: Context,
@@ -42,14 +31,14 @@ pub struct JsEngine {
     pub(super) unit_map: HashMap<Entity, JsProxy>,
     path_url: Arc<FxHashMap<&'static str, &'static str>>,
     request_sender: Arc<Sender<SwRequireLoaderRequestEvent>>,
-    respone_receiver: Arc<Mutex<Receiver<SwRequireLoaderResponeEvent>>>,
+    Response_receiver: Arc<Mutex<Receiver<SwRequireLoaderResponseEvent>>>,
 }
 
 impl JsEngine {
     pub fn new(
         loader: SimpleWarfareModuleLoader,
         request_sender: Arc<Sender<SwRequireLoaderRequestEvent>>,
-        respone_receiver: Arc<Mutex<Receiver<SwRequireLoaderResponeEvent>>>,
+        Response_receiver: Arc<Mutex<Receiver<SwRequireLoaderResponseEvent>>>,
     ) -> Self {
         let context_builder = Context::builder();
         let loader = Rc::new(loader);
@@ -71,7 +60,7 @@ impl JsEngine {
             &mut ctx.borrow_mut(),
             path_url.clone(),
             request_sender.clone(),
-            respone_receiver.clone(),
+            Response_receiver.clone(),
         );
 
         Self {
@@ -80,7 +69,7 @@ impl JsEngine {
             unit_map: HashMap::new(),
             path_url,
             request_sender,
-            respone_receiver,
+            Response_receiver,
         }
     }
 }
@@ -91,10 +80,7 @@ fn egister_global_property(ctx: &mut Context) {
         .expect("the console builtin shouldn't exist");
 }
 
-fn register_global_class(ctx: &mut Context) {
-    ctx.register_global_class::<Core>()
-        .expect("the Core builtin shouldn't exist");
-}
+fn register_global_class(ctx: &mut Context) {}
 pub fn get_real_path(
     path_url: Arc<FxHashMap<&'static str, &'static str>>,
     url: &Url,
@@ -116,21 +102,24 @@ fn register_global_callable(
     ctx: &mut Context,
     path_url: Arc<FxHashMap<&'static str, &'static str>>,
     request_sender: Arc<Sender<SwRequireLoaderRequestEvent>>,
-    respone_receiver: Arc<Mutex<Receiver<SwRequireLoaderResponeEvent>>>,
+    Response_receiver: Arc<Mutex<Receiver<SwRequireLoaderResponseEvent>>>,
 ) {
     let moduleobj = JsObject::default();
-    moduleobj.set(
-        js_string!("exports"),
-        JsValue::from(js_string!(" ")),
-        false,
-        ctx,
-    ).unwrap();
+    moduleobj
+        .set(
+            js_string!("exports"),
+            JsValue::from(js_string!(" ")),
+            false,
+            ctx,
+        )
+        .unwrap();
 
     ctx.register_global_property(
         js_string!("module"),
         JsValue::from(moduleobj),
         Attribute::default(),
-    ).unwrap();
+    )
+    .unwrap();
 
     ctx.register_global_callable("require".into(), 0, unsafe {
         NativeFunction::from_closure(move |referrer, args, ctx| {
@@ -149,13 +138,13 @@ fn register_global_callable(
                 )))?;
             // Read the module source file
             println!("Loading: {real_path}");
-            let respone_receiver = respone_receiver.clone();
-            let js_asset = match respone_receiver
+            let Response_receiver = Response_receiver.clone();
+            let js_asset = match Response_receiver
                 .lock()
                 .map_err(|err| {
                     JsNativeError::typ()
                         .with_message(format!(
-                            "could lock the respone receiver when load `{real_path}`"
+                            "could lock the Response receiver when load `{real_path}`"
                         ))
                         .with_cause(JsError::from_opaque(JsValue::String(js_string!(
                             err.to_string()
@@ -164,21 +153,19 @@ fn register_global_callable(
                 .recv()
             {
                 Ok(event) => match event {
-                    SwRequireLoaderResponeEvent::LoadedJsAsset(js_asset) => {
+                    SwRequireLoaderResponseEvent::LoadedJsAsset(js_asset) => {
                         Ok::<JsAsset, JsError>(js_asset)
                     }
                 },
                 Err(err) => Err(JsNativeError::typ()
                     .with_message(format!(
-                        "could lock the respone receiver when load `{real_path}`"
+                        "could lock the Response receiver when load `{real_path}`"
                     ))
                     .with_cause(JsError::from_opaque(JsValue::String(js_string!(
                         err.to_string()
                     ))))
                     .into()),
             }?;
-
-            info!("{:?}",js_asset);
 
             ctx.eval(Source::from_bytes(&js_asset.context))?;
 

@@ -9,7 +9,7 @@ use crate::{
         map::ldtk::{LdtkMap, LdtkMapLoader},
         mods::{info::*, js::*, lua::*},
         texture::{
-            TextureAtlasLayoutHandles, chrome::ChromeTextureSlicer, interface::DialogTextureSlicer,
+            TextureAtlasLayoutHandles, chrome::ChromeTextureSlicer, dialog::DialogTextureSlicer,
             process_textures,
         },
     },

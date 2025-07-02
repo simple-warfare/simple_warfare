@@ -8,7 +8,7 @@ use crate::{
         texture::{
             TextureAtlasLayoutHandles,
             chrome::{ChromeAtlasKind, ChromeTextureSlicer},
-            interface::{DialogAtlasKind, DialogTextureSlicer},
+            dialog::{DialogAtlasKind, DialogTextureSlicer},
         },
     },
     bevy_ext::app::AppExt,
@@ -22,9 +22,15 @@ pub struct SelectMapScene;
 #[derive(Component)]
 struct SelectMapSceneMark;
 
+#[derive(Component, Clone)]
+struct MapRect;
+
 impl Scene for SelectMapScene {
     fn build(&self, app: &mut App) {
-        app.add_scene_system::<SelectMapSceneMark, _, _>(SceneState::SelectMapScene, setup);
+        app.add_scene_system::<SelectMapSceneMark, _, _>(
+            SceneState::SelectMapScene,
+            (setup, show_map).chain(),
+        );
     }
 }
 
@@ -34,34 +40,35 @@ fn setup(
     texture_atlas_layout_handles: Res<TextureAtlasLayoutHandles>,
     dialog_texture_slicer: Res<DialogTextureSlicer>,
     chrome_texture_slicer: Res<ChromeTextureSlicer>,
-    ldtk_maps: Res<Assets<LdtkMap>>,
 ) -> Result {
     let dialog_layout = &texture_atlas_layout_handles.dialog;
     let dialog = &game_asset.interface.dialog;
-    let gray_button_slicer = &dialog_texture_slicer.gray_button;
+    let light_blue_rect_slicer = &dialog_texture_slicer.light_blue_rect;
 
     let chrome = &game_asset.interface.chrome;
     let chrome_layout = &texture_atlas_layout_handles.chrome;
     let map_viewer_slicer = &chrome_texture_slicer.map_viewer;
-    let text_style = TextFont::default();
-    let map = ldtk_maps
-        .get(
-            game_asset
-                .maps
-                .first()
-                .ok_or("No maps available in game assets")?,
-        )
-        .ok_or("Requested map not found in ldtk_maps")?;
 
-    let map_test = (
+    let map_rect = (
+        MapRect,
         Node {
+            width: Val::Percent(100.),
+            height: Val::Percent(100.),
             display: Display::Grid,
             border: UiRect::all(Val::Px(10.)),
             align_content: AlignContent::Center,
             justify_content: JustifyContent::Center,
             ..Default::default()
         },
-        ImageNode::new(map.thumbnail.clone()),
+        Button,
+        ImageNode::from_atlas_image(
+            dialog.clone(),
+            TextureAtlas {
+                layout: dialog_layout.clone(),
+                index: DialogAtlasKind::LightBlueRect as usize,
+            },
+        )
+        .with_mode(NodeImageMode::Sliced(light_blue_rect_slicer.clone())),
     );
 
     commands.spawn((SelectMapSceneMark, Camera2d));
@@ -113,15 +120,15 @@ fn setup(
                         ..Default::default()
                     },
                     children![
-                        map_test.clone(),
-                        map_test.clone(),
-                        map_test.clone(),
-                        map_test.clone(),
-                        map_test.clone(),
-                        map_test.clone(),
-                        map_test.clone(),
-                        map_test.clone(),
-                        map_test.clone(),
+                        map_rect.clone(),
+                        map_rect.clone(),
+                        map_rect.clone(),
+                        map_rect.clone(),
+                        map_rect.clone(),
+                        map_rect.clone(),
+                        map_rect.clone(),
+                        map_rect.clone(),
+                        map_rect.clone(),
                     ]
                 ),
                 (Node {
@@ -139,6 +146,40 @@ fn setup(
             ],
         )],
     ));
+
+    Ok(())
+}
+
+fn show_map(
+    mut commands: Commands,
+    ldtk_maps: Res<Assets<LdtkMap>>,
+    game_asset: Res<GameAsset>,
+    map_rects: Query<Entity, With<MapRect>>,
+) -> Result {
+    let text_style = TextFont::default();
+    let map = ldtk_maps
+        .get(
+            game_asset
+                .maps
+                .first()
+                .ok_or("No maps available in game assets")?,
+        )
+        .ok_or("Requested map not found in ldtk_maps")?;
+
+    for entity in map_rects {
+        commands.entity(entity).with_child((
+            Node {
+                max_width: Val::Percent(100.),
+                max_height: Val::Percent(100.),
+                aspect_ratio: Some(1.),
+                border: UiRect::all(Val::Px(10.)),
+                align_content: AlignContent::Center,
+                justify_content: JustifyContent::Center,
+                ..Default::default()
+            },
+            ImageNode::new(map.thumbnail.clone()),
+        ));
+    }
 
     Ok(())
 }

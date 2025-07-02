@@ -1,13 +1,12 @@
 class Core {
-    constructor({ name, price, mass, buildSpeed, radius, isBio, isBuilder, maxHp }) {
+    constructor({ name, hp, maxHp, price, mass, buildSpeed, radius, }) {
         this.name = name
+        this.hp = hp
+        this.maxHp = maxHp
         this.price = price
         this.mass = mass
         this.buildSpeed = buildSpeed
         this.radius = radius
-        this.isBio = isBio
-        this.isBuilder = isBuilder
-        this.maxHp = maxHp
 
     }
 }
@@ -17,13 +16,12 @@ class CoreBuilder {
     constructor() {
         this.params = {
             name: "",
+            hp: 0,
+            maxHp: 0,
             price: 0,
             mass: 0,
-            buildSpeed: 0,
-            radius: 0,
-            isBio: false,
-            isBuilder: false,
-            maxHp: 0,
+            buildSpeed: 0.,
+            radius: 0.,
         }
 
         Object.keys(this.params).forEach(key => {

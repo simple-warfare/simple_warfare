@@ -1,5 +1,4 @@
-let create = require("package:gl-vec2-1.3.0/create.js");
-
+let create = require("package:gl-vec2/create.js");
 class Graphic {
     constructor({ position, path, layer, frameWidth, frameHeight }) {
         this.position = position
@@ -16,8 +15,8 @@ class GraphicBuilder {
             position: create(),
             path: '',
             layer: 1,
-            frameWidth: undefined,
-            frameHeight: undefined
+            frameWidth: 0,
+            frameHeight: 0
         }
 
         Object.keys(this.params).forEach(key => {
