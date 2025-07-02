@@ -1,32 +1,42 @@
+class Core {
+    constructor({ name, price, mass, buildSpeed, radius, isBio, isBuilder, maxHp }) {
+        this.name = name
+        this.price = price
+        this.mass = mass
+        this.buildSpeed = buildSpeed
+        this.radius = radius
+        this.isBio = isBio
+        this.isBuilder = isBuilder
+        this.maxHp = maxHp
+
+    }
+}
+
+
 class CoreBuilder {
     constructor() {
-        this.name = ""
-        this.price = 0
-        this.mass = 0
-        this.build_speed = 0
-        this.radius = 0
-        this.is_bio = false
-        this.isBuilder = false
-        this.max_hp = 0
+        this.params = {
+            name: "",
+            price: 0,
+            mass: 0,
+            buildSpeed: 0,
+            radius: 0,
+            isBio: false,
+            isBuilder: false,
+            maxHp: 0,
+        }
 
-        Object.keys(this).forEach(key => {
-            const with_name = `with_${key}`;
-            this[with_name] = value => {
-                this[key] = value;
-                return this;
-            }
-        })
+        Object.keys(this.params).forEach(key => {
+            const methodName = `with${key.charAt(0).toUpperCase() + key.slice(1)}`
+            this[methodName] = (value) => {
+                this.params[key] = value
+                return this
+            };
+        });
     };
 
     build() {
-        const keysNoWithers = Object.keys(this).filter(key => typeof this[key] !== 'function');
-
-        return keysNoWithers.reduce((returnValue, key) => {
-            return {
-                ...returnValue,
-                [key]: this[key]
-            }
-        }, {})
+        return new Core(this.params)
     }
 };
 

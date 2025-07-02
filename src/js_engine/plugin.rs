@@ -1,30 +1,48 @@
 use bevy::prelude::*;
 
-use crate::{assets::mods::js::JsAsset, js_engine::loader::*};
+use crate::{
+    assets::mods::js::JsAsset,
+    js_engine::{
+        engine::{
+            SwRequireLoaderRequestEvent, SwRequireLoaderRequestReceiver,
+            SwRequireLoaderResponeEvent, SwRequireLoaderResponeSender,
+        },
+        loader::*,
+    },
+};
 
-pub struct SwModuleLoaderPlugin;
+pub struct SwLoaderPlugin;
 
-impl Plugin for SwModuleLoaderPlugin {
+impl Plugin for SwLoaderPlugin {
     fn build(&self, app: &mut App) {
-        app.init_resource::<JsAssetHandles>()
+        app.init_resource::<ModuleJsAssetHandles>()
+        .init_resource::<RequireJsAssetHandles>()
             .add_systems(
                 Update,
-                receiver_request.run_if(resource_exists::<SwModuleLoaderRequestReceiver>),
+                (module_receiver_request, require_receiver_request).run_if(
+                    resource_exists::<SwModuleLoaderRequestReceiver>
+                        .and(resource_exists::<SwRequireLoaderRequestReceiver>),
+                ),
             )
             .add_systems(
                 Update,
-                check_js_asset_ready.run_if(resource_exists::<SwModuleLoaderResponeSender>),
+                (module_check_js_asset_ready, require_check_js_asset_ready).run_if(
+                    resource_exists::<SwModuleLoaderResponeSender>
+                        .and(resource_exists::<SwRequireLoaderResponeSender>),
+                ),
             );
     }
 }
 
 #[derive(Resource, Default)]
-pub struct JsAssetHandles(pub Vec<Handle<JsAsset>>);
+pub struct ModuleJsAssetHandles(pub Vec<Handle<JsAsset>>);
+#[derive(Resource, Default)]
+pub struct RequireJsAssetHandles(pub Vec<Handle<JsAsset>>);
 
-pub(super) fn receiver_request(
+pub(super) fn module_receiver_request(
     asset_server: Res<AssetServer>,
     event_receiver: Res<SwModuleLoaderRequestReceiver>,
-    mut js_asset_handles: ResMut<JsAssetHandles>,
+    mut js_asset_handles: ResMut<ModuleJsAssetHandles>,
     js_assets: Res<Assets<JsAsset>>,
     sender: Res<SwModuleLoaderResponeSender>,
 ) -> Result {
@@ -48,9 +66,9 @@ pub(super) fn receiver_request(
     Ok(())
 }
 
-fn check_js_asset_ready(
+fn module_check_js_asset_ready(
     asset_server: Res<AssetServer>,
-    js_asset_handles: Res<JsAssetHandles>,
+    js_asset_handles: Res<ModuleJsAssetHandles>,
     js_assets: Res<Assets<JsAsset>>,
     mut events: EventReader<AssetEvent<JsAsset>>,
     sender: Res<SwModuleLoaderResponeSender>,
@@ -64,6 +82,59 @@ fn check_js_asset_ready(
                 {
                     info!("加载完成");
                     sender.0.send(SwModuleLoaderResponeEvent::LoadedJsAsset(
+                        js_assets.get(*id).unwrap().clone(),
+                    ))?;
+                }
+            }
+            _ => {}
+        }
+    }
+    Ok(())
+}
+
+pub(super) fn require_receiver_request(
+    asset_server: Res<AssetServer>,
+    event_receiver: Res<SwRequireLoaderRequestReceiver>,
+    mut js_asset_handles: ResMut<RequireJsAssetHandles>,
+    js_assets: Res<Assets<JsAsset>>,
+    sender: Res<SwRequireLoaderResponeSender>,
+) -> Result {
+    if let Ok(SwRequireLoaderRequestEvent::LoadJsAsset(path)) =
+        event_receiver.0.lock().unwrap().try_recv()
+    {
+        info!("try load module:{}", path);
+        let asset = asset_server.load(path);
+        if asset_server.is_loaded_with_dependencies(asset.id()) {
+            sender
+                .0
+                .send(SwRequireLoaderResponeEvent::LoadedJsAsset(
+                    js_assets.get(asset.id()).unwrap().clone(),
+                ))
+                .unwrap();
+        } else {
+            js_asset_handles.0.push(asset);
+        }
+    }
+
+    Ok(())
+}
+
+fn require_check_js_asset_ready(
+    asset_server: Res<AssetServer>,
+    js_asset_handles: Res<RequireJsAssetHandles>,
+    js_assets: Res<Assets<JsAsset>>,
+    mut events: EventReader<AssetEvent<JsAsset>>,
+    sender: Res<SwRequireLoaderResponeSender>,
+) -> Result {
+    for event in events.read() {
+        match event {
+            AssetEvent::LoadedWithDependencies { id } => {
+                if js_asset_handles
+                    .0
+                    .contains(&asset_server.get_id_handle(*id).unwrap())
+                {
+                    info!("加载完成");
+                    sender.0.send(SwRequireLoaderResponeEvent::LoadedJsAsset(
                         js_assets.get(*id).unwrap().clone(),
                     ))?;
                 }

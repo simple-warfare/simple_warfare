@@ -1,22 +1,30 @@
-class CustomUnitBuilder {
+class CustomUnit {
     constructor() {
-        this._proxy = new Proxy(this, CustomUnitHandle);
+        this.graphics = new Array()
+        this._proxy = new Proxy(this, CustomUnitHandle)
     }
 
     get_proxy() {
-        return this._proxy;
+        return this._proxy
+    }
+}
+
+
+class CustomUnitBuilder {
+    constructor() {
+
     }
 };
 
 const CustomUnitHandle = {
     get(target, prop) {
-        console.log(`访问属性: ${String(prop)}`);
-        return Reflect.get(target, prop);
+        console.log(`访问属性: ${String(prop)}`)
+        return Reflect.get(target, prop)
     },
     set(target, prop, value) {
-        console.log(`设置属性: ${String(prop)} = ${value}`);
-        return Reflect.set(target, prop, value);
+        console.log(`设置属性: ${String(prop)} = ${value}`)
+        return Reflect.set(target, prop, value)
     }
 };
 
-export { CustomUnitBuilder };
+export { CustomUnit, CustomUnitBuilder };

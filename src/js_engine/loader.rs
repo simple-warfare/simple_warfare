@@ -5,7 +5,6 @@ use std::sync::{
 
 use crate::assets::mods::js::JsAsset;
 use bevy::prelude::*;
-use bevy_inspector_egui::egui::ahash::HashMapExt;
 use boa_engine::{
     JsResult, js_string,
     module::{ModuleLoader, Referrer},
@@ -35,7 +34,7 @@ pub struct SwModuleLoaderResponeSender(pub Arc<Sender<SwModuleLoaderResponeEvent
 #[derive(Debug)]
 pub struct SimpleWarfareModuleLoader {
     module_map: GcRefCell<FxHashMap<String, Module>>,
-    path_url: FxHashMap<&'static str, &'static str>,
+    path_url: Arc<FxHashMap<&'static str, &'static str>>,
     request_sender: Arc<Sender<SwModuleLoaderRequestEvent>>,
     respone_receiver: Arc<Mutex<Receiver<SwModuleLoaderResponeEvent>>>,
 }
@@ -52,12 +51,11 @@ impl SimpleWarfareModuleLoader {
                 .into());
         }
 
-        let mut path_url = FxHashMap::new();
+        let mut path_url = FxHashMap::default();
         path_url.insert("std", "mods/std/");
-
         Ok(Self {
             module_map: GcRefCell::default(),
-            path_url,
+            path_url: Arc::new(path_url),
             request_sender,
             respone_receiver,
         })
@@ -145,7 +143,7 @@ impl ModuleLoader for SimpleWarfareModuleLoader {
 
             let real_path = self.get_real_path(&specifier_url)?;
             let js_asset = self.load(real_path)?;
-            println!("js_asset:{}", js_asset.context);
+
             let source = Source::from_bytes(&js_asset.context);
             let module = Module::parse(source, None, context)?;
             Ok(module)

@@ -13,12 +13,12 @@ use crate::{
     app_state::AppState,
     js_engine::{
         context::*,
-        engine::JsEngine,
+        engine::{JsEngine, SwRequireLoaderRequestReceiver, SwRequireLoaderResponeSender},
         event::{JsEngineRequestEvent, JsEngineResponeEvent},
         loader::{
             SimpleWarfareModuleLoader, SwModuleLoaderRequestReceiver, SwModuleLoaderResponeSender,
         },
-        plugin::SwModuleLoaderPlugin,
+        plugin::SwLoaderPlugin,
     },
 };
 use bevy::prelude::*;
@@ -38,7 +38,7 @@ pub struct JsEnginePlugin;
 
 impl Plugin for JsEnginePlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins(SwModuleLoaderPlugin)
+        app.add_plugins(SwLoaderPlugin)
             .add_event::<JsEngineRequestEvent>()
             .add_systems(OnEnter(AppState::InitJsContext), init_js_context)
             .add_systems(
@@ -75,6 +75,15 @@ fn init_js_context(mut commands: Commands) -> Result {
         sw_module_request_receiver,
     ))));
 
+    let (sw_require_request_sender, sw_require_request_receiver) = mpsc::channel();
+    let (sw_require_respone_sender, sw_require_respone_receiver) = mpsc::channel();
+    commands.insert_resource(SwRequireLoaderResponeSender(Arc::new(
+        sw_require_respone_sender.clone(),
+    )));
+    commands.insert_resource(SwRequireLoaderRequestReceiver(Arc::new(Mutex::new(
+        sw_require_request_receiver,
+    ))));
+
     std::thread::spawn(move || {
         let engine = &mut JsEngine::new(
             SimpleWarfareModuleLoader::new(
@@ -82,6 +91,8 @@ fn init_js_context(mut commands: Commands) -> Result {
                 Arc::new(Mutex::new(sw_module_respone_receiver)),
             )
             .unwrap(),
+            Arc::new(sw_require_request_sender),
+            Arc::new(Mutex::new(sw_require_respone_receiver))
         );
         let je_respone_sender = Arc::new(je_respone_sender);
         // 开始监听

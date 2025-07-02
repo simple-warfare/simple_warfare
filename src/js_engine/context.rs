@@ -1,30 +1,14 @@
-use crate::{
-    js_engine::{engine::JsEngine, event::*, module::ModModule},
-    unit::section::core::Core,
-};
+use crate::
+    js_engine::{engine::JsEngine, event::*, module::ModModule}
+;
 use bevy::prelude::*;
 use boa_engine::{
     builtins::promise::PromiseState, js_string, object::builtins::JsProxy, prelude::*,
-    property::Attribute,
 };
-use boa_runtime::Console;
 use std::{
     path::Path,
     sync::{Arc, mpsc::Sender},
 };
-
-pub(super) fn add_runtime(context: &mut Context) {
-    let console = Console::init(context);
-    context
-        .register_global_property(Console::NAME, console, Attribute::all())
-        .expect("the console builtin shouldn't exist");
-}
-
-pub(super) fn register_class(context: &mut Context) {
-    context
-        .register_global_class::<Core>()
-        .expect("the Core builtin shouldn't exist");
-}
 
 pub(super) fn process_js_event(
     engine: &mut JsEngine,
