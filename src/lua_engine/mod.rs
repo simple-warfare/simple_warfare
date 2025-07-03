@@ -36,8 +36,7 @@ impl Plugin for LuaEnginePlugin {
                 Update,
                 check_mod_infos.run_if(in_state(AppState::ModInfoLoading)),
             )
-            .add_systems(OnEnter(AppState::ModInfoLoaded), load_main_lua)
-            .add_systems(OnEnter(AppState::MainLuaExecuted), init_Js_engine);
+            .add_systems(OnEnter(AppState::ModInfoLoaded), load_main_lua);
     }
 }
 
@@ -128,5 +127,3 @@ fn add_default_value(engine: &Lua, global: &Table, mod_info: &ModInfo) -> Result
     global.set("mod_enable", mod_enable_lua)?;
     Ok(())
 }
-
-fn init_Js_engine() {}

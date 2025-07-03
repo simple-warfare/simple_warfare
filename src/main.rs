@@ -1,7 +1,7 @@
 use bevy::{prelude::*, window::WindowMode};
 use bevy_inspector_egui::{bevy_egui::EguiPlugin, quick::WorldInspectorPlugin};
 use simple_warfare::SimpleWarfarePlugin;
-
+use bevy_rapier2d::prelude::*;
 fn main() {
     let mut app = App::new();
     app.add_plugins(
@@ -22,6 +22,10 @@ fn main() {
         enable_multipass_for_primary_context: true,
     })
     .add_plugins(WorldInspectorPlugin::new())
+    .add_plugins((
+        RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(10.0),
+        RapierDebugRenderPlugin::default(),
+    ))
     .add_plugins(SimpleWarfarePlugin)
     .run();
 }

@@ -8,6 +8,8 @@ pub mod panel;
 pub mod scenes;
 pub mod unit;
 pub mod utils;
+pub mod statistics;
+
 
 use bevy::{app::PluginGroupBuilder, prelude::*};
 use bevy_ecs_ldtk::prelude::*;

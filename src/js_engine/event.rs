@@ -1,8 +1,11 @@
 use bevy::prelude::*;
 
-use crate::assets::mods::{
-    info::{ModEnable, ModInfo},
-    js::JsAsset,
+use crate::{
+    assets::mods::{
+        info::{ModEnable, ModInfo},
+        js::JsAsset,
+    },
+    unit::custom_unit::SpawnedUnitData,
 };
 
 #[derive(Event, Clone)]
@@ -11,10 +14,10 @@ pub enum JsEngineRequestEvent {
     SpawnUnit(Entity, String),
 }
 
-#[derive(Event, Clone, PartialEq, Eq)]
+#[derive(Event, Clone)]
 pub enum JsEngineResponseEvent {
     EngineInited,
-    SpawnedUnit(Entity),
+    SpawnedUnit(Entity, String, SpawnedUnitData),
 }
 #[derive(Debug, Event, Clone)]
 pub enum SwModuleLoaderRequestEvent {

@@ -1,3 +1,4 @@
+mod game;
 mod loading;
 mod mian;
 mod select_map;
@@ -6,7 +7,7 @@ use bevy::prelude::*;
 
 use crate::{
     bevy_ext::app::AppExt,
-    scenes::{loading::LoadingScene, mian::MainScene, select_map::SelectMapScene},
+    scenes::{game::GameScene, loading::LoadingScene, mian::MainScene, select_map::SelectMapScene},
 };
 
 pub trait Scene: Default {
@@ -19,6 +20,7 @@ pub enum SceneState {
     LoadingScene,
     MainScene,
     SelectMapScene,
+    GameScene,
 }
 
 pub struct ScenePlugin;
@@ -28,6 +30,7 @@ impl Plugin for ScenePlugin {
         app.init_state::<SceneState>()
             .init_scene::<LoadingScene>()
             .init_scene::<MainScene>()
-            .init_scene::<SelectMapScene>();
+            .init_scene::<SelectMapScene>()
+            .init_scene::<GameScene>();
     }
 }

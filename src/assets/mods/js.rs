@@ -44,7 +44,16 @@ impl AssetLoader for JsAssetLoader {
                 load_context.path().display().to_string(),
             ))?
             .to_string_lossy()
-            .to_string();
+            .into_owned();
+
+        let from = load_context
+            .path()
+            .parent()
+            .ok_or(Self::Error::FileNameNotFound(
+                load_context.path().display().to_string(),
+            ))?
+            .to_string_lossy()
+            .into_owned();
 
         let mut context = String::new();
         reader.read_to_string(&mut context).await?;
@@ -52,11 +61,11 @@ impl AssetLoader for JsAssetLoader {
         Ok(Self::Asset {
             file_name,
             context,
-            ..Default::default()
+            from
         })
     }
 
     fn extensions(&self) -> &[&str] {
-        &["js","mjs"]
+        &["js", "mjs"]
     }
 }

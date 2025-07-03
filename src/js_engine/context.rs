@@ -1,6 +1,12 @@
 use crate::{
     js_engine::{engine::JsEngine, event::*, module::ModModule},
-    unit::section::{core::Core, graphic::Graphic},
+    unit::{
+        custom_unit::SpawnedUnitData,
+        section::{
+            core::Core,
+            graphic::{Graphic, Graphics},
+        },
+    },
 };
 use bevy::prelude::*;
 use boa_engine::{
@@ -40,7 +46,7 @@ pub(super) fn process_js_event(
                 let module = Module::parse(
                     Source::from_reader(
                         js_asset.context.as_bytes(),
-                        Some(Path::new(&js_asset.file_name)),
+                        Some(&Path::new(&js_asset.from).join(js_asset.file_name)),
                     ),
                     None,
                     context,
@@ -75,13 +81,10 @@ pub(super) fn process_js_event(
             let unit_from: Vec<&str> = unit_str.split(':').collect();
             if let Some(modules) = module_map.get(unit_from[0]) {
                 for module in modules {
-                    if module.classes.contains(&unit_from[1].to_string()) {
-                        let array_obj = context
-                            .eval(Source::from_bytes("new Array()"))?
-                            .to_object(context)?;
-                        let array = JsArray::from_object(array_obj)?;
-                        info!("{:?}", array);
-
+                    let target_class = unit_from[1].to_string();
+                    if module.classes.contains(&target_class) {
+                        let module_path =
+                            module.module.path().unwrap().to_string_lossy().into_owned();
                         let class = module
                             .module
                             .namespace(context)
@@ -92,37 +95,39 @@ pub(super) fn process_js_event(
                             .construct(&[], None, context)
                             .expect("construct error");
 
-                        let graphics = class_obj
-                            .get(js_string!("graphics"), context)?
-                            .to_object(context)?;
-
-                        let graphics = JsArray::from_object(graphics)?;
-
-                        let graphic = Graphic::try_from_js(&graphics.at(0, context)?, context).unwrap();
-
-                        info!("{:?}", graphic);
                         let unit_proxy = JsProxy::from_object(
                             class_obj
                                 .get(js_string!("get_proxy"), context)?
                                 .as_callable()
                                 .ok_or(JsError::from_opaque(
-                                    js_string!(format!("the vaule is not a callable",)).into(),
+                                    js_string!(format!("the vaule is not callable",)).into(),
                                 ))?
                                 .call(&JsValue::Object(class_obj), &[], context)?
                                 .to_object(context)?
                                 .clone(),
                         )?;
-                        info!(
-                            "{:?}",
-                            Core::try_from_js(
-                                &unit_proxy.get(js_string!("core"), context)?,
-                                context
-                            )?
-                        );
+
+                        let graphics = Graphics::new(Vec::<Graphic>::try_from_js(
+                            &JsValue::Object(
+                                unit_proxy
+                                    .get(js_string!("graphics"), context)?
+                                    .to_object(context)?,
+                            ),
+                            context,
+                        )?);
+
+                        let core = Core::try_from_js(
+                            &unit_proxy.get(js_string!("core"), context)?,
+                            context,
+                        )?;
 
                         unit_map.insert(entity, unit_proxy);
                         sender
-                            .send(JsEngineResponseEvent::SpawnedUnit(entity))
+                            .send(JsEngineResponseEvent::SpawnedUnit(
+                                entity,
+                                module_path,
+                                SpawnedUnitData::new(core, graphics),
+                            ))
                             .unwrap();
                     }
                 }

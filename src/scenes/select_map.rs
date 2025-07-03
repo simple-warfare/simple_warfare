@@ -30,8 +30,15 @@ impl Scene for SelectMapScene {
         app.add_scene_system::<SelectMapSceneMark, _, _>(
             SceneState::SelectMapScene,
             (setup, show_map).chain(),
-        );
+        )
+        .add_observer(button_click);
     }
+}
+
+#[derive(Debug, Component, Reflect, Serialize, Deserialize)]
+#[reflect(Component, Serialize, Deserialize)]
+enum ButtonLabel {
+    Ok,
 }
 
 fn setup(
@@ -48,14 +55,14 @@ fn setup(
     let chrome = &game_asset.interface.chrome;
     let chrome_layout = &texture_atlas_layout_handles.chrome;
     let map_viewer_slicer = &chrome_texture_slicer.map_viewer;
+    let gray_brick_rect = &chrome_texture_slicer.gray_brick_rect;
 
     let map_rect = (
         MapRect,
         Node {
             width: Val::Percent(100.),
             height: Val::Percent(100.),
-            display: Display::Grid,
-            border: UiRect::all(Val::Px(10.)),
+            padding: UiRect::all(Val::Px(6.)),
             align_content: AlignContent::Center,
             justify_content: JustifyContent::Center,
             ..Default::default()
@@ -75,6 +82,7 @@ fn setup(
     commands.spawn((
         SelectMapSceneMark,
         Node {
+            display: Display::Grid,
             width: Val::Percent(100.),
             height: Val::Percent(100.),
             justify_content: JustifyContent::Center,
@@ -85,10 +93,10 @@ fn setup(
         BackgroundColor(Color::Srgba(GRAY)),
         children![(
             Node {
+                display: Display::Grid,
                 width: Val::Percent(80.),
                 height: Val::Percent(80.),
-                display: Display::Grid,
-                grid_template_columns: vec![GridTrack::flex(2.0), GridTrack::flex(1.0)],
+                grid_template_columns: vec![GridTrack::flex(1.9), GridTrack::flex(1.0)],
                 grid_template_rows: vec![
                     GridTrack::flex(1.0),
                     GridTrack::flex(1.0),
@@ -107,16 +115,16 @@ fn setup(
             children![
                 (
                     Node {
+                        display: Display::Grid,
                         aspect_ratio: Some(1.0),
                         width: Val::Percent(100.),
                         height: Val::Percent(100.),
-                        display: Display::Grid,
-                        padding: UiRect::all(Val::Px(24.0)),
+                        padding: UiRect::all(Val::Px(16.0)),
                         grid_template_columns: RepeatedGridTrack::flex(3, 1.0),
                         grid_template_rows: RepeatedGridTrack::flex(3, 1.0),
                         grid_row: GridPlacement::span(3),
-                        row_gap: Val::Px(12.0),
-                        column_gap: Val::Px(12.0),
+                        row_gap: Val::Px(6.0),
+                        column_gap: Val::Px(6.0),
                         ..Default::default()
                     },
                     children![
@@ -131,18 +139,54 @@ fn setup(
                         map_rect.clone(),
                     ]
                 ),
-                (Node {
-                    align_items: AlignItems::Start,
-                    justify_items: JustifyItems::Center,
-                    padding: UiRect::all(Val::Px(10.)),
-                    grid_template_rows: vec![
-                        GridTrack::auto(),
-                        GridTrack::auto(),
-                        GridTrack::fr(1.0)
-                    ],
-                    row_gap: Val::Px(10.),
-                    ..Default::default()
-                },)
+                (
+                    Node {
+                        display: Display::Grid,
+                        width: Val::Percent(100.),
+                        height: Val::Percent(100.),
+                        padding: UiRect::all(Val::Px(10.)),
+                        grid_template_rows: vec![
+                            GridTrack::fr(2.0),
+                            GridTrack::fr(5.0),
+                            GridTrack::fr(1.0)
+                        ],
+                        row_gap: Val::Px(10.),
+                        ..Default::default()
+                    },
+                    children![
+                        (Node {
+                            display: Display::Grid,
+                            width: Val::Percent(100.),
+                            height: Val::Percent(100.),
+                            ..Default::default()
+                        }),
+                        (Node {
+                            display: Display::Grid,
+                            width: Val::Percent(100.),
+                            height: Val::Percent(100.),
+                            ..Default::default()
+                        }),
+                        (
+                            Node {
+                                display: Display::Grid,
+                                align_items: AlignItems::Center,
+                                justify_items: JustifyItems::Center,
+                                ..Default::default()
+                            },
+                            Button,
+                            ButtonLabel::Ok,
+                            ImageNode::from_atlas_image(
+                                chrome.clone(),
+                                TextureAtlas {
+                                    layout: chrome_layout.clone(),
+                                    index: ChromeAtlasKind::GrayBrickRect as usize
+                                }
+                            )
+                            .with_mode(NodeImageMode::Sliced((gray_brick_rect.clone()))),
+                            children![(Text::new("Ok"), TextColor(Color::Srgba(WHITE),))]
+                        )
+                    ]
+                )
             ],
         )],
     ));
@@ -156,7 +200,6 @@ fn show_map(
     game_asset: Res<GameAsset>,
     map_rects: Query<Entity, With<MapRect>>,
 ) -> Result {
-    let text_style = TextFont::default();
     let map = ldtk_maps
         .get(
             game_asset
@@ -170,16 +213,29 @@ fn show_map(
         commands.entity(entity).with_child((
             Node {
                 max_width: Val::Percent(100.),
-                max_height: Val::Percent(100.),
+                max_height: Val::Percent(80.),
                 aspect_ratio: Some(1.),
                 border: UiRect::all(Val::Px(10.)),
                 align_content: AlignContent::Center,
                 justify_content: JustifyContent::Center,
                 ..Default::default()
             },
+            Button,
             ImageNode::new(map.thumbnail.clone()),
         ));
     }
 
     Ok(())
+}
+
+fn button_click(
+    click: Trigger<Pointer<Click>>,
+    buttons: Query<&ButtonLabel, With<Button>>,
+    mut scene_state: ResMut<NextState<SceneState>>,
+) {
+    if let Ok(lable) = buttons.get(click.target()) {
+        match lable {
+            ButtonLabel::Ok => scene_state.set(SceneState::GameScene),
+        }
+    }
 }

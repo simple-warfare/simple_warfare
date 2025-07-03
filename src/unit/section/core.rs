@@ -1,6 +1,6 @@
+use bevy::prelude::*;
 use boa_engine::value::TryFromJs;
-
-#[derive(Debug, TryFromJs)]
+#[derive(Debug, Clone, Component, Reflect, TryFromJs)]
 pub struct Core {
     pub name: String,
     pub hp: u32,

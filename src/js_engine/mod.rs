@@ -137,8 +137,9 @@ fn inited_js_engine(
     mut event_reader: EventReader<JsEngineResponseEvent>,
 ) {
     for event in event_reader.read() {
-        if *event == JsEngineResponseEvent::EngineInited {
-            next_state.set(AppState::ModInfoLoading);
+        match event {
+            JsEngineResponseEvent::EngineInited => next_state.set(AppState::ModInfoLoading),
+            _ => {}
         }
     }
 }

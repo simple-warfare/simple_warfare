@@ -24,7 +24,7 @@ struct MainSceneMark;
 
 #[derive(Debug, Component, Reflect, Serialize, Deserialize)]
 #[reflect(Component, Serialize, Deserialize)]
-pub enum ButtonLabel {
+enum ButtonLabel {
     SinglePlayer,
     MultipPlayer,
     Setting,
@@ -157,7 +157,6 @@ fn setup(
     mod_server.spawn_unit(commands.spawn_empty().id(), "example:Tank");
 }
 
-/// An observer to rotate an entity when it is dragged
 fn button_click(
     click: Trigger<Pointer<Click>>,
     buttons: Query<&ButtonLabel, With<Button>>,
