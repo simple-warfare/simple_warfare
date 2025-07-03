@@ -1,11 +1,12 @@
 const UnitType = {
-  Unit: 'Unit',
-  Building: 'Building',
+    Unit: 'Unit',
+    Building: 'Building',
 };
 
 class CustomUnit {
     constructor() {
         this.graphics = new Array()
+        this.movement = undefined
         this._proxy = new Proxy(this, CustomUnitHandle)
     }
 

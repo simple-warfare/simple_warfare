@@ -1,0 +1,27 @@
+ Section    [template_NAME]   [模板_NAME]
+代码  代码翻译  描述  例子
+模板部分可以具有任何键，并且其自身无效。
+可以使用[core]copyFrom从其他文件中引用模板。例如：[core]copyFrom:ROOT:effects/explodeEffects.template。copyFrom可以一次引用多个文件。  
+-以下所有这些功能都可以与任何部分一起使用，而不仅仅是模板-  
+@copyFromSection  复制节  在任何节中使用，以引用节或模板的代码。如@copyFromSection template_name/action_name/projectile_name            @copyFromSection:projectile_1
+@copyFrom_skipThisSection  复制但跳过节  在任何节中使用，例如，在引用时候不复制某个action。          [action_test]@copyFrom_skipThisSection:true
+@define X  局部变量  在一个节中定义一个局部变量(最好在模板外部)  @define targetEffect: boom
+@global X  全局变量  定义在所有节中使用的全局变量。注意：局部变量具有更高的优先级          @global targetEffect: pop
+${X}  变量引用  ${X}可以用来引用变量(也可以在模板外部完成)            spawnEffects:effect_${targetEffect}
+${section.key}  值引用  ${section.key}可以用来引用键（也可以在模板外部完成）。        addResources:credits=${core.price * 2 + 10}
+         如果值为小数，可用int取整，例如${int(core.price*0.25)}
+%{X}可用于将动态逻辑添加到某些字符串中(不能在任何地方使用)。该值将在每一帧更新。        [action]text: Missing hp %{self.maxHp - self.hp}               1.15p1
+'''''' text '''''' 可用于多行字符串。换行符将从最终结果中删除。"
+copyFrom:''''''
+ROOT:a.ini,
+ROOT:b.ini,
+ROOT:c.ini
+''''''
+
+基本游戏：
+ 资源提取器-0.98（如果是自由点，则对于一个现有的提取器为0.55，然后为0.4，例如）
+ 陆军工厂-0.8（如果全局值为0，否则为0.46（其他基数））
+ 空军基地-0.48全局否则为0.29预先基准
+ 炮塔-如果基地为0，则基地为0.47，然后为0.35，依此类推
+ 激光防御-0.018
+ 维修湾-0.02

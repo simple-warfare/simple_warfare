@@ -1,0 +1,195 @@
+name:	名字	"定义单位原始名称，可以是中文。游戏使用它区分其它单位。如果没有在displayText或者语言文件设置显示名称，那么它也将作为单位的显示名称。
+具体描述文件位置:assets/translationsStrings_zh.properties格式:units.单位名称.name=写单位显示的名称
+altNames:	别名	以逗号分隔的名称列表。像名称一样，但优先级较低，对于启用多个自定义nod有用。	altNames:custTank1,customTank1,cTank1	string(s)
+class:	类	无实际用处，可以删除。Luke说：保留供将来使用，默认情况下必须为CustomUnitMetadata。	class: CustomUnitMetadata	string
+strictLevel:	严格级别	"默认值为0，忽略代码重复。设为1时如果当前单位内有重复代码，则报错。建议添加到""all-units.template""以应用于所有单位,进行统一查错。"	strictLevel:1	float
+price:	价格	设定单位造价，可以是负数，负数时提直接供资金。	price: 500	int(price)
+mass:	质量	单位的“重量”定义了它与其他单位的碰撞方式，值越大，推动就越困难。	mass: 3000	int
+techLevel:	科技等级	设置单位的科技等级，共有3个级别，1级GUI显示为绿色，2、3级显示为黄色。	techLevel: 1	int
+buildSpeed:	建造速度	建造此单位需要的时间，填秒。以前的计算方式为：此处所填时间=1÷(60x你需要的秒)如果定义了工厂速率则需要乘以建造乘数。	buildSpeed: 3s	float / s
+radius:	半径	单位的实际碰擦体积，也是实际的可选择范围。其光圈在displayRadius覆盖时真实体积不变。	radius: 20	int
+isBio:	是生物	此单位是否为生物，为生物则影响死亡声音和血迹（图像在drawable/blood_mark.png，hideScorchMark：true时可以隐藏）非生物则为黑色爆炸效果。	isBio: true	bool
+isBug:	是虫子	是否为虫子，用于沙盒中的单独分类。	isBug: false	bool
+isBuilder:	是建造者	若需要此单位建造建筑物，则通常需要此代码。并且默认设为[ai] useAsBuilder。	isBuilder: true	bool
+streamingCost	流式造价	就像价格，但在建造时逐渐消耗资金，如果在构建过程中资源耗尽，建造或生产队列将暂停。就像是红警中那样。铁锈默认是预先扣除资金。	streamingCos:100	int(price)
+switchPriceWithStreamingCost	切换价格为流造价	快捷设置为默认资金消耗方式或为流式建造方式。建议使用模板快速将一个模组为所有单位切换流资源。	switchPriceWithStreamingCost:true	bool
+#====	#====	单位统计代码	#====	#====
+maxHp:	生命值	单位最大生命值，默认生成时即为此值。	maxHp: 200	int
+selfRegenRate:	生命恢复速度	此数值决定每帧增加血量。游戏内默认速度下，一秒为60逻辑帧，而你看到的FPS帧数为渲染帧，所以电脑上几百帧和手机上60帧和省电模式下30帧并不影响计算。所以不要写太大。可以写负值用于自毁。	selfRegenRate: 0.01	float
+maxShield:	护盾值	单位最大护盾值，默认生成时即为此值。如果设置了startShieldAtZero:true，则初始为0.	maxShield: 500	int
+startShieldAtZero:	护盾初始为0	如果为true，则单位护盾值从0开始增加。	startShieldAtZero: true	bool
+shieldRegen:	护盾恢复速度	此数值决定每帧增加护盾值，游戏内一秒为60帧，所以不要写太大。可以写负值。	shieldRegen: 0.15	float
+energyMax:	能量值	默认值为0。可以用作炮塔，激光防御和行动的弹药的能量。	energyMax: 1	float
+energyRegen:	能量恢复速度	能量每帧恢复速度，游戏内一秒为60帧，所以不要写太大。可以写负值。	energyRegen: 0.01	float
+energyRegenWhenRecharging	充能时能量恢复速度	能量恢复是持续的，如果你设置了energyNeedsToRechargeToFull，那么攻击时按energyRegen恢复，耗尽时的灰条按此处设定值恢复。	energyRegenWhenRecharging:0.1	float
+energyStartingPercentage:	能量初始百分比	单位生成时所携带的能量百分比。	energyStartingPercentage: 0.5	float
+energyNeedsToRechargeToFull:	能量需要充满	若果能量耗尽，则需要完全充能才能进行攻击。	energyNeedsToRechargeToFull: true	float
+energyDisplayName	能量显示名称	能量显示名称,目前似乎无效.1.15	energyDisplayName:柴犬	string
+armour:	装甲	抵消敌方攻击所造成的伤害。	armour: 6	int
+armourMinDamageToKeep:	装甲最低伤害	至少造成多少点伤害，默认为1.防止护甲太高完全打不动。	armourMinDamageToKeep: 2	int
+borrowResourcesWhileAlive:	资源活着时借用	创建时获取这些资源，删除或销毁时将其返回。例如用于电力逻辑，负数供电和正数耗电。	borrowResourcesWhileAlive: gold=10	price
+borrowResourcesWhileBuilt:price 和存在时资源借用类似，但直到建筑建成之后才会开始生效
+generation_resources:	资源获取	单位定时获得的资源，可自定义资源。	generation_resources: credits=5, gold=20	price
+generation_active:	资源取得条件	获取资源条件。可用于受损时无法产出。	generation_active: if not self.hp(lessThan=100)	logicBoolean
+generation_credits:	资金获取	生成资源，仅用于默认的资金，也就是铁锈默认的金钱。	generation_credits: 2	int
+generation_delay:	资金获取时间	多久帧添加添加一次资源(generation_creditsvi指定数值)。默认值为40，一秒为60帧。Luke不建议使用。	generation_delay: 40	int
+#====	#====	UI和图形代码	#====	#====
+showInEditor:	显示在沙盒中	设置为false可在沙箱编辑器中隐藏此单位。 （默认为true）	showInEditor: false	bool
+displayText:	界面显示名称	默认单位显示给玩家的单位名称。不填则显示core下的单位name。此条目依据语言设定不同会被下一条覆盖。	displayText: Custom Tank	LocaleString
+displayText_{LANG}:	界面显示文本多语言	为单位名称添加多语言支持。此方法并不方便，不如设置游戏内部语言文件，建议催luke改。zh(中文通用) zh-cn(简体) zh-tw(台湾) zh-hk中文(香港) en(英语通用) ru(俄语) 其它自查(此列表并不全)，不过你应该不会闲着支持这么多语言。西班牙语（西班牙）es-ES、葡萄牙语（葡萄牙）pt-PT、日语ja、阿姆哈拉语am、爱沙尼亚语et、保加利亚语bg、冰岛语is、波兰语pl、丹麦语da、德语de、法语（法国）fr-FR、法语（加拿大）fr-CA、菲律宾语fil、芬兰语fi、韩语ko、荷兰语nl、加泰罗尼亚语ca、捷克语cs、克罗地亚语hr、拉脱维亚语lv、立陶宛语lt、罗马尼亚语ro、马来语ms、南非荷兰语af、挪威语no、葡萄牙语（巴西）pt-BR、瑞典语sv、塞尔维亚语sr、斯洛伐克语sk、斯洛文尼亚语sl、斯瓦希里语sw、泰语th、土耳其语tr、乌克兰语uk、西班牙语（拉丁美洲）es-419、希伯来语he、希腊语el、匈牙利语hu、意大利语it、印地语hi、印度尼西亚语id in、英语（美国）en-US、英语（英国）en-GB、越南语vi、祖鲁语zu	"displayText_es: Tanque Personalizado
+displayText_zh:中文名"	string
+displayDescription:	界面显示描述	单位显示给玩家的单位描述。	displayDescription:-Fast movement\n炮灰	LocaleString
+displayDescription_{LANG}:	界面显示描述_其它语言	为单位描述添加多语言支持。此方法并不方便，不如设置游戏内部语言文件，建议催luke改。地区码见上。	displayDescription_es: -Movimiento rápido\n-Daño ligero	string
+displayLocaleKey:	界面显示内部调用	调用内部语言文件的单位名称和说明的翻译文件。	displayLocaleKey: units.mechArtillery	string
+displayRadius:	单位选择时显示圆圈	修改选择单位时显示的绿色圆圈，不更改实际碰撞(radius)和可选择范围。	displayRadius: 20	int
+uiTargetRadius	为目标时半径	默认值为displayRadius。当攻击/回收/等等这个单位使用半径	uiTargetRadius:20	int
+shieldRenderRadius:	单位护盾显示半径	护盾绘制半径，默认值比半径大一点。可以设置在单位上显示更大或更小的护盾圈。	shieldRenderRadius: 12	int
+shieldDisplayOnlyDeflection:	护盾只在受攻击时显示	隐藏护盾，只在受到攻击时显示。	shieldDisplayOnlyDeflection: true	bool
+shieldDeflectionDisplayRate:	护盾消失速度	默认值为4。数值越大消失越快。	shieldDeflectionDisplayRate: 3	float
+showOnMinimap:	显示在小地图上	默认为true。如果为false，则在小地图上不显示此单位。	showOnMinimap: false	bool
+showOnMinimapToEnemies	显示于敌人小地图	是否在敌人小地图上显示。目前不支持逻辑。	showOnMinimapToEnemies:false	bool
+showActionsWithMixedSelectionIfOtherUnitsHaveTag:	混合所选单位所显示的行为	如果选择的单位都包含此处使用的标签，则合并“行为(action)”。比如你的步兵通过部署转化成另一个单位，在混合时可以当作同一个单位处理，不再是默认的谁都无法执行操作。例子如红警的盟军大兵在混合选中后依旧可执行部署或解除。	showActionsWithMixedSelectionIfOtherUnitsHaveTag:tag_联系	tags
+#====	#====	仅构建代码	#====	#====
+isBuilding:	是建筑	定义单位是否为建筑物。	isBuilding: true	bool
+footprint:	建筑碰撞范围	"填四个数值(左，上，右，下)，单位是格子，建筑默认占一格，向左和向上需要填负数，填整数在选择时有偏移。
+四个数值可以完全颠倒，这样不会阻碍单位移动。
+决定建筑单位碰撞体积，此区域内单位不能通过，如果在单位运动途中单位则会绕过。单位实际可选择面积使用的是radius。"	"（1x1）footprint: 0,0,0,0
+（2X2）footprint: 0,0,1,1
+（3X3）footprint: -1,-1,1,1"	ints
+constructionFootprint:	建筑覆盖范围	基础规则同上，这个区域内不能建造建筑，但是单位可以通过。一般需要设定比上一个面积大。好处是即使建造的密密麻麻，单位也有路可走	constructionFootprint: -1,-1,1,3	ints
+displayFootprint:	建筑选择UI	基础规则同上，用于选择单位时UI显示。不设定则默认为建筑覆盖区域。	displayFootprint: 0,0,1,1	ints
+buildingSelectionOffset:	建筑UI调整	默认值为0。以像素为单位对选框额外设定。	buildingSelectionOffset: 4	int
+buildingToFootprintOffsetX:	建筑X轴偏移	"设置X轴位置偏移，默认10.若设置非对称的建筑，单位会根据覆盖范围会挤在角上，这时如果要准确显示就需要额外偏移。与直接使用图像偏移的区别:
+由于铁锈判断选中单位是根据单位体积(radius),因此图像偏移实际上单位的位置不变，会容易造成点击时的误差。而当前代码实际上是移动单位，则不会造成这个问题。"	buildingToFootprintOffsetX: 4	float
+buildingToFootprintOffsetY:	建筑Y轴偏移	设置Y轴位置偏移，默认10.其它参上条	buildingToFootprintOffsetY: 6	float
+placeOnlyOnResPool:	建筑只能建造在资源池上	通常用于提取器，会强制在资源池中进行建筑物构造。可以用于在自定义战役中限制某单位只能在某地建造。	placeOnlyOnResPool: true	bool
+selfBuildRate:	自动建造速度	此单位自动构造所需要的时间，目前用于虫族。计算方式为：此处所填时间=1÷(60x你需要的秒)。	selfBuildRate: 0.0008	float
+ignoreInUnitCapCalculation	不计入单位数量统计	铁锈中有单位数量上限设定，填true时不计入统计，多用于辅助单位，建筑物的默认值为true。	ignoreInUnitCapCalculation:true	bool
+#====	#====	杂项代码	#====	#====
+copyFrom:	复制数据自	加载其它文件的单位数据作为该单位的默认值，支持多个文件。无后缀名限制，可不写dont_load，用于模块化。	copyFrom: ROOT:defaultTanks.template, tankT1.ini	file(s) (ini)
+dont_load:	禁止加载	不加载此单位，缺失数据时不会出错。与copyFrom一起使用时很有用。	dont_load: true	bool
+overrideAndReplace:	覆盖单位	用此单位覆盖另一个单位，地图上所有单位也将被替换，可以用来替换dex内无法修改的单位。	overrideAndReplace: builder, combatEngineer	string(s)
+onNewMapSpawn:	地图位置产生指定单位	"在地图上添加此单位。可以用于覆盖铁锈默认的资源逻辑。参数：
+emptyResourcePools_asNeutral  产生位置于空资源池，并且为中立所属
+emptyOrOccupiedResourcePools_asNeutral 空的或者已经占用的资源池，并且为中立所属
+mapCenter_asNeutral 地图中心，且为中立所属
+mapCenter_eachActiveTeam 地图中心，且给与每个玩家
+spawnPoint_eachActiveTeam 玩家初始位置，给与每个玩家"	"[core]
+name:钻矿机
+onNewMapSpawn:emptyResourcePools_asNeutral"	string
+globalScale:	全局缩放	废弃代码，不要用。将一个单位按比例放大，但不放大攻击力。默认值为1。不建议更改。	globalScale: 2	float
+isLocked:	锁定	禁止建造该单位。可以与overrideAndReplace一起使用，以限制玩家可以建造的单位。	isLocked: true	bool
+isLockedIfGameModeNoNuke:	禁核模式锁定	如果在游戏开始前选择了禁用核武器，禁止建造此单位。	isLockedIfGameModeNoNuke: true	bool
+experimental:	实验单位标志	标记单位为实验单位。影响缩小图标和游戏结束统计。	experimental: true	bool
+stayNeutral:	保持中立	设置为false时，单位处于中立队伍情况下，禁止靠近时更改为玩家所属。仍然有其它方式获得。	stayNeutral: false	bool
+createNeutral:	创建时中立	设置为true时，产生该单位总是自动转变为中立队伍。创建时中立，但不妨碍玩家捕获。	createNeutral: true	bool
+createOnAggressiveTeam:	创建为敌对中立	设置为true时，此中立单位对所有玩家有敌意。	createOnAggressiveTeam: true	bool
+tags:	标签	标签，用于对单位进行分类，用于实现各种各样的特殊作。比如单位数量限制，伤害修正，增益损益，触发条件等等	tags: tank, smallTank, piercingDamage	string(s)
+defineUnitMemory	定义单位内存	"为每个单元创建唯一的自定义存储变量。允许的类型:boolean, float/number, unit, string 数组有unit[] boolean[] number/float[]
+格式:defineUnitMemory:类型 变量名称
+""defineUnitMemory: boolean nukeActive,boolean laserReady, float experience, unit nextTarget, unit homeBase, string ,number/float[] a ,unit[] b,boolean[] c customText
+"""	defineUnitMemory:unit attackunit
+updateUnitMemory: 设定内存数值(同setUnitMemory，但性能和计时更好) value pairs
+updateUnitMemoryMemoryRate: 设定触发时间(每X秒触发一次这种) int/time
+fogOfWarSightRange:	视野	设置单位视野，在战争迷雾中可以看到的瓷砖数量。默认为15。	fogOfWarSightRange: 18	int
+fogOfWarSightRangeWhileNotBuilt	未完成时视野	填数值，当建筑或单位没有建造完成时，它的视野范围	fogOfWarSightRangeWhileNotBuilt:3	int
+softCollisionOnAll:	碰撞体积软化	与其他单位碰撞时产生柔和的碰撞效果，填负数会导致单位相互吸引。	softCollisionOnAll: 3	int
+disableAllUnitCollisions:	禁用碰撞	如果为true，则该单位无视与其它单位碰撞。无碰撞体积单位可以用于固定位置制造效果，或是用于一些不影响单位通行的场景。	disableAllUnitCollisions: true	bool
+isUnrepairableUnit:	禁止被修复	如果为true，则任何单位都无法修复此单位。但负伤害仍然可以维修。	isUnrepairableUnit: true	bool
+isUnselectable:	禁止选择	如果为true，则无法选择单位。 （包括AI）可用于效果单位，禁止被玩家选择。	isUnselectable: true	bool
+isUnselectableAsTarget	禁止选择和作为目标	默认效果为isUnselectable。可以用来创造不能被选择但是可以被攻击，回收的单位	isUnselectableAsTarget:true	bool
+isPickableStartingUnit:	为可选初始单位	如果为true，则将单位添加到游戏高级设置菜单中，用于可选初始单位菜单。	isPickableStartingUnit:true	bool
+startFallingWhenStartingUnit:	为可选单位开局后从天而降	如果为true，则游戏开始时，此单位会从从天而降。	startFallingWhenStartingUnit: true	bool
+soundOnAttackOrder:	攻击指令音效	填音效名称列表。用,隔开。每次下达攻击指令时只播放其中一个。仅支持.ogg和.wav格式，注意如果你mod用于pc端，则不要直接修改后缀名，要转换格式。	soundOnAttackOrder: tankAttackOrder1.ogg:0.6, tankAttackOrder2.ogg 	sound(s)
+soundOnMoveOrder:	移动指令音效	填声音名称列表。用,隔开。每次下达移动指令时只播放其中一个。仅支持.ogg和.wav格式，注意不要直接修改后缀名，要转换格式。	soundOnMoveOrder: tankMoveOrder1.ogg, tankMoveOrder2.ogg	sound(s)
+soundOnNewSelection:	选择指令音效	填声音名称列表。用,隔开。每次下达选择指令时只播放其中一个。仅支持.ogg和.wav格式，注意不要直接修改后缀名，要转换格式。	soundOnNewSelection: tankSelection1.ogg, tankSelection2.ogg	sound(s)
+canNotBeDirectlyAttacked:	禁止直接攻击	无敌，如果为true，任何单位都不能直接瞄准此单位，也不会受到范围武器伤害。则还将在胜利/失败检查中跳过检查。	canNotBeDirectlyAttacked: true	bool
+canNotBeDamaged	禁止受到伤害	无敌，可被敌方攻击，但不造成实质伤害。如果canNotBeDirectlyAttacked为true,此语句为false,则不可被直接攻击但受到范围伤害。	canNotBeDamaged:true	bool
+canNotBeGivenOrdersByPlayer:	禁止接受指令	如果为true，则单位不会接受玩家或AI的命令。可以选中查看信息。	canNotBeGivenOrdersByPlayer: true	bool
+canOnlyBeAttackedByUnitsWithTags:	仅许带此标签单位攻击	填标签，只有带有这些标签的单位才能直接定位到该单位。	canOnlyBeAttackedByUnitsWithTags: piercingTank, powerfulTank	strings(s)
+#====	#====	运输代码	#====	#====
+transportSlotsNeeded:	运输占用位置	默认值为1。此单位在运输载具中占据的格子数。	transportSlotsNeeded: 2	int
+maxTransportingUnits:	运输槽位数量	该单位载员格子数量。	maxTransportingUnits: 5	int
+transportUnitsRequireTag:	被运输单位需要标签	仅允许运输具有这些标签之一的单位。可以用于运输类型分类，如人运物资，步兵车运人，气垫船运车辆。或是子机限制，如航母飞机只能降落到航母。	transportUnitsRequireTag: smallTank, soldier	string(s)
+transportUnitsRequireMovementType:	被运输单位类型限制	仅允许运输具有这些移动类型之一的单位。默认陆地。比如可以设定某单位可以运输空军以实现停机坪，只运输海军等。	transportUnitsRequireMovementType: AIR, WATER	movementTypes
+transportUnitsBlockAirAndWaterUnits:	禁止运输空军和海军	禁止运输空军和海军，默认为true。如果为true，则此单位只能运输LAND单位。	transportUnitsBlockAirAndWaterUnits: false	bool
+transportUnitsKeepBuiltUnits:	单位建造完成时保留在载具内	使建造的单位留在运输者中，而不是造完直接从载具中出来。	transportUnitsKeepBuiltUnits: true	LogicBoolean
+transportUnitsCanUnloadUnits:	载具可以卸载单位	载具卸载单位需要满足条件，默认为“ if not self.isOverLiquid() and not self.isMoving()”(不在液体上且没有移动)	transportUnitsCanUnloadUnits: false	LogicBoolean
+transportUnitsAddUnloadOption:	载具显示卸载按钮	是否显示卸载按钮	transportUnitsAddUnloadOption: false	LogicBoolean
+transportUnitsUnloadDelayBetweenEachUnit:	载具卸载时间间隔	卸载单位之间的延迟时间。	transportUnitsUnloadDelayBetweenEachUnit: 12	float
+transportUnitsKillOnDeath:	载具内单位和载具一同死亡	默认为true。如果载具死亡，则其中单位也死亡。	transportUnitsKillOnDeath: if self.isOverLiquid()	LogicBoolean
+transportUnitsHealBy:	载具治疗内部单位速度	填数值，以帧为单位。自动治疗载具内部单位。	transportUnitsHealBy: 0.1	float
+transportUnitsBlockOtherTransports:	载具禁止装载其它载具	默认值为true，如果为false，则此载具可以装载其它载具。比如步兵装物资，载具装步兵，运输船装载具。	transportUnitsBlockOtherTransports: false	bool
+whileNeutralTransportAnyTeam:	中立时可装载任意所属单位	如果是中立的，则这个部队可以装载任何队伍的部队。可用于占领中立单位，比如坦克需要驾驶员，步兵建筑平民建筑。	whileNeutralTransportAnyTeam: true	bool
+whileNeutralConvertToTransportedTeam:	中立时转换为载员队伍	中立时将其转换为载员队伍。与whileNeutralTransportAnyTeam一起使用，用于占领中立单位。	whileNeutralConvertToTransportedTeam: true	bool
+convertToNeutralIfNotTransporting:	卸载所有单位时恢复为中立	卸载单位时将其恢复为中立队伍。与whileNeutralTransportAnyTeam一起使用。	convertToNeutralIfNotTransporting: true	bool
+transportUnitsOnTeamChangeKeepCurrentTeam:	转换所属时保留内部单位所属	如果为true，则单位转换阵营时仍然将运输的单位保留在其原始队伍中。	transportUnitsOnTeamChangeKeepCurrentTeam: true	bool
+transportUnitsEachUnitAlwaysUsesSingleSlot	载员只占用一个槽位	所有载员无论体积只占用一个运输槽。但体积大于载员数时仍然不能进入。	transportUnitsEachUnitAlwaysUsesSingleSlot:true	bool
+transportUnitsKeepWaypoints	载员保持路径点	目前无效	transportUnitsKeepWaypoints:true	bool
+#====	#====	资源节点代码	#====	#====
+resourceRate:	回收速率	回收速度。每帧回收血量。与canReclaimResources一起使用。允许其他队伍回收该单位。通常与中立队伍配合使用。使用价格来设置获取哪些资源。	resourceRate:1	float
+similarResourcesHaveTag:	像用于此标签的单位	有这些标签时，资源采集单位将视为同一种资源	similarResourcesHaveTag: goldResource	string(s)
+resourceMaxConcurrentReclaimingThis:	可同时被此数目单位回收	默认为无限制。限制有多少单位可以同时回收此资源。	resourceMaxConcurrentReclaimingThis: 3	int
+reclaimPrice:	回收价格	自定义资源，类似价格。对于自定义资源很有用。	reclaimPrice: gold=1000	int
+#====	#====	资源收集器代码	#====	#====
+canReclaimResources:	可以回收资源	如果为true，则此单位可以收集资源，这对于resourceRate很有用。	canReclaimResources: true	bool
+canReclaimResourcesNextSearchRange:	搜寻资源范围	当一处资源采集完后，搜寻更多资源的范围。	canReclaimResourcesNextSearchRange: 100	int
+canReclaimResourcesOnlyWithTags:	仅允许回收特定标签资源	仅允许回收有此标签的单位。	canReclaimResourcesOnlyWithTags: foodResource, goldResource	string(s)
+#====	#====	建筑和工厂代码	#====	#====
+canRepairBuildings:	可以修建筑	如果为true，该单位可以修复建筑。 （isBuilder：true是必需的）	canRepairBuildings: true	bool
+canRepairUnits:	可以修单位	如果为true，此单位可以修复单位。 （isBuilder：true是必需的）	canRepairUnits: true	bool
+autoRepair:	可以自动修	自动维修附近单位，范围为nanoRange。 （isBuilder：true是必需的）	autoRepair: true	bool
+canReclaimUnitsOnlyWithTags	仅允许回收特定标签单位	仅允许此单位回收具有特定标签单位。	canReclaimUnitsOnlyWithTags:shibaInu	tags
+canRepairUnitsOnlyWithTags	仅允许维修特定标签单位	仅允许此单位维修具有特定标签单位。	canRepairUnitsOnlyWithTags:cat	tags
+nanoRange:	维修或建造范围	默认值为85。定义单位的构建/修复/回收范围。	nanoRange: 110	int
+nanoRepairSpeed:	维修速度	默认值为0.2。定义单位修复速度。	nanoRepairSpeed: 0.01	float
+nanoBuildSpeed:	建造速度	默认值为1。定义单位建造速度。 （可能与目标的buildSpeed相乘）	nanoBuildSpeed: 0.9	float
+nanoUnbuildSpeed:float 建造者回收未建成建筑的回收速度
+nanoRangeForRepairIsMelee:	维修范围按近战逻辑	"定义此单位维修时是否为近战算法，默认计算是从自身中心到目标中心，如果单位过大运动又受到阻碍，则虽然看起来很近，然而实际太远无法建造。
+近战类算法则是算上其半径，由中心计算改为从边缘计算。"	nanoRangeForRepairIsMelee: true	bool
+nanoReclaimSpeed:float - 建造者回收单位的速度默认为nanoRepairSpeed*5.1
+resourceReclaimMultiplier:float 回收资源时的回收速度倍率
+nanoRangeForReclaimIsMelee:	回收范围按近战逻辑	与上条类似，本条定义其回收范围是否为近战算法。	nanoRangeForReclaimIsMelee: true	bool
+nanoRangeForRepair:	维修距离	此单位维修距离。	nanoRangeForRepair: 60	int
+nanoRangeForReclaim:	回收距离	此单位回收距离。	nanoRangeForReclaim: 60	int
+nanoFactorySpeed:	工厂速度乘数	默认值为1。如果此单位是工厂，则乘以创建单位的buildSpeed值。用于加速或者减速建造。	nanoFactorySpeed: 1.2	float
+extraBuildRangeWhenBuildingThis:	额外建造距离	此单位额外的建造距离，可以使建造者在更远的地方建造它，多用于水上建筑。	extraBuildRangeWhenBuildingThis: 90	int
+exit_x:	离开x轴	从载具卸载或者工厂生产完成时，单位出现的位置，默认为0	exit_x: 0	float
+exit_y:	离开y轴	从载具卸载或者工厂生产完成时，单位出现的位置，默认为5，正数向下。	exit_x: 5	float
+exit_dirOffset:	离开旋转角度	单位默认为180(朝下)，建筑物默认为0(朝右)。定义已创建或卸载单位的退出方向。	exit_dirOffset: 140	float
+exit_heightOffset:	离开高度	默认值为0。定义创建或卸载的单位出现的高度。	exit_heightOffset: 16	float
+exit_moveAwayAmount:	离开距离	默认值为70。定义创建或卸载的单位与该单位的距离。	exit_moveAwayAmount: 10	float
+exitHeightIgnoreParent	离开高度忽略父单位	离开时的高度不考虑父高度;用于与父单位一起建造时分离附件	exitHeightIgnoreParent:true	bool
+#====	#====	死亡代码	#====	#====
+dieOnConstruct:	构建时死亡	如果为true，则创建建筑时删除自身。（目标建筑物/单位需要selfBuildRate以自动建造完成）	dieOnConstruct: true	bool
+dieOnZeroEnergy:	无能量时死亡	如果能量值为零，该单位死亡。	dieOnZeroEnergy: true	bool
+numBitsOnDeath:	死亡产生碎片	定义该单位死亡时散落的碎片的数量。	numBitsOnDeath: 20	int
+nukeOnDeath:	死亡核爆	不推荐使用。建议使用死亡武器代替，其拥有更丰富的设定选项。如果为true，单位死亡时会生成一个内置的核弹爆炸效果。	nukeOnDeath: true	bool
+nukeOnDeathRange:	死亡核爆范围	不推荐使用。定义使用nukeOnDeath时的核弹效果范围。	nukeOnDeathRange: 140	float
+nukeOnDeathDamage:	死亡核爆伤害	不推荐使用。定义使用nukeOnDeath时的核武器效果区域伤害。	nukeOnDeathDamage: 2000	float
+nukeOnDeathDisableWhenNoNuke:	死亡核爆条件	不推荐使用。默认为false。如果为true，则禁用核武器时，该单位死亡时不会产生核爆炸。	nukeOnDeathDisableWhenNoNuke: true	bool
+fireTurretXAtSelfOnDeath:	死亡武器	死亡武器。单位死后，使用指定炮塔攻击自身所在位置。	fireTurretXAtSelfOnDeath: turret_1	turret ref
+explodeOnDeath:	死亡爆炸	默认为true。如果为false，则禁用单位死亡时的内置爆炸效果。	explodeOnDeath: false	bool
+explodeOnDeathGroundCollision:	死亡撞击地面爆炸	默认为true。如果为false，则禁用接触地面时内置爆炸效果。	explodeOnDeathGroundCollision: false	boolean
+effectOnDeath:	死亡效果	单位死亡时产生内置或自定义效果。	effectOnDeath: shockwave, CUSTOM:pieces*3, CUSTOM:deathSound	effect(s) ref
+effectOnDeathGroundCollision:	死亡撞击地面效果	类似于effectOnDeath，但当单位接触地面时。对飞行单位有用。	effectOnDeathGroundCollision: CUSTOM:bigExplosion	effect(s) ref
+unitsSpawnedOnDeath:	死亡产生单位	死亡时产生这些单位。逗号分隔的单位标识符。	unitsSpawnedOnDeath: tank*5, hoverTank	string(s)
+unitsSpawnedOnDeath_setToTeamOfLastAttacker:	死亡产生单位所属	如果为true，死亡时产生的单位将更改归属为最后一个攻击者的队伍。	unitsSpawnedOnDeath_setToTeamOfLastAttacker: true	bool
+hideScorchMark:	死亡痕迹	如果为true，则禁止单位死亡时留下焦痕。	hideScorchMark: true	bool
+soundOnDeath:	死亡音效	为该单位设置自定义死亡声音。	soundOnDeath: tankExplosion1.ogg, tankExplosion2.ogg	string(s)
+explodeTypeOnDeath:	死亡时爆炸类型	"options: verysmall, small, normal, large, largeUnit, building, buildingNoShockwaveOrSmoke, verylargeBuilding
+添加内置死亡效果关键字，选项：非常小，很小，正常，大，大单位，建筑物，没有冲击波和烟雾的建筑物，非常大建筑"	explodeTypeOnDeath:small	preset effects
+effectOnDeathIfUnbuilt:	没建造完成时死亡效果	如果这个单位没建造完成就被毁了，则播放此效果	effectOnDeathIfUnbuilt: CUSTOM:implode	effect(s) ref
+disableDeathOnZeroHp	禁用零血死亡	如果为true，允许单位在0血量的情况下仍然存活，单位不会自然死亡。对自定义“死亡”动作很有用	disableDeathOnZeroHp:true	bool
+#====	#====	动作代码	#====	#====
+autoTriggerCooldownTime:	自动触发间隔	设置自动触发动作间隔。默认为1s。警告：对于许多设备，将此值设置得太低可能会影响性能，具体取决于操作效果。	autoTriggerCooldownTime:0.1s	time (seconds)
+autoTriggerCooldownTime_allowDangerousHighCPU	允许超高频触发	自动触发冷却时间，允许高CPU占用，也就是可以使用非常高频的触发，但不建议这么做。	autoTriggerCooldownTime_allowDangerousHighCPU:true	bool
+autoTriggerCheckRate	自动触发检查率	"选项:everyFrame(默认)，every4Frames, every8Frames。
+注意:所有触发器无论检查率都是在第一次创建和自动触发冷却之后检查的。
+注:使用模板添加[core]autoTriggerCheckRate:every8Frames到所有单位。可以使使用了复杂autoTriggers的mod有巨大的性能提升。"	autoTriggerCheckRate:everyFrame	enum
+ autoTriggerCheckWhileNotBuilt 默认 false， 当为 true 时，所有 autoTriggers 仍在运行，而该单元尚未构建 bool
+
+logIfCreditResourceUsed:bool 记录资源使用？
+energyDisplayName:String 能量描述名:基本无效
+fireOnDeath:int 死亡后的火焰
+allowCaptureWhenNeutralByAI -允许中立时被AI俘虏(推测,以前人机不能捕获中立单位) bool

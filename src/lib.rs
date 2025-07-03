@@ -14,7 +14,7 @@ pub mod statistics;
 use bevy::{app::PluginGroupBuilder, prelude::*};
 use bevy_ecs_ldtk::prelude::*;
 use bevy_fly_camera::FlyCameraPlugin;
-use bevy_inspector_egui::quick::{ResourceInspectorPlugin, StateInspectorPlugin};
+use bevy_inspector_egui::quick::StateInspectorPlugin;
 use bevy_light_2d::prelude::*;
 use bevy_panic_handler::PanicHandler;
 use js_engine::JsEnginePlugin;

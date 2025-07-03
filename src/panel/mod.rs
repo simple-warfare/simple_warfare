@@ -14,7 +14,4 @@ pub enum PanelState {
 
 pub struct PanelPlugin;
 
-impl Plugin for PanelPlugin {
-    fn build(&self, app: &mut App) {
-    }
-}
+

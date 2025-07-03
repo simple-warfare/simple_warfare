@@ -1,0 +1,16 @@
+刷弹		Spawn Projectiles line
+代码	代码翻译	描述	例子	值类型
+大多数刷抛射体代码可用于抛射体参数。	spawnProjectilesOnEndOfLife: secondary*3(spawnChance=0.5)
+spawnChance	产生机会	抛射体产生几率，默认为1	spawnProjectilesOnCreate:1(spawnChance=0.5)	float
+maxSpawnLimit	最大产生限制	抛射体的最大产生数量	spawnProjectilesOnCreate:1(maxSpawnLimit=4)	int
+recursionLimit	递归限制	用于限制抛射体刷抛射体自身的上限,而不会产生死循环。这对自动生成很有用，因为不会无限生成，有利于链条爆炸	spawnProjectilesOnCreate:1(recursionLimit=5)	int
+offsetX	偏移量x	刷出的抛射体的x轴偏移量	spawnProjectilesOnCreate:1(offsetX=10)	float
+offsetY	偏移量y	刷出的抛射体的y轴偏移量	spawnProjectilesOnCreate:1(offsetY=11)	float
+offsetRandomX	偏移随机X	刷出的抛射体的x轴的随机偏移量	spawnProjectilesOnCreate:1(offsetRandomX=12)	float
+offsetRandomY	偏移随机Y	刷出的抛射体的y轴的随机偏移量	spawnProjectilesOnCreate:1(offsetRandomY=13)	float
+offsetRandomXY	偏移随机XY	刷出的抛射体在两个方向的偏移随机偏移，使真正的在一个区域随机化。	spawnProjectilesOnCreate:1(offsetRandomXY=14)	float
+offsetHeight	偏移高度	刷出的抛射体的z轴也就是高度偏移	spawnProjectilesOnCreate:1(offsetHeight=15)	float
+offsetDir	偏移角度	刷出的抛射体的角度偏移	spawnProjectilesOnCreate:1(offsetDir=16)	float
+offsetRandomDir	偏移随机角度	刷出的抛射体的角度随机偏移量	spawnProjectilesOnCreate:1(offsetRandomDir=17)	float
+xOffsetRelative	x相对偏移	刷出的抛射体的x轴的相对偏移量	spawnProjectilesOnCreate:1(xOffsetRelative=19)	float
+yOffsetRelative	y相对偏移	刷出的抛射体的y轴的相对偏移量	spawnProjectilesOnCreate:1(yOffsetRelative=20)	float

@@ -1,5 +1,4 @@
-use bevy::{prelude::*, render::view::RenderLayers};
-use bevy_fly_camera::FlyCamera2d;
+use bevy::prelude::*;
 
 use crate::{app_state::AppState, assets::GameAsset, bevy_ext::app::AppExt};
 

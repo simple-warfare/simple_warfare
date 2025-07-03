@@ -39,4 +39,4 @@ class CoreBuilder {
 };
 
 
-export { CoreBuilder };
+export { Core, CoreBuilder };

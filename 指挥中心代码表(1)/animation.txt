@@ -1,0 +1,32 @@
+animation_TYPE_start:  弃用，而不是使用[animation]部分。               animation_moving_start: 0             int       deprecated 1.13
+animation_TYPE_end:  结束帧，必须较大，然后开始。             animation_moving_end: 3                   int      deprecated 1.13
+animation_TYPE_scale_start:  缩放单位图像。默认值为1。有用的生物单位或呼吸效果。            float      deprecated 1.13
+animation_TYPE_scale_end:  缩放单位图像。默认值为1。有用的生物单位或呼吸效果。          float        deprecated 1.13
+animation_TYPE_speed:  延迟每个帧的动画。较大的值会导致动画较慢。                      float         deprecated 1.13
+animation_TYPE_pingPong:  重复之前反向播放动画。适用于scale_start/scale_end。
+动画		[animation_NAME]	[animation_233]
+代码	代码翻译	描述	例子	值类型
+onActions:created, move, attack, idle, underConstruction, underConstructionWithLinkedBuiltTime, queuedUnits, reclaim, repair
+动画条件：创建，移动，攻击，闲置，在建造中，建造中并将动画拉伸至建造时长，生产中，回收，维修
+onActionsQueuedUnitPlayAt	在队列中有单位播放	当使用onAction:queueedUnits时，动画开始之前需要达到值，设置为0-1之间	onActionsQueuedUnitPlayAt :1	 float
+blendIn	融入时间	与上一个动画融合时间。	blendIn : time	time
+blendOut	切换融合	与下一个动画融合时间。	blendOut : time	time
+pingPong	缩放效果	结束后反向播放动画，它一般用来做生物的呼吸效果。	pingPong:true	bool
+KeyframeTimeScale	帧时长缩放	缩放所有关键帧时间，这有助于在不更改所有内容的情况下更快/更慢地制作动画	KeyframeTimeScale : float	float
+关键帧-根据需要创建多个
+body_[time]	主体关键帧	随时为主体添加关键帧。身体仅允许使用frame和scale	body_4s: {frame: 4, scale: 0.5}	list
+effect_[time]	效果关键帧	在播放动画时产生效果	eg: effect_2s: {x: 0,y: 5, explode}	list
+多向
+direction_units	多向动画度数	"播放此动画时，覆盖[graphics] animation_direction_units。多向动画度数	45个代表8个方向，90个代表4个方向的动画。"	direction_units:45	float
+direction_strideX:	多向动画x向	覆盖[graphics] animation_direction_strideX，动画帧取值在方向改变时偏移。一般填0	direction_strideX:0	int
+direction_strideY:	多向动画y向	覆盖[graphics] animation_direction_strideY，动画帧在方向改变Y轴偏移偏移。与frame_height一起使用。一般填1	direction_strideY:1	int
+direction_starting:	多向动画朝向	覆盖[graphics] animation_direction_starting，第一帧的方向，取决于你的素材。	direction_starting:90	float
+Luke不推荐使用的代码（可以使用，但是有更好的方法）
+start : int	开始	开始图像框。不推荐使用，用于类似此形式的动画。animation_TYPE_pingPong	animation_move_start:1	int
+end : int	结束	结束图像帧。不推荐使用	end : 	int
+scale_start : float	缩放开始	开始规模。不推荐使用，而是使用主体关键帧。	scale_start : 	float
+scale_end : float	缩放结束	最终规模。不推荐使用，而是使用主体关键帧。	scale_end : 	float
+speed : float	速度	速度越小越快。仅效果开始，结束，scale_start，scale_end	speed : 	float
+direction_useMainTurret:bool 角度使用主炮台
+turret1_:{x:0,y:0}
+arm1,leg1_:{x:0,y:0,dir:0,height:0,alpha:0-1}

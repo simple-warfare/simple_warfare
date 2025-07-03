@@ -41,13 +41,14 @@ bevy_tween = "0.8.0"
 serde_json = "1.0.140"
 rustc-hash = "2.1.1"
 url = "2.5.4"
+image = "0.25.6"
 
 [dependencies.bevy]
 version = "0.16.1"
 features = ["jpeg"]
-#[dev-dependencies.bevy]
-#version = "0.16.1"
-#features = ["jpeg", "dynamic_linking"]
+[dev-dependencies.bevy]
+version = "0.16.1"
+features = ["jpeg", "dynamic_linking"]
 
 [profile.release]
 opt-level = 3           # 使用稍高一些的优化级别，最低是0，最高是3

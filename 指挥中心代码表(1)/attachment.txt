@@ -1,0 +1,38 @@
+附属	 Section	[attachment_NAME]	[attachment_wolf]
+代码	代码翻译	描述	例子	值类型
+x	x	子单位x轴位置	x:10	float
+y	y	子单位Y轴位置	y:15	float
+height	高度	子单位高度。	height:3	float
+idleDir	闲置方向	闲置时角度。	idleDir:45	int
+idleDirReversing	闲置方向反转	允许朝向反转，比如重坦倒退移动时炮塔反转，而不需要整个单位转向。	idleDirReversing:1	float
+isVisible	是可见	是可见的。	isVisible:true	bool
+onCreateSpawnUnitOf	创建时生成单位	此创造时也产生此子单位。	onCreateSpawnUnitOf:flydog	units
+canBeAttackedAndDamaged	可被攻击或损坏	可以被攻击或受到伤害。	canBeAttackedAndDamaged:true	bool
+isUnselectable	不可选择	是不可选择的。	isUnselectable:true	bool
+lockLegMovement	锁定腿脚运动	锁定腿脚防止乱动。	lockLegMovement:true	bool
+keepAliveWhenParentDies	保持子存活	当此单位死亡时，子单位保持存活。	keepAliveWhenParentDies:true	bool
+setDrawLayerOnTop	绘制于顶层	此子单位绘制于顶层。	setDrawLayerOnTop:true	bool
+setDrawLayerOnBottom	绘制于底层	此子单位绘制于底层。	setDrawLayerOnBottom:true	bool
+addTransportedUnits	增加被运输单位	添加到运输单位槽中。	addTransportedUnits:true	bool
+lockRotation	锁定旋转	锁定方向，禁止旋转。	lockRotation:true	bool
+rotateWithParent	子单位一同旋转	旋转时子单位是否一同旋转。	rotateWithParent:true	bool
+resetRotationWhenNotAttacking	不攻击时重置角度	不攻击时恢复到自身默认角度	resetRotationWhenNotAttacking:true	bool
+deattachIfWantingToMove	移动时脱离	若收到移动命令，子单位将自动分离。这包括来自action的路径点。可以用来制作机场。	deattachIfWantingToMove:true	bool
+prioritizeParentsMainTarget	优先考虑父单位的主要目标	子单位优先考虑父单位当前的目标。	prioritizeParentsMainTarget:true	bool
+alwaysAllowedToAttackParentsMainTarget	总是攻击父单位的主要目标	子单总是跟随攻击父单位的主要目标。	alwaysAllowedToAttackParentsMainTarget:true	bool
+canAttack	可攻击	默认值为true。设置为false以阻止子单位自动攻击。	canAttack:true	bool
+onParentTeamChangeKeepCurrentTeam	改变队伍时子单位保持原队伍	默认值为false。如果为true则父单位改变队伍时子单位不改变队伍。	onParentTeamChangeKeepCurrentTeam:true	bool
+smoothlyBlendPositionWhenExistingUnitAdded	补充时平滑移动	补充所装载单位至槽位时平滑移动。	smoothlyBlendPositionWhenExistingUnitAdded:true	bool
+keepWaypointsNeedingMovement	保持需要移动路径点	默认值为false。当为false时，队列中任何需要移动才能完成的队列路径点都会被移除。	keepWaypointsNeedingMovement:false	bool
+showAllActionsFrom	显示所有操作来源	当被选中时，在父单元列表中显示所有附加单位的动作	showAllActionsFrom:if self.hasFlag(id=1)	logic boolean
+createIncompleteIfParentIs:	创建随父单位	如果父节单位不完整，则创建子单位不完整	createIncompleteIfParentIs:false	bool
+redirectDamageToParent:	重定向伤害到父单位	将对附属造成的伤害重定向到父单位，而不是伤害子单位自身。	redirectDamageToParent:true	bool
+redirectDamageToParent_shieldOnly:	重定向伤害到父单位护盾	只将对附属造成的伤害重定向到父单位的护盾，而不是伤害子单位自身。如果盾没了那就伤害自身，如模块蜘蛛。	redirectDamageToParent_shieldOnly:true	bool
+
+lockDir:float 锁定方向
+freezeLegMovement:bool 冻结腿运动
+onConvertKeepExistingUnitInSameSlot:bool 转换保持现有附属槽在相同位
+unloadInCurrentPosition:bool 在当前位置卸货
+hidden:bool 隐藏此附属槽的单位,但还是会受到攻击
+showMiniHp:bool 展示小型血量条
+hideHp:bool 隐藏血量

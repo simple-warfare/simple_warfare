@@ -1,0 +1,31 @@
+ Section    [movement]   [运动]
+代码 描述 例子 值类型
+movementType:  定义单位可以移动的地形，以及与单位类型相关的其他属性。            movementType: LAND           string
+slowDeathFall:  用于大型飞机。使单位在死亡时保持缓慢的速度下降。              slowDeathFall: true         bool
+moveSpeed:  单位的最大移动速度。              moveSpeed: 1.2         float
+moveAccelerationSpeed:  移动加速度。定义单位加速到最高速度时的速度。              moveAccelerationSpeed: 0.07       float
+moveDecelerationSpeed:  移动减速度。不要把它弄得太低，否则单位停下来会有点困难。            moveDecelerationSpeed: 0.17        float
+reverseSpeedPercentage:  反向速度百分比。0.6默认值。超过0.4会在短距离内反转(速度为40%)。如果设置为1，将与前进方向相反。缓慢转弯时有用。 reverseSpeedPercentage: 0             float
+landOnGround:  飞行单位会在闲置时降落。                  landOnGround: false          bool
+targetHeight:  目标高度。默认为0，但如果飞行运动类型默认为35。                  targetHeight: 25            float
+targetHeightDrift:  目标高度浮动。默认为0，但如果飞行运动类型默认为1.5。                 targetHeightDrift: 1          float
+startingHeightOffset:  起始高度偏移。单位创建时的初始高度。        float
+heightChangeRate:  高度改变速率。单位切换高度的频率。      float
+fallingAcceleration:  降落加速度。      float
+fallingAccelerationDead:  死亡坠落加速度。       float
+maxTurnSpeed:  最大转弯速度。       float
+turnAcceleration:  转弯加速度。               float
+moveSlidingMode:  移动滑动模式。             bool
+moveIgnoringBody:  移动忽略主体。           bool
+moveSlidingDir:  移动滑动方向。           int
+joinsGroupFormations:  加入团体编队。默认为true。不推荐更改。
+ignoreMoveOrders	忽略移动指令	忽略移动指令,此代码强制要求移动速度为0，适用例子：红警中单位部署忽略移动指令。	ignoreMoveOrders:true	bool
+moveYAxisScaling	Y轴速度比例	垂直方向单位移动速度乘数，适用于2.5D，也就是用铁锈模拟3D。典型如红警。
+特性项目
+maxSpeed:float 最大速度
+enabled:LogicBoolean 启用
+movement_repelFromUnits:bool 单位运动排斥？
+onlySameTeam:bool 只在相同队伍？(movement_repelFromUnits)
+otherUnitHasTag:tags 其它单位有标签？(movement_repelFromUnits)
+movement_random:bool 随机移动
+awayFromEdge:int 边缘距离 (movement_random)

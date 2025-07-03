@@ -1,0 +1,26 @@
+ Section    [global_resource_NAME]   [全局资源_NAME]
+代码  代码翻译  描述  例子  值类型
+"定义与玩家所有单位共享的新资源，其工作方式类似于内置的资金。添加到""all-units.template""（位于mod根目录）"    
+displayName:  显示名称。用户界面中此资源的名称                     string
+displayNameShort:  显示短名称。在较小的UI上显示的文本。默认为displayName。        displayNameShort:￥  string
+hidden:  向玩家隐藏此资源  hidden:true  bool
+priority:  优先级。如果多个mod单元中定义了同名的资源，则使用具有最高优先级的displayName/displayColor  priority:1  float
+displayColor:  颜色，可以是十六进制，带有可选的alpha  displayColor:#FF0000  color
+displayRoundedDown:  不向玩家显示小数点。  displayRoundedDown:true  bool
+displayTextPrefix:  在资源值前添加一个字符串。       string
+displayTextPostfix:  在资源值后添加一个字符串。       string
+displayTextAppendResource:  在此资源之后追加另一个资源。建议在追加的资源上提供“隐藏”键以隐藏重复项。         resource
+displayWhenZero:  资源为零时也显示。      displayWhenZero:true       bool
+displayPos:  设定资源在屏幕中的位置。       int
+iconImage:  图标图像。在屏幕上方和文本中显示包含此资源的图像。         file (image)        1.15p6
+iconImageUseInText:  图标图像在文本中使用。默认true。显示资源图像在动作描述中。      bool     1.15p6
+displayNameHideWhenIconShownInText:  显示名称当图标显示在文本中时隐藏。有助于缩短描述文本。           1.15p6
+displayNameHideWhenIconShownInHUD:  显示名称当图标显示在屏幕上方时隐藏。             1.15p6
+displayColorUseInText:  默认为true。显示文本中的颜色使用。在动作描述中显示资源颜色。      bool       1.15p6
+appendResourceInHUD:  在屏幕上方堆叠资源。将在此之后在HUD中堆叠另一个资源。使用目标资源的颜色和图标，并且可以堆叠。          1.15p6
+appendResourceInHUD_whenThisZero:  默认为true。当为false时，允许附加资源与父资源一起隐藏。       bool        1.15p7
+displayPrefixInHUD:  在HUD中显示前缀。要在资源值之前显示的文本，替换资源名称并删除":"与appendResourceInHUD一起使用，以显示资源限制。     string        1.15p6
+displayPostfixInHUD:  在HUD中显示后缀。要在资源值之后显示的文本。      string      1.15p6
+displayTextAppendResourceWithGap:  默认false。当两个资源显示在同一行时，在资源之间添加空间        bool        1.15p7
+displayRoundedDown:  显示为整数。对资源进行舍入显示为整数。      displayRoundedDown:true      bool
+displayDigitGrouping: none/comma/space -资源数字分组(空,逗号,空格)(例如资源数量10000,空格分组就是10 000)

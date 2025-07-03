@@ -4,8 +4,12 @@
   ],
   "compilerOptions": {
     "paths": {
-      "package:*": ["./package/*"],
-      "std:*": ["./std/*"],
+      "package:*": [
+        "./package/*"
+      ],
+      "std:*": [
+        "./std/*"
+      ],
     },
     "allowJs": true,
     "declaration": true,

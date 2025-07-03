@@ -22,23 +22,22 @@ use crate::{
         loader::SimpleWarfareModuleLoader,
         module::ModModule,
     },
-    unit::section::core::Core,
 };
 
 pub struct JsEngine {
     pub(super) context: Context,
     pub(super) module_map: HashMap<String, Vec<ModModule>>,
     pub(super) unit_map: HashMap<Entity, JsProxy>,
-    path_url: Arc<FxHashMap<&'static str, &'static str>>,
-    request_sender: Arc<Sender<SwRequireLoaderRequestEvent>>,
-    Response_receiver: Arc<Mutex<Receiver<SwRequireLoaderResponseEvent>>>,
+    _path_url: Arc<FxHashMap<&'static str, &'static str>>,
+    _request_sender: Arc<Sender<SwRequireLoaderRequestEvent>>,
+    _response_receiver: Arc<Mutex<Receiver<SwRequireLoaderResponseEvent>>>,
 }
 
 impl JsEngine {
     pub fn new(
         loader: SimpleWarfareModuleLoader,
         request_sender: Arc<Sender<SwRequireLoaderRequestEvent>>,
-        Response_receiver: Arc<Mutex<Receiver<SwRequireLoaderResponseEvent>>>,
+        response_receiver: Arc<Mutex<Receiver<SwRequireLoaderResponseEvent>>>,
     ) -> Self {
         let context_builder = Context::builder();
         let loader = Rc::new(loader);
@@ -60,16 +59,16 @@ impl JsEngine {
             &mut ctx.borrow_mut(),
             path_url.clone(),
             request_sender.clone(),
-            Response_receiver.clone(),
+            response_receiver.clone(),
         );
 
         Self {
             context,
             module_map: HashMap::new(),
             unit_map: HashMap::new(),
-            path_url,
-            request_sender,
-            Response_receiver,
+            _path_url: path_url,
+            _request_sender: request_sender,
+            _response_receiver: response_receiver,
         }
     }
 }
@@ -80,7 +79,9 @@ fn egister_global_property(ctx: &mut Context) {
         .expect("the console builtin shouldn't exist");
 }
 
-fn register_global_class(ctx: &mut Context) {}
+fn register_global_class(ctx: &mut Context) {
+    
+}
 pub fn get_real_path(
     path_url: Arc<FxHashMap<&'static str, &'static str>>,
     url: &Url,
@@ -102,7 +103,7 @@ fn register_global_callable(
     ctx: &mut Context,
     path_url: Arc<FxHashMap<&'static str, &'static str>>,
     request_sender: Arc<Sender<SwRequireLoaderRequestEvent>>,
-    Response_receiver: Arc<Mutex<Receiver<SwRequireLoaderResponseEvent>>>,
+    response_receiver: Arc<Mutex<Receiver<SwRequireLoaderResponseEvent>>>,
 ) {
     let moduleobj = JsObject::default();
     moduleobj
@@ -122,7 +123,7 @@ fn register_global_callable(
     .unwrap();
 
     ctx.register_global_callable("require".into(), 0, unsafe {
-        NativeFunction::from_closure(move |referrer, args, ctx| {
+        NativeFunction::from_closure(move |_referrer, args, ctx| {
             let arg = args.get_or_undefined(0);
             let lib_file = arg.to_string(ctx)?.to_std_string_escaped();
             let url = Url::parse(&lib_file).map_err(|err| {
@@ -138,8 +139,8 @@ fn register_global_callable(
                 )))?;
             // Read the module source file
             println!("Loading: {real_path}");
-            let Response_receiver = Response_receiver.clone();
-            let js_asset = match Response_receiver
+            let response_receiver = response_receiver.clone();
+            let js_asset = match response_receiver
                 .lock()
                 .map_err(|err| {
                     JsNativeError::typ()

@@ -66,26 +66,26 @@ pub struct JsEngineEventResponseReciver(pub Arc<Mutex<Receiver<JsEngineResponseE
 fn init_js_context(mut commands: Commands) -> Result {
     //与js线程的双向通道
     let (je_request_sender, je_request_receiver) = mpsc::channel();
-    let (je_Response_sender, je_Response_receiver) = mpsc::channel();
+    let (je_response_sender, je_response_receiver) = mpsc::channel();
 
     commands.insert_resource(JsEngineEventRequestSender(Arc::new(je_request_sender)));
     commands.insert_resource(JsEngineEventResponseReciver(Arc::new(Mutex::new(
-        je_Response_receiver,
+        je_response_receiver,
     ))));
 
     let (sw_module_request_sender, sw_module_request_receiver) = mpsc::channel();
-    let (sw_module_Response_sender, sw_module_Response_receiver) = mpsc::channel();
+    let (sw_module_response_sender, sw_module_response_receiver) = mpsc::channel();
     commands.insert_resource(SwModuleLoaderResponseSender(Arc::new(
-        sw_module_Response_sender.clone(),
+        sw_module_response_sender.clone(),
     )));
     commands.insert_resource(SwModuleLoaderRequestReceiver(Arc::new(Mutex::new(
         sw_module_request_receiver,
     ))));
 
     let (sw_require_request_sender, sw_require_request_receiver) = mpsc::channel();
-    let (sw_require_Response_sender, sw_require_Response_receiver) = mpsc::channel();
+    let (sw_require_response_sender, sw_require_response_receiver) = mpsc::channel();
     commands.insert_resource(SwRequireLoaderResponseSender(Arc::new(
-        sw_require_Response_sender.clone(),
+        sw_require_response_sender.clone(),
     )));
     commands.insert_resource(SwRequireLoaderRequestReceiver(Arc::new(Mutex::new(
         sw_require_request_receiver,
@@ -95,21 +95,21 @@ fn init_js_context(mut commands: Commands) -> Result {
         let engine = &mut JsEngine::new(
             SimpleWarfareModuleLoader::new(
                 Arc::new(sw_module_request_sender),
-                Arc::new(Mutex::new(sw_module_Response_receiver)),
+                Arc::new(Mutex::new(sw_module_response_receiver)),
             )
             .unwrap(),
             Arc::new(sw_require_request_sender),
-            Arc::new(Mutex::new(sw_require_Response_receiver)),
+            Arc::new(Mutex::new(sw_require_response_receiver)),
         );
-        let je_Response_sender = Arc::new(je_Response_sender);
+        let je_response_sender = Arc::new(je_response_sender);
         // 开始监听
         // 由bevy的EventWriter写入事件并经js_event_bridge中转到此
-        je_Response_sender
+        je_response_sender
             .send(JsEngineResponseEvent::EngineInited)
             .expect("Faied to send EngineInited event");
 
         while let Ok(event) = je_request_receiver.recv() {
-            process_js_event(engine, event, je_Response_sender.clone())
+            process_js_event(engine, event, je_response_sender.clone())
                 .expect("process_js_event error")
         }
     });

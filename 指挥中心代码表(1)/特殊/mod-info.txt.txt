@@ -1,0 +1,11 @@
+[mod]
+title:标题
+description:注释 （显示ram)
+minVersion:1.10 最小版本
+[music]
+sourceFolder:path
+音乐文件目表
+whenUsingUnitsFromThisMod_playExclusively:false bool
+使用这个mod的单位时播放音乐
+addToNormalPlaylist:false bool
+增加到默认播放队列

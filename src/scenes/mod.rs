@@ -1,7 +1,7 @@
-mod game;
-mod loading;
-mod mian;
-mod select_map;
+pub mod game;
+pub mod loading;
+pub mod mian;
+pub mod select_map;
 
 use bevy::prelude::*;
 

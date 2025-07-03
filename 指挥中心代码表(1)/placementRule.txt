@@ -1,0 +1,15 @@
+放置规则		[placementRule_NAME]允许创建要求建筑物的规则
+代码	代码翻译	描述	例子	值类型
+anyRuleInGroup:	放置规则组	放置规则组名。（仅需要通过此组规则中的1条，而不是全部通过。在其他放置规则中可使用相同的组名称来创建组。）	anyRuleInGroup:DogFoodPlace	string
+searchTags	检索标签	搜索至少包含这些标签之一的任何单位	searchTags:redFox	tag list
+searchTeam:	检索队伍	要搜索的团队可以是：自身|中立|盟友非自身|盟友|敌人|任何。  own|neutral|allyNotOwn|ally|enemy|any	searchTeam:own	relation
+searchOffsetX:	检索偏移	检索偏移，默认为0	searchOffsetX:0	float
+searchOffsetY:	检索偏移	检索偏移，默认为0	searchOffsetY:0	float
+searchDistance:	搜索距离	搜索距离	searchDistance:99	float
+excludeIncompleteBuildings:	排除不完整建筑	排除不完整的建筑	excludeIncompleteBuildings:true	bool
+excludeNonBuildings:	排除非建筑	排除非建筑	excludeNonBuildings:true	bool
+minCount:	最小数量	设定需要在搜索中找到的单位的最小数量。(如需要靠近某物)。默认值为0	minCount:1	int
+maxCount:	最大数量	在匹配失败前设置最大单位数量(例如不能接近某个值)。默认为无限的	maxCount:1	int
+blocksPlacement:	禁止放置	禁止放置。默认为true。	blocksPlacement:true	bool
+cannotPlaceMessage:	失败信息	如果此放置规则失败，则会向玩家显示消息（将成为mergedRuleGroup中的第一个失败规则）	cannotPlaceMessage:你不能睡觉，因为附近有柴犬在游荡~	LocaleString
+checkEachTile:	检查每个地块	[true / false]默认为true（仅对测试单元中心设置为false，true会检查显示在放置网格上的单元下方的每个图块）	checkEachTile:true	bool

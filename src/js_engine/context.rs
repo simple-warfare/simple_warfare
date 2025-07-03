@@ -5,16 +5,13 @@ use crate::{
         section::{
             core::Core,
             graphic::{Graphic, Graphics},
+            movement::Movement,
         },
     },
 };
 use bevy::prelude::*;
 use boa_engine::{
-    JsResult,
-    builtins::promise::PromiseState,
-    js_string,
-    object::builtins::{JsArray, JsProxy},
-    prelude::*,
+    JsResult, builtins::promise::PromiseState, js_string, object::builtins::JsProxy, prelude::*,
     value::TryFromJs,
 };
 use std::{
@@ -120,13 +117,17 @@ pub(super) fn process_js_event(
                             &unit_proxy.get(js_string!("core"), context)?,
                             context,
                         )?;
+                        let movement = Movement::try_from_js(
+                            &unit_proxy.get(js_string!("movement"), context)?,
+                            context,
+                        )?;
 
                         unit_map.insert(entity, unit_proxy);
                         sender
                             .send(JsEngineResponseEvent::SpawnedUnit(
                                 entity,
                                 module_path,
-                                SpawnedUnitData::new(core, graphics),
+                                SpawnedUnitData::new(core, graphics, movement),
                             ))
                             .unwrap();
                     }

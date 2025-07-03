@@ -1,0 +1,6 @@
+[resource_]
+displayName:  UI中此资源的名称             string
+displayNameShort:  显示短名称。在较小的UI上显示的文本。默认为displayName。       displayNameShort:s        string
+hidden:  隐藏。对玩家隐藏这个资源。        hidden:true       bool
+equivalentGlobalResourceForAI:  作为AI的全局资源。用于向AI提示具有本地资源的资源节点可用于获取不同的全局资源。      equivalentGlobalResourceForAI:true     bool
+displayRoundedDown:  显示为整数。对资源进行舍入显示为整数。      displayRoundedDown:true      bool

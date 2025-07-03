@@ -1,0 +1,77 @@
+效果	 Section	[effect_NAME]	[effect_fox]
+代码	代码翻译	描述	例子	值类型
+life	效果存在时间	默认值为200。到时间效果消失。 设置得尽可能低以减少效果开销。	effect:custom:doge	float
+lifeRandom	效果存在时间随机值	效果存在时间的随机范围。	lifeRandom: 12	float
+alsoEmitEffectsOnDeath	死亡时创建效果	在生命耗尽的时候创造这些效果。	alsoEmitEffectsOnDeath:shibadie	effect ref
+alsoEmitEffects	也创造效果	创建时创建更多效果，对于多效果很有用。 注意：创建的效果上的其他“ alsoEmitEffects”将被忽略，禁止套娃。	alsoEmitEffects:custom:doge2	effect ref
+trailEffect: 尾部效果 使这个特效尾部再添加一个效果，用于陨石等 effect ref
+trailEffectRate: 尾部效果频率 在X帧刷新一次 int
+ifSpawnFailsEmitEffects	如果失败则创建效果	如果此效果的“spawnChance”失败，则产生这些效果。	ifSpawnFailsEmitEffects:custom:doge3	effect ref
+alsoPlaySound	也播放音效	播放音效，填文件名或内置。	alsoPlaySound:ao.ogg	sound ref
+createWhenOffscreen	可创建于画面之外	允许在画面之外产生此效果，默认为false。	createWhenOffscreen:true	bool
+createWhenZoomedOut	缩小时可产生效果	允许缩小时产生此效果，默认值为true	createWhenZoomedOut:true	bool
+createWhenOverLiquid	创建于液体上	允许在液体上方产生此效果，默认值为true	createWhenOverLiquid:true	bool
+createWhenOverLand	创建于陆地上	允许在陆地上方产生此效果，默认值为true	createWhenOverLand:true	bool
+spawnChance	产生几率	默认值1.如果小于1，则效果随机被创建	spawnChance:0.9	float
+showInFog	在雾中显示	默认为false	showInFog:true	boolean
+delayedStartTimer	延迟创建	等待这么久再播放此动画，单位为帧。	delayedStartTimer:10	float
+delayedStartTimerRandom	延迟创建随机时间	等待时间随机变化	delayedStartTimerRandom:10	float
+liveAfterAttachedDies	目标死后存活	目标死后动画继续存活,使用AttachedToUnit时默认为false.	liveAfterAttachedDies:true	bool
+priority	优先级	默认为高，一次显示太多效果时依据重要程度丢弃不重要的以用于创建新的。verylow/low/high/veryhigh/critical(很低，低，高，很高，至关重要)	priority:low	string
+移动
+attachedToUnit	附着在单位上	此效果产生时吸附到目标单位或抛射体。将与之一起移动。	attachedToUnit:true	bool
+alwayStartDirAtZero	初始角度总是为零	忽略附属单位或者产者的角度。	alwayStartDirAtZero:true	bool
+atmospheric	空气效果	添加阻力使此效果减慢速度，并添加随机移动。用于模拟尾焰。	atmospheric:true	bool
+physics	物理效果	撞击地面时反弹。需要高度才能生效。	physics:true	bool
+physicsGravity	物理重力	默认为1。physics:true时的垂直方向加速度。	physicsGravity:1	float
+xOffsetRelative	X相对偏移量	效果起始时相对于炮塔，炮弹，单位的偏移的方向位置。正数向右，负数向左。	xOffsetRelative:0	float
+yOffsetRelative	Y相对偏移量	效果起始时相对于炮塔，炮弹，单位的偏移的方向位置。正数向前，负数向后。	yOffsetRelative:-25	float
+xOffsetRelativeRandom	X相对随机偏移量	X相对目标随机偏移量。随机增加或减少此值，用于偏移像素。	xOffsetRelativeRandom:1	float
+yOffsetRelativeRandom	Y相对随机偏移量	Y相对目标随机偏移量。随机增加或减少此值，用于偏移像素。	yOffsetRelativeRandom:10	float
+xOffsetAbsolute	X绝对偏移量	Absolute类为绝对偏移，它不像Relative那样考虑单位的方向。比如设置x向速度为1，绝对偏移则始终向右移动，相对偏移可以向任意方向移动。	xOffsetAbsolute:0	float
+yOffsetAbsolute	Y绝对偏移量	按位置偏移起动效果，忽略附加炮塔单位等的方向。	yOffsetAbsolute:10	float
+xOffsetAbsoluteRandom	X绝对随机偏移量	随机增加或减少此值，用于偏移像素。	xOffsetAbsoluteRandom:2	float
+yOffsetAbsoluteRandom	Y绝对随机偏移量	随机增加或减少此值，用于偏移像素。	yOffsetAbsoluteRandom:2	float
+xSpeedRelative	X相对速度	X轴相对于目标的移动速度。，正数向右，负数向左。	xSpeedRelative:1	float
+ySpeedRelative	Y相对速度	Y轴相对于目标的移动速度。正数向前，负数向后。	ySpeedRelative:1	float
+xSpeedRelativeRandom	X随机相对速度	随机增加或减少此值，用于偏移像素。	xSpeedRelativeRandom:0.1	float
+ySpeedRelativeRandom	Y随机相对速度	随机增加或减少此值，用于偏移像素。	ySpeedRelativeRandom:0.1	float
+xSpeedAbsolute	X绝对速度	X轴相对于起点的绝对移动速度。	xSpeedAbsolute:0.1	float
+ySpeedAbsolute	Y绝对速度	Y轴相对于起点的绝对移动速度。	ySpeedAbsolute:0.6	float
+xSpeedAbsoluteRandom	X随机绝对速度	按此值随机更改初始值。	xSpeedAbsoluteRandom:0.1	float
+ySpeedAbsoluteRandom	Y随机绝对速度	按此值随机更改初始值。	ySpeedAbsoluteRandom:0.4	float
+hOffset	高度偏移	距目标的高度偏移。正数向上，负数向下。	hOffset:5	float
+hOffsetRandom	随机高度偏移	按此值随机更改初始值。	hOffsetRandom:3	float
+hSpeed	高度速度	高度移动速度。正数向上，负数向下。	hSpeed:1	float
+hSpeedRandom	随机高度速度偏移	按此值随机更改初始值。	hSpeedRandom:0.1	float
+dirOffset	角度偏移	角度偏移，修改初始朝向。注意,0度可能存在朝向问题。	dirOffset:180	float
+dirOffsetRandom	随机角度偏移量	按此值随机更改偏移角度。	dirOffsetRandom:180	float
+dirSpeed	转速	修改效果的旋转速度。	dirSpeed:5	float
+dirSpeedRandom	随机转速	按此值随机更改旋转速度。	dirSpeedRandom:2	float
+pivotOffset	枢轴偏移	像 dirOffset，但也旋转所有的相对键，并产生子效果
+pivotOffsetRandom	枢轴偏移随机
+图形
+frameIndex	帧索引	使用内置效果时所取用的帧编号，0取第一帧。	frameIndex:1	int
+frameIndexRandom	帧随机	随机增减索引值，用于随机使用同组内不同的图像。	frameIndexRandom:1	int
+stripIndex	图像集	"要使用的内置图像集。不能与自定义图像一起使用。如effects 效果1对应res内文件effects.png，以此类推。
+explode_big爆炸效果图、light_50闪光贴图、flame开火图火焰、dust灰尘贴图、smoke_black黑烟、shockwave冲击波、fire火焰图、lava_bubble岩浆泡、effects2效果2、plasma_shot等离子、shockwave_large大冲击波、explode_bits碎片、explode_big2大爆炸、explode_bits_bug虫碎片、projectiles抛射体、projectiles2抛射体2、effects3效果3"	stripIndex:shockwave	int/string
+Image	图像	要使用的自定义图像文件。不能与stripIndex一起使用。	Image:shibaing.png	image
+imageShadow	阴影图像	用于自定义阴影的图像	imageShadow:SHADOW:shibaing.png	image
+scaleTo	结束缩放倍数	效果结束时缩放倍数。	scaleTo:2	float
+scaleFrom	初始缩放倍数	效果初始时缩放倍数，用于效果从小到大缩放，或者反向缩放。	scaleFrom:0.5	float
+color	颜色	填16进制颜色值，给图像上叠加颜色。一般建议图像使用灰度图，然后叠加颜色。注意彩色图是无法叠加白色变白的。	color:#FFFF0000	color
+teamColorRatio	队伍色相	填0-1在图像上叠加阵营色，1为完全为阵营色。	teamColorRatio:0.5	float
+drawUnderUnits	绘制在单位下方	将此效果绘制在单位下方。	drawUnderUnits:true	bool
+fadeInTime	淡入时间	设置淡入效果时间，从透明到不透明。透明度值从0%到100%。	fadeInTime:15	float
+fadeOut	淡出	设置淡入效果时间，透明度从100%淡出到%0。把alpha设置为高于1可以延长淡出。	fadeOut:true	bool
+alpha	透明度	介于0-1之间。可以设置为大于1以延迟淡出效果	alpha:1	float
+shadow	阴影	true时绘制阴影。如果使用imageShadow则强制为true	shadow:true	bool
+动画
+total_frames	动画总帧数	动画的总帧数，与图像(image)或frameIndex一起使用。	total_frames:15	int
+animateFrameStart	动画开始帧	动画从哪一帧开始,第一帧编号为0	animateFrameStart:0	int
+animateFrameEnd	动画结束帧	动画在哪一帧结束。	animateFrameEnd:14	int
+animateFramePingPong	动画帧重放	动画正序播放完毕后再倒序播放一次。	animateFramePingPong:true	int
+animateFrameSpeed	动画帧速度	动画播放速度，单位位游戏帧，一般动画帧数也不高，所以设置一般为0.x	animateFrameSpeed:0.2	time
+animateFrameSpeedRandom	动画帧随机速度	按此值随机更改动画速度。	animateFrameSpeedRandom0.1	time
+animateFrameLooping	动画帧循环	默认false。当为false时,效果被移除时，动画结束	animateFrameLooping:false	bool
+liftingHeightOffset:int 提高高度偏移

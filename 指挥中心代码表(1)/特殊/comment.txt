@@ -1,0 +1,36 @@
+ Section    [comment_NAME]   [注释_NAME]
+补充一些杂项    描述    
+注释部分可以有任何键，但没有效果。
+     特殊参数
+techLevel:  “techLevel”单位生成参数,主要用于内置的单元和设置damagingBorder大小。计算方式是数值X地块5格。最小值为0，圈不可见。如填1则半径为5格。
+        
+     特殊单位
+damagingBorder  伤害边框。此内部单位会生成一个圆形的安全区域，所有区域外的单位会不断收到伤害直到死亡。          spawnUnits:damagingBorder(techLevel=4,offsetRandomX=1,offsetRandomY=1)
+zonemarker  区域标记。此单位用于指示伤害边框移动到何处，是放大还是缩小，可使用“techLevel”控制大小。          spawnUnits:zonemarker(techLevel=2,offsetRandomX=1,offsetRandomY=1)
+
+a!=b -inf,0
+a==b nan,inf
+a!=-b inf,0
+a==-b nan,-inf
+
+a<=b 0,inf,-inf
+!a<=b nan
+a<=-b -inf
+!a<=-b inf,0,nan
+
+b==a*0 nan,inf,-inf
+b!=a*0 0
+
+a>=b inf
+!a>=b 0,-inf,nan
+
+b>a*0 0
+a>=b inf
+!a>=-b nan
+a>-b 0,inf
+b>a 0,-inf
+!b>a inf,nan
+!a>-b -inf,nan
+a>=-b 0,inf,-inf
+!a>=b 0,-inf,nan
+!b>a*0 inf,-inf,nan

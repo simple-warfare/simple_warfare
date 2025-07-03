@@ -1,0 +1,72 @@
+ Section    [graphics]   [图像]
+代码 描述 例子 值类型
+image:  图像文件的路径。               file (image)
+image_back:  单位的底层图片(底层图片只会显示在单位下方)。适用于建造单位的工厂。               file (image)
+image_shield:  自定义单位的护盾图像。             file (image)
+image_wreak:  单位死亡时使用的图像。             file (image)
+image_offsetX:  图像X轴偏移。             int
+image_offsetY:  图像Y轴偏移。           int
+image_floatingPointSize:float -对奇数大小的图像进行一个像素的调整(填写0/1,无直观区别,有说法是把x-1来改变单位坐标系使其更方便使用)
+image_offsetH:float -高度绘制偏移
+isVisible:  默认为true。如果为false，则隐藏单位图像。         logic
+isVisibleToEnemies:  默认为true。如果为false，则向敌人隐藏单位图像。          bool
+teamColoringMode:  队伍颜色模式。设置单位着色逻辑，默认纯绿。(参数:disabled禁用, hueShift色相偏移, hueAdd色相添加, pureGreen绿)          string
+teamColorsUseHue:  单位贴图上覆盖一层队伍颜色。默认为false。              bool
+imageSmoothing:  图像平滑。测试毫无变化。             bool
+scaleImagesTo:  按像素调整图像大小。影响腿和阴影图像。             float
+imageScale:  按倍率调整图像大小。默认值为1。影响腿和阴影图像。             float
+drawLayer:  显示图层。陆地单位通常默认为ground或ground2(运输船)。wreaks, underwater, bottom, ground, ground2, experimentals, air, top                 string
+whenBeingBuiltMakeTransparentTill:  建造时透明直到。单位未建造完时的透明效果，设置为0可完全禁用。               float     1.13
+icon_zoomed_out:  自定义单位缩放地图时显示的图标。         file (image)      1.13.2p1
+icon_zoomed_out_neverShow:  禁用单位缩放图标。缩放地图时不显示图标。         bool
+icon_bulid:  建造图标。单位在建造UI中显示的图标。       file (image)
+
+     炮塔(图像也可以设置在每个炮塔)
+image_turret:  炮塔的默认图像，每个炮塔也可以单独设置。               file (image)
+turretImageScale:  炮塔图像缩放。按比例缩放炮塔图像。       float
+teamColorsOnTurret:  默认false。在炮塔上使用队伍颜色。也影响前炮塔图像。                bool
+scaleTurretImagesTo:  按像素缩放炮塔大小。               float
+lock_body_rotation_with_main_turret:  将身体图像锁定到第一炮塔的方向。               bool
+lock_leg_rotation_with_main_turret:  将腿图像锁定到第一炮塔的方向。             bool       1.13
+
+     阴影
+image_shadow:  可填图像文件、NONE或AUTO。(AUTO将自动使用单位图像并使其变为透明黑色。)                file (image)
+shadowOffsetX:  阴影X轴偏移。       float
+shadowOffsetY:  阴影Y轴偏移。            float
+image_shadow_frames:  阴影图像锁定。true时阴影不随单位旋转而改变方向。         bool
+lock_shadow_rotation_with_main_turret:  将身体图像阴影锁定到第一炮塔的方向。        bool
+
+     效果与动画
+total_frames:  设定图像帧数。默认值为1。一些动画需要这样做。       int
+default_frames:  默认帧。单位默认显示第几帧。         int
+frame_width:  帧宽度。        int
+frame_height:  帧高度。         int
+splastEffect:  如果为true，则在水上时会产生水波特效。默认false。          bool
+dustEffect:  如果为true，则在陆地时会产生灰尘特效。默认false。            bool
+splastEffectReverse:  在单位倒车时也会产生水波特效。          bool
+dustEffectReverse:  在单位倒车时也会产生灰尘特效。         bool
+movementEffect:  移动特效。自定义移动特效，可以是任何东西。                  eg: movementEffect: smoke, CUSTOM:fastDust*2, CUSTOM:pop*5         effect       1.13
+movementEffectReverse:  倒车移动特效。自定义倒退时移动特效。                effect       1.13
+movementEffectRate:  移动特效速率。每个多少帧产生一次                     float       1.13
+movementEffectReverseFlipEffects:  倒车旋转特效。倒车时单位特效旋转180度。                bool           1.13
+repairEffect:  修复特效。自定义修复特效，可以是任何东西。替换建造者的默认特效。        effect ref        1.13p6
+repairEffectAtTarget:  修复特效在目标。在目标位置产生的特效。      effect         1.13p6
+repairEffectRate:  修复特效速率。默认为5。每隔多少帧产生一次。                  float          1.13p6
+reclaimEffect:  回收特效。自定义回收特效，可以是任何东西。替换回收时的默认特效。     effect 
+reclaimEffectAtTarget:  回收单位时在目标上产生的特效。         effect
+reclaimEffectRate:  回收特效速率。每隔多少帧产生一次。           float
+rotate_with_direction:  默认值为true。当为false时，将单位身体图像锁定为0度。经常与animation_direction_*一起使用。               bool
+animation_direction_units:  单位动画方向。每旋转多少度切换一次图像。45表示8个方向，90表示4个方向动画。 与rotate_with_direction:false一起使用。               float
+animation_direction_strideX:  方向改变时要偏移的动画帧。              int
+animation_direction_strideY:  方向改变时要偏移的动画帧。与frame_height一起使用。                 int
+animation_direction_starting:  第一帧的方向。            float
+disableLowHpFire:  禁用低HP时冒火特效。            bool
+disableLowHpSmoke:  禁用低HP时冒烟特效。            bool
+showTransportBar:  显示运输条。false时隐藏单位下方运输条。             bool
+showHealthBar:  显示生命条。false时隐藏单位下方生命条。          bool
+showEnergyBar:  显示能量条。false时隐藏单位下方能量条。          bool
+showShieldBar:  显示护盾条。false时隐藏单位下方护盾条。          bool
+showQueueBar:  显示队列条。false时隐藏单位下方队列条。          bool
+showShotDelayBar:  显示射击延迟条。false时隐藏单位下方高延迟时的射击间隔条。           bool         1.15p6
+showSelectionIndicator:bool -显示选择指示(单位的选择框)
+showShotDelayBar:bool 显示蓄力条

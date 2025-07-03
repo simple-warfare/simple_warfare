@@ -1,0 +1,25 @@
+AI		[ai]
+代码	代码翻译	描述  这些代码不一定都有效	例子	值类型
+useAsBuilder:	用作建造者	作为建造者。如果单位可以建造或维修建筑物，则设置为true。 默认为[core] isBuilder。	useAsBuilder:true	bool
+useAsTransport	用作运输	作为载具。如果单位可以运输单位，则默认为true.如果你的单位可以运输又能攻击，则AI可能囤积起来而不攻击，则需要设置false.	useAsTransport:true	bool
+useAsAttacker	用作攻击者	是否作为攻击者。	useAsAttacker:true	bool
+useAsHarvester	用作采集	作为采集者。如果单位可以回收资源，则默认为true	useAsHarvester:true	bool
+disableUse:	禁用	禁止AI建立这个单位或建筑物	disableUse:true	bool
+ai_upgradePriority	AI升级优先级	升级优先级。默认值为0.06。 设置在0-1之间，越高，表示AI更有可能先于其他升级该单位。	ai_upgradePriority:0.1	float
+aiTags ai的标签，未知 string
+仅建筑物
+buildPriority:	建造优先级	建造优先级，填0-1。 越大越AI越可能造。Luke的的第一座土地工厂使用0.8，空中工厂使用0.48，第一炮塔使用0.47。	buildPriority:0.6	float
+noneInBaseExtraPriority:	基地内没有时优先级	如果AI基地中不存在此单位，则增加其优先级。	noneInBaseExtraPriority:0.2	float
+noneGlobalExtraPriority:	全图没有时优先级	如果此单位在地图上的任何位置都不存在，则增加其优先级。	noneGlobalExtraPriority:0.4	float
+recommendedInEachBaseNum	推荐在每个基地的数量	推荐在每个基地中的数量。	recommendedInEachBaseNum:5	int
+recommendedInEachBasePriorityIfUnmet	推荐条件不满足时优先级	如果未满足，推荐在基地中的优先级。	recommendedInEachBasePriorityIfUnmet:0.2	float
+upgradedFrom:	升级自	创建到另一个单位的链接，用于保留同一单位已升级和未升级的计数，主要用于合并动作	upgradedFrom:炮塔	string
+maxGlobal:	全图最大数量	全图最多拥有的数量。	maxGlobal:10	int
+maxEachBase:	每个基地最大数量	每个基地最多拥有的数量。	maxEachBase:1	int
+notPassivelyTargetedByOtherUnits	不被动地被其他单位瞄准	允许更好的墙壁建筑物，默认情况下，这些建筑物不会瞄准目标。用于围墙	notPassivelyTargetedByOtherUnits:true	bool
+lowPriorityTargetForOtherUnits	低优先级目标	其它单位不优先考虑此单位。用于围墙	lowPriorityTargetForOtherUnits:true	bool
+采集
+whenUsingAsHarvester_recommendedInEachBase	每个基地此采集者数量	当此单位用作采集者时，每个基地推荐的采集者数量。	whenUsingAsHarvester_recommendedInEachBase:10	int
+whenUsingAsHarvester_recommendedGlobal	全地图推荐采集者数量	当此单位用作采集者时，全图推荐的采集者数量。	whenUsingAsHarvester_recommendedGlobal:20	int
+whenUsingAsHarvester_includeOtherHarvesterCounts	是否算在采集者计数中	当此单位用作采集者时，是否算在其它采集者统计中。	whenUsingAsHarvester_includeOtherHarvesterCounts:false	bool
+onlyUseAsHarvester_ifBaseHasUnitTagged	有此标签才作为采集者	只有当基地有单位标记时才可以作为采集者使用.	onlyUseAsHarvester_ifBaseHasUnitTagged:false	string

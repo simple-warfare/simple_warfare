@@ -1,0 +1,44 @@
+ Section    [leg_#]/[arm_#]   [腿_#]/[胳膊_#]
+代码 描述 例子 值类型
+x:  设置脚在X轴上的位置。  float
+y:  设置脚在Y轴上的位置。  float
+copyFrom:  从另一条腿复制参数。只需要设置一个的腿值。              copyFrom: 1          int
+attach_x:  在X轴上设置腿的连接点。     float
+attach_y:  在Y轴上设置腿的连接点。     float
+liftingHeightOffset:float -离开高度偏移
+targetHeight:float -目标高度
+targetHeightRelative:float -相对目标高度
+rotateSpeed:  旋转速度。设置腿的旋转速度            float
+endDirOffset:  结束方向偏移。目标脚部/末端相对于身体的旋转。      
+lockMovement:  锁定到单位主体。如果陆地单位转换成飞行单位，则很有用。          bool
+heightSpeed:  抬高速度。腿的抬高速度。            float
+moveSpeed:  移动速度。腿的移动速度。             float
+moveWarmUp:  运动预热。移动前停顿一段时间。       float
+holdDisMin:  保持最小值。默认值为7。如果相邻腿没有重新定位，则重新定位腿。           float
+holdDisMax:  保持最大值。默认值为16。用力重新定位腿在这个距离。         float
+holdDisMin_maxMovingLegs:  腿最大移动数。最多能同时移动多少腿。           int
+hold_moveOnlyIfFurthest:  仅在离身体最远时保持移动。         bool
+holdDisMin_checkNeighbours:  移动最小距离时检查相邻的腿脚。         bool
+hardLimit:  默认为50。强迫腿永远不要走这么远，超过这个距离会被强行拉回来。          float
+estimatingPositionMultiplier:  默认值为1。根据单位速度预测腿部位置。            float
+     图形与效果
+hidden:  隐藏腿。        logic boolean
+image_end:  尾端图像。同等于脚。             file (image)       1.13
+image_end_shadow:  尾端图像阴影。         file (image)      1.13
+image_end_teamColors:  尾端图像颜色。              1.13
+image_foot:  脚图像。于image_end相同。          file (image)         1.13
+image_foot_shadow:  脚图像阴影。         file (image)
+image_middle:  中间图像。同等于腿。            file (image)          1.13
+image_leg:  腿图像。       file (image)
+draw_foot_on_top:  在腿的上层显示脚。        bool       1.13
+drawOverBody:  显示在单位身体上方。默认值为false。             bool
+drawUnderAllUnits:  在所有单位下显示。             bool
+drawDirOffset:  显示方向偏移。       float
+dust_effect:  每一步产生灰尘颗粒。           bool
+spinRate:  旋转速率。使arm/leg旋转，像炮塔一样。          float
+favourOppositeSideNeighbours:  让腿的移动产生间隔，不会让他们不会同时移动。             boolean         1.13p5
+drawLegWhenZoomedOut:  缩放时显示腿。对于性能,默认值根据单位大小而变化。缩小时不显示这个单位的腿。         bool        1.13.2p1
+drawFootWhenZoomedOut:  缩放时显示脚。对于性能,默认值根据单位大小而变化。缩小时不显示这个单位的脚。         bool        1.13.2p1
+resetAngle:	复位角度	复位角度。	resetAngle:45	float
+explodeOnDeath:bool 在死亡时是否爆炸
+image_middle_teamColors:bool -腿图像阵营色

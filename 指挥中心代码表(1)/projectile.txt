@@ -1,0 +1,112 @@
+抛射体		[projectile_NAME]	[projectile_1]
+代码	代码翻译	描述	例子	值类型
+trueGravity:float 高度变化重力
+life:	存在时间	开火后炮弹在没命中时的存活时间，单位为帧。60为1s。多少合适取决于速度与射程。	life:120	int
+deflectionPower:	激光拦截耗能	默认值为1。此抛射体被激光防御摧毁所需的能量。 -1为禁止拦截。（对特殊武器如火焰）	deflectionPower:-1	float
+explodeOnEndOfLife	寿终爆炸	默认为false。True则会在寿命终结时爆炸，并产生其命中时该有的效果。而不是直接消失。	explodeOnEndOfLife:true	bool
+autoTargetingOnDeadTarget:	自动切换目标	"如果目标死亡则自动切换单位。填true时如果有代码""targetGround:true""炮弹将会追踪距离它最近的单位。如果没有""targetGround""时将会在单位死亡后再改变目标。"	autoTargetingOnDeadTarget:true	bool
+autoTargetingOnDeadTargetRange	自动切换目标检索范围	当旧目标死亡时选择新目标的范围	autoTargetingOnDeadTargetRange:45	int
+autoTargetingOnDeadTargetLead	自动切换目标预判	尝试新的目标时的预判	autoTargetingOnDeadTargetLead:1	float
+unloadUpToXUnitsFromSource	卸载单位至命中地	将指定个数单位卸载到抛射体爆炸位置。	unloadUpToXUnitsFromSource:1	int
+teleportSource	传送	将单位移动到抛射体爆炸的位置，用于传送自身。	teleportSource:true	bool
+spawnUnit	产生单位	在弹丸爆炸位置产生这种单位	spawnUnit:heavyTank,tank*5,hoverTank(offsetX=10)	unit types
+convertHitToSourceTeam	命中时更改所属	将更改被命中的单位转换队伍为自身所属。	convertHitToSourceTeam:true	bool
+tags	标签	用于抛射体拦截功能。	tags:nuke	tags
+flameWeapon:	火焰武器	命中时产生小火焰（仅用于装饰）	flameWeapon:true	bool
+spawnProjectilesOnEndOfLife	在寿命结束时刷抛射体	填抛射体名。在寿命(life)结束时刷抛射体。刷抛射体逻辑具体参数参考后面刷抛射体大项。这简化了过去许多需要多炮塔(如贯穿攻击)或是刷辅助单位才能实现的操作。	spawnProjectilesOnEndOfLife:torpedo_split(offsetDir=90),torpedo_split(offsetDir=-90)	projectile ref
+spawnProjectilesOnExplode	在爆炸时刷抛射体	填抛射体名。只在爆炸时刷抛射体，如果耗光life则不会刷。	spawnProjectilesOnExplode:shiba(offsetDir=60,recursionLimit=6)	projectile ref
+spawnProjectilesOnCreate	在创建时刷抛射体	填抛射体名。抛射体创建时刷抛射体。	spawnProjectilesOnCreate:1.5,2,3,4,5	projectile ref
+#====	#====	伤害	#====	#====
+directDamage:	直接伤害	击中对目标单位造成伤害。不适用于targetGround:true。	directDamage:999	int
+areaDamage:	范围伤害	范围伤害值，此区域内敌方单位都将受到损伤，默认向边缘递减。	areaDamage:99	int
+areaRadius:	范围半径	范围伤害区域大小，此区域内敌方单位都将受到损伤，默认向边缘递减。数值类型为像素，大小算法为半径，铁锈内地块一格长为20像素。	areaRadius:99	float
+areaDamageNoFalloff	范围伤害不衰减	默认false.为true时范围伤害不再向边缘递减。	areaDamageNoFalloff:true	bool
+areaRadiusFromEdge	范围伤害从边缘计算	范围伤害将从单位的边缘计算，而不是默认的中心计算。主要用于攻击大型单位。	areaRadiusFromEdge:true	bool
+areaExpandTime	范围扩展时间	将区域伤害变为爆炸波向边缘扩散。效果如核弹。	areaExpandTime:15	float
+areaHitAirAndLandAtSameTime	范围武器同时攻击空中和地面	范围武器将同时打击空中和地面。	areaHitAirAndLandAtSameTime:true	bool
+areaHitUnderwaterAlways	范围武器可攻击深海	范围武器将可以打击深海单位如潜艇。	areaHitUnderwaterAlways:true	bool
+areaIgnoreUnitsCloserThan	范围伤害忽略区域	小于此范围的单位不会受到攻击影响。需要比areaRadius小，否则造不成伤害。	areaIgnoreUnitsCloserThan:20	int
+buildingDamageMultiplier	建筑伤害乘数	默认为1。对建筑物伤害乘上此数值，用于伤害修正。比如闪电对建筑物伤害低，火焰对建筑物伤害高。	buildingDamageMultiplier:0.5	float
+shieldDamageMultiplier	护盾伤害乘数	默认为1。对护盾伤害乘数。如0对护盾不造成伤害，2对护盾造成双倍伤害	shieldDamageMultiplier:2	float
+shieldDefectionMultiplier	护盾阻挡乘数	护盾阻挡乘数，填0则可无视护盾，同时对单位和盾造成伤害。	shieldDefectionMultiplier:0	float
+hullDamageMultiplier	护盾损伤乘数	可以用来制造只影响护盾的电磁脉冲武器。0忽略单位，只伤害护盾	hullDamageMultiplier:0	float
+ignoreParentShootDamageMultiplier	忽略父单位射击伤害乘数		ignoreParentShootDamageMultiplier:true	bool
+armourIgnoreAmount	无视装甲数量	无视目标装甲数量并造成伤害。	armourIgnoreAmount:10	int
+friendlyFire	友伤	范围武器有友伤，可以伤害自己单位。铁锈限制不能对盟友有伤害。负数友伤可以用于范围维修，如果修盟友则需要用中立单位实现。参数false true only-ignoreEnemy	friendlyFire: false/true/only-ignoreEnemy	bool/string
+mutatorX_ifUnitWithTags	修正需要标签	伤害修正所需标签，仅对携带标签单位有效。否则为原始伤害。	mutator1_ifUnitWithTags: infantry	float
+mutatorX_ifUnitWithoutTags	修正除此标签	伤害修正除此标签外有效。	mutator1_ifUnitWithoutTags: strongArmour	float
+mutatorX_directDamageMultiplier	修正直接伤害	伤害修正,直接伤害(directDamage)乘数。比如直接伤害100，这里填2，对目标就造成200伤害。	mutator1_directDamageMultiplier:2	float
+mutatorX_areaDamageMultiplier	修正范围伤害	伤害修正,范围伤害(areaDamage)乘数。比如直接伤害100，这里填2，对目标就造成200伤害。	mutator1_areaDamageMultiplier:0.5	float
+mutatorX_changedExplodeEffect	修正命中效果	如果此修正处于有效状态，则更改爆炸效果。	mutator1_changedExplodeEffect:custom:small	effect
+mutatorX_addResourcesDirectHit	修正直接添加资源	伤害修正,用于直接伤害(directDamage)，给目标添加指定资源。用途如给目标资源后，目标检测自身资源然后禁止移动。	mutatorX_addResourcesDirectHit:shibaMove=1	resource
+mutatorX_addResourcesAreaHit	修正区域添加资源	伤害修正,用于范围伤害(areaDamage)，给目标添加指定资源。	mutatorX_addResourcesAreaHit:shibaMove=1	resource
+#====	#====	运动	#====	#====
+targetGround	目标为地面	抛射体瞄准并攻击目标所在的地面，而不是追踪目标。直接伤害(directDamage)将会失效，需要使用areaDamage和areaRadius。	targetGround:true	bool
+targetGround_includeTargetHeight	目标为地面包括目标高度	区域影响AA武器	targetGround_includeTargetHeight	float
+targetGroundHeightOffset	目标为地面高度偏移	在目标上方或下方射击。可能对分裂和落下的炮弹有用。	targetGroundHeightOffset:10	float
+speed:	速度	抛射体飞行速度，单位是每帧飞行像素。铁锈地块1格20像素，填1则每秒飞行3格。	speed:2	float
+targetSpeed:	到达速度	加速到这个速度	targetSpeed:8	float
+targetSpeedAcceleration	加速度	加速度，控制targetSpeed的速度提升	targetSpeedAcceleration:1	float
+ballistic:	弹道	弹道导弹效果，使抛射体先飞向空中并向下飞，而不是走直线。	ballistic:true	bool
+ballistic_delaymove_height:	弹道垂直飞行高度	弹道导弹发射初期效果，决定弹道一开始先升高多少，再斜向爬升到最高过度。	ballistic_delaymove_height:1	float
+ballistic_height:	弹道高度	弹道最终高度。	ballistic_height:15	float
+targetGroundSpread:	目标为地面散布	填数值，用于目标为地面时随机造成偏差效果	targetGroundSpread:15	float
+speedSpread:	速度散布	随机改变炮弹初始速度	speedSpread:1	float
+instant	瞬间命中	开火时立即击中目标,用于激光、闪电、波束。	instant:true	bool
+instantReuseLast:	瞬间命中回收最后抛射体	用于激光和闪电。激光或闪电命中后还会存在一段时间，当此抛射体命中后，清除上一个抛射体效果。使得只有一个抛射体存在。如使用高频射速变成光束武器，而不是瞎眼叠加。	instantReuseLast:true	bool
+instantReuseLast_alsoChangeTurretAim	命中回收抛射体且改变瞄准	使炮塔瞄准受到命中目标扫描效果的影响，对光束武器有用	instantReuseLast_alsoChangeTurretAim:true	bool
+instantReuseLast_keepAreaDamageList	命中回收抛射体区域伤害列表	瞬间命中并回收最后的抛射体并且保持区域伤害列表，默认false,保持列表是1.13的正常行为，造成区域伤害不会第二次生效，但不是很有用。只有当你想要旧的行为时才使用这个。	instantReuseLast_keepAreaDamageList:false	bool
+disableLeadTargeting	禁用预判	瞄准移动目标时，禁用预判计算。默认为false。	disableLeadTargeting:true	bool
+leadTargetingSpeedCalculation	预判计算	用于使用targetGround时预判计算。目标计算的预期速度。默认为“targetSpeed”。如果设置则基于speed. 	leadTargetingSpeedCalculation:0.5	float
+initialUnguidedSpeedHeight	初始非制导垂直速度	设置抛射体和地面间的垂直速度，利用gravity制造出平滑的抛物线。比较迷，填1左右，重力可以不填。	initialUnguidedSpeedHeight:1	float
+initialUnguidedSpeedX	初非导引速度X	让抛射体以弧线形式移动,负数向左，正数向右。	initialUnguidedSpeedX:3	float
+initialUnguidedSpeedY	初非导引速度Y	修改抛射体的高度，正数向下，负数向上。	initialUnguidedSpeedY:3	float
+gravity	重力	控制地面的弹丸的拉力。与initialUnguidedSpeedHeight一起使用。	gravity:0.5	float
+turnSpeed	转弯速度	限制抛射体的转弯速度，更好的做出弹道效果。	turnSpeed:2	float
+turnSpeedWhenNear	靠近时转弯速度	用于当射弹非常接近目标时，默认禁用转弯速度以使其能够命中。	turnSpeedWhenNear:true	bool
+wobbleAmplitude	摆动幅度	抛射体飞行中摆动的剧烈程度。	wobbleAmplitude:0.2	float
+wobbleFrequency	摆动频率	抛射体飞行中摆动的频率。	wobbleFrequency:0.8	float
+pushForce	推动力量	弹丸所携带的“重量”,质量越大，推力越大。推动（或以负值拉动）被击中的单位。除以目标质量	pushForce:2	float
+pushVelocity	推进速度	抛射体爆炸后可用推动单位,推力相对于方向的速度，推动（或以负值拉动）被击中的单位。忽略目标质量	pushVelocity:2	float
+moveWithParent	随父物体移动	当父单位移动时也移动抛射体。对光束效果武器很有用。	moveWithParent:true	bool
+sweepOffset	扫描偏移	扫描偏移，用于制作类似于两栖护盾坦克的激光武器。对光束效果很有用。	sweepOffset:10	float
+sweepSpeed	扫描速度	扫描速度，用于制作类似于两栖护盾坦克的激光武器。对光束效果很有用。	sweepSpeed:10	float
+sweepOffsetFromTargetRadius	扫描偏移目标半径	以目标半径作为扫描偏移量乘数，用于制作类似于两栖护盾坦克的激光武器。对光束效果很有用。	sweepOffsetFromTargetRadius:0.4	float
+retargetingInFlight	重新瞄准在飞行时	在飞行过程中重新瞄准一个新的目标，非常适合投掷式武器和相互碰撞的抛射体	retargetingInFlight:true	bool
+retargetingInFlightSearchDelay	重新瞄准在飞行时搜索延迟	寻找新目标之间的时间。默认5	retargetingInFlightSearchDelay:10	float/time
+retargetingInFlightSearchRange	重新瞄准在飞行时搜索范围	重新选择目标的范围。默认值120	retargetingInFlightSearchRange:45	int
+retargetingInFlightSearchLead	重新瞄准在飞行时预判	引导射弹试图击中目标。默认15	retargetingInFlightSearchLead:1	float
+retargetingInFlightSearchOnlyTags	重新瞄准在飞行时针对标签	只针对具有这些标签的单位进行重定向。	retargetingInFlightSearchOnlyTags:tg_project	tag ref
+图形和效果
+color	颜色	使用十六进制值对该抛射体重新着色，它也决定了激光颜色，颜色格式为#AARRGGBB。	color: #bebe50	color
+teamColorRatio	阵营色色相	将团队颜色混合到抛射体颜色中，填0-1。	teamColorRatio:0.5	float
+teamColorRatio_sourceRatio	阵营色色相比例	将团队颜色混合到抛射体颜色中与原色比例，默认为(1-teamColorRatio)	teamColorRatio_sourceRatio:0.5	float
+invisible	隐藏	隐藏抛射体图像。	invisible:true	bool
+image:	图像	使用自定义图片。覆盖drawType和frame	image:233.png	file (image)
+shadowImage	阴影图像	使用自定义图片给抛射体加阴影。	shadowImage:SHADOW:PRO_fd.png	file (image)
+drawType	绘制类型	使用内置抛射体图像。 0:projectiles.png 1:projectiles_large.png 2:projectiles2.png	drawType:1	int
+drawSize:	绘制大小	缩放抛射体大小。默认为1	drawSize:0.5	float
+frame	帧	使用的内置图像帧，编号从零开始。和drawType结合使用。	frame:1	int
+hitSound:	打击音效	启用命中音效，默认true	hitSound:true	bool
+explodeEffect	爆炸效果	抛射体爆炸效果	explodeEffect: smallExplosion, CUSTOM:myExplodeEffect	effect ref list
+explodeEffectOnShield	护盾上爆炸效果	如果目标上有护盾，则使用此效果	explodeEffectOnShield:small	effect ref list
+drawUnderUnits	绘制与单位下	绘制于单位下方。	drawUnderUnits:true	bool
+effectOnCreate	创建时效果	创建时效果，会追随抛射体。	effectOnCreate:large	effect ref list
+shouldRevealFog	揭开迷雾	抛射体在爆炸时向玩家揭开迷雾。	shouldRevealFog:true	bool
+alwaysVisibleInFog	迷雾中显示	抛射体总是在迷雾中显示。	alwaysVisibleInFog:true	bool
+nukeWeapon	核武器	发射时在迷你地图上显示。还有其他一些效果。	nukeWeapon:true	bool
+trailEffect	尾焰	设置为true时为默认的尾焰。但也可以指向任何自定义效果，或使用内置效果。	trailEffect:true	bool/effect
+trailEffectRate	尾焰频率	尾焰产生频率，默认为3	trailEffectRate:8	float
+lightSize:	闪光大小	抛射体光照大小,单位半径是地块格子	lightSize:2	float
+lightColor	闪光颜色	抛射体光照颜色,不决定激光颜色，激光由color决定。	lightColor: #ffe92b	color
+lightCastOnGround	闪光映射到地面	将闪光效果映射到地面，如火炮的光和抛射体是分离的。	lightCastOnGround:true	bool
+largeHitEffect:	大的打击效果	为true时会产生大的爆炸效果和声音（仅用于装饰），设为false时会禁用范围武器的冲击波效果。	largeHitEffect:true	bool
+lightingEffect:	闪电效果	将抛射体图像修改为闪电，一般需要instant(瞬间命中)搭配.	lightingEffect:true	bool
+laserEffect:	激光效果	将抛射体图像修改为激光。	laserEffect:true	bool
+delayedStartTimer	延迟时间	抛射体发射延迟时间。	delayedStartTimer:15	time
+beamImage	波束图像	用于激光效果的主体图像，图像会被复制为多份显示。例如可用于做红警中的正弦波状辐射武器。因为本质是图像拼接,所以长度限制不能小于20	beamImage:shibaray.png	file (image)
+beamImageOffsetRate	波束偏移频率	波束图像的移动频率。	beamImageOffsetRate:0	float
+beamImageStart	波束开始图像	光束动画开火端效果图像	beamImageStart:beam1_start.png	file (image)
+beamImageEnd	波束命中图像	光束动画命中端效果图像	beamImageEnd:beam1_end.png	file (image)
+beamImageStartRotated	波束始端旋转	光束动画开火端效果图像是否以炮塔角度旋转旋转,默认false,不旋转.	beamImageStartRotated:true	bool
+beamImageEndRotated	波束末端旋转	光束动画命中端效果图像是否旋转,默认false.	beamImageEndRotated:true	bool

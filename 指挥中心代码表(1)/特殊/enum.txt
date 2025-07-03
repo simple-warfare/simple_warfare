@@ -1,0 +1,120 @@
+内置特效
+
+none 无
+smoke 烟
+shockwave 冲击波
+large 开火大
+small 开火小
+medium 中等
+smallExplosion 小爆炸
+largeExplosion 大爆炸
+noneExplosion 无爆炸
+
+内置死亡爆炸
+
+verysmall 很小
+small 小
+normal 普通
+large 大
+largeUnit 大单位
+building 建筑
+buildingNoShockwaveOrSmoke 建筑无冲击烟雾
+verylargeBuilding 大型建筑
+
+移动类型
+
+NONE 无(横穿任何地块)
+LAND 陆地
+BUILDING 建筑
+AIR 空军
+WATER 海军
+HOVER 悬浮
+OVER_CLIFF 跨悬崖
+OVER_CLIFF_WATER 跨水和悬崖
+
+布尔值括号内参数
+
+withTag 带标签
+includes 包含标签
+type 类型   
+greaterThan 超过   
+lessThan 少于   
+equalTo 等于 
+full 满   
+empty 空   
+withinRange 范围内
+incompleteBuildings 包含未完成的
+factoryQueue 包含队列中的
+withinSeconds 指定时间内
+laterThanSeconds 指定时间后
+
+路径点类型
+
+move 移动
+attack 攻击
+attackMove 行军
+guard 防守
+loadInto 进入
+loadUp 装载
+reclaim 回收
+repair 修复
+touchTarget 靠近目标
+build 建造
+follow 跟随
+setPassiveTarget 被动¿
+
+AI难度资金比例
+
+very easy 40%
+easy 70%
+medium 100%
+hard 140%
+very hard 180%
+impossible 370%
+
+[action]displayType
+
+none 无 绿色
+rally 集结 白色R
+upgrade 升级 蓝色U
+queueUnit 单位队列 绿色
+building 建筑 绿色
+action 行为 蓝色
+infoOnly 仅信息 灰色
+infoOnlyNoBox 无框信息 
+
+队伍关系    
+      
+己方 own
+中立 neutral
+盟友 ally
+敌人 enemy
+所有 any
+除自己外盟友 allyNotOwn
+
+地图位置产生指定单位   
+     
+emptyResourcePools_asNeutral    产生于空资源池，且为中立所属     
+emptyOrOccupiedResourcePools_asNeutral    空的或已经占用资源池，且为中立所属     
+mapCenter_asNeutral    地图中心，且为中立所属     
+mapCenter_eachActiveTeam    地图中心，且给与每个玩家     
+spawnPoint_eachActiveTeam     玩家初始位置，给与每个玩家     
+
+autoTriggerOnEvent事件
+
+killedAnyUnit     杀死任何单位
+destroyed     销毁(包括删除单位)
+completeAndActive     完成和激活(大概指完全能够战斗或辅助)
+created     创建
+queuedUnitFinished     队列中单位完成
+queueItemAdded     队列添加项目
+queueItemCancelled     队列项目取消
+teleported     传送
+touchTargetSuccess     接触目标成功
+newWaypointGivenByPlayer     玩家指定路径
+teamChanged     队伍变更
+transportingNewUnit     运输新单位
+transportUnloadedOrRemovedUnit     卸载或移除单位
+tookDamage     受到伤害
+
+

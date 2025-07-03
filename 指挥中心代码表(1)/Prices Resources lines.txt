@@ -1,0 +1,12 @@
+价格/资源		Prices/Resources
+代码	代码翻译	描述 -由addResources，price等使用	例子	值类型
+credits	资金	铁锈中默认用于全局的资金。	credits	Resources
+energy	能量	单位使用的能量，如可用于开火限制。	energy	Resources
+hp	血量	单位血量，一般血量归零时就会销毁单位。	hp	Resources
+shield	护盾	单位护盾，一般用于抵挡敌人攻击。	price: hp=-100, shield=100	Resources
+ammo	弹药	弹药，每个单位的隐藏值，供mod使用。	ammo=1	int
+setFlag	设置标志	设置标志，范围0-31。标志存储在每个单元中，与addResources，resourceUsage或price等一起使用。	setFlag=1	int
+unsetFlag	取消标志	取消已经设置的标志	unsetFlag=1 , unsetFlag = 1-5	int
+hasFlag	拥有标志	拥有标志。	hasFlag=1	int
+hasMissingFlag	没有标志	没有标志。	hasMissingFlag=1	int
+X	X	[global_resource_x]或[resource_x]节中定义的任何资源。	gold=5, stone=20	Resources

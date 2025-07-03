@@ -1,0 +1,57 @@
+[decal_]
+layer   enum   shadow, beforeBody, afterBody, onTop, beforeUI, inactive   绘制图层,可以是前面几种
+order   float  排序(默认为0并且按照ini里的顺序)
+onlyWhenSelectedByOwnPlayer  仅在被拥有着选中时绘制
+onlyWhenSelectedByEnemyPlayer  被敌方玩家选中时绘制
+onlyWhenSelectedByAllyNotOwnPlayer  非自身队伍的盟友选中时绘制
+onlyWhenSelectedByAnyPlayer   被任意玩家选中时绘制
+includeParentsSelection   bool  包含父单位选中
+onlyPlayersWithUnitControl   bool  仅在查看者能够控制此单位时绘制
+onlyTeam   TeamRelation  own|notOwn|neutral|allyNotOwn|ally|enemy|any  仅在查看者为特定队伍时显示
+onlyWithZoomLevelOrMore   float   仅当缩放到当前大小或更大时绘制(推测啥都不动进游戏就是1倍缩放)
+onlyWhileActive  仅在单位建造完成时绘制(比如建造者建造一般的建筑就不算)
+onlyWhileAlive:bool  (如果图层(layer)为beforeUI默认为true,否则false)仅在存活时绘制(为ture死后消失)
+onlyInPreview:bool  仅在侧边栏和建筑放置预览中显示
+onlyOnNonPreview:bool 仅在非预览中显示(与上一条相反)
+imageScale   dynamic float  图像缩放(倍数)
+imageScaleX   dynamic float  图像X缩放
+imageScaleY   dynamic float  图像Y缩放
+image  图像
+teamColors   bool  阵营色
+imageStack  图像列表(目前没有实例所以不清楚,但确定是用于3d单位) file
+stack_hOffset   列表图像高度偏移
+stack_frameOffset  列表图像帧偏移
+stack_drawInReverseOrder  列表图像绘图顺序
+stack_indexStart   dynamic int 列表图像起始图像
+stack_indexCount 
+ dynamic int 列表图像数量
+total_frames 
+总帧数(跟后面两个二选一使用)
+frame_width 
+帧宽度
+frame_height 
+帧高度
+frame 
+ dynamic int 
+ 帧(与total_frames相比,frame是动值,可以改变内存来修改第几帧)
+isVisible 
+ dynamic bool  可见(可以使用逻辑)
+xOffsetRelative   float  X相对偏移
+yOffsetRelative   float  Y相对偏移
+xOffsetAbsolute   dynamic float  X绝对偏移
+yOffsetAbsolute   dynamic float  Y绝对偏移
+hOffset   float  高度偏移
+dirOffset   float  角度偏移
+pivotOffset   float 坐标系旋转(相当于把单位定位的直角坐标系旋转该角度,然后重新确定xy) 只影响X/Y相对偏移,不旋转图像
+alwaysStartDirAtZero   bool  总是固定角度为零(总是朝上)
+alwaysStartHeightAtZero   bool  总是固定高度为零
+basePosition  中心位置(填单位参考)
+basePositionFromLeg   leg ref 以脚为中心位置
+basePositionFromTurret   turret ref 以炮塔为中心位置
+drawLineTo   unit or marker $ 绘制线条到(受到颜色和宽度影像)
+image_shadow    image  阴影图像
+shadowOffsetX   float  阴影偏移X
+shadowOffsetY   float  阴影偏移Y
+color   color      颜色(影像图像和线条)
+alpha   dynamic float (0 1).  透明度(影像颜色和线条)
+lineWidth   float  线宽度

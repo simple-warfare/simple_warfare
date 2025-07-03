@@ -1,0 +1,202 @@
+1.15的逻辑表,扒源码所得,不一定能用
+self.teamname
+self.playername
+mass
+maxenergy
+energy
+maxhp
+hp
+maxshield
+shield
+shieldregen
+armour
+maxattackrange
+shootdelaymultiplier
+shootdamagemultiplier
+movespeed
+maxturnspeed
+undefined
+voidReturn
+bool
+number
+unit
+string
+point
+boolean
+bool
+unit
+number
+float
+text
+string
+game
+parent
+self
+this
+boolean
+bool
+unit
+void
+null
+number
+float
+attachment
+parent
+transporting
+activeWaypointTarget
+attacking
+customTarget1
+customTarget2
+lastDamagedBy
+nearestUnit
+globalSearchForFirstUnit
+nullUnit
+null
+getOffsetAbsolute
+getOffsetRelative
+getAsMarker
+thisActionTarget
+eventSource
+self.
+subject.
+大概写点,以后可能补充更多
+
+语言编码{LANG}是什么?要填什么?
+ISO 3166-1 联合国统计局统计用国家地区代码
+ISO 639-1 国际标准化组织语言编码标准
+路径使用斜杠/\
+/作为路径是通用的,比如网址、路径
+\似乎只在win资源管理作为路径使用,许多时候作为转义使用，
+这意味着\\相当于\,如\n则被解析为换行，处理几次\就没了，而/不存在这种问题。
+
+语言文件写法示例
+units.单位名称.name=写单位显示的名称
+units.单位名称.description= [[填单位显示的描述]]
+
+Debug模式
+AI debug模式
+开启按键：Shift+f3
+Debug模式
+开启按键：Ctrl+shift+d
+放置规则示例
+
+[placementRule_需要靠近主要建筑]
+#anyRuleInGroup: needmainbuild
+searchTags: BUIYS
+minCount:1
+checkEachTile:true
+blocksPlacement:true
+cannotPlaceMessage:距离太远,需要靠近主要建筑物
+searchDistance:180
+excludeIncompleteBuildings:true
+excludeNonBuildings:true
+
+"铁锈不断更新，luke也不断更新原始代码表，因此不保证本代码表于英文版同步，有些疏漏难免。
+有些代码是扒内部数据所得，不保证铁锈更新后依旧有效。"
+本代码表和地图代码表最优先更新地址： http://hxyy.ys168.com
+群：166891314 https://jq.qq.com/?_wv=1027&k=V2Kp9jMu
+hx制作
+1.0 20200515第一版
+1.01 调整了目录文本跳转
+内容补充完善
+1.02 修正一些错误，补充1条代码
+1.03 补充一些描述，补充动画部分遗漏条目。
+1.04 补充1.14代码，修正部分问题，更改内部参数样式
+1.05 测试了些代码,单位表改为1.14.
+1.14正式 "还是用有意义的版本号吧。补充了p8p9和正式版新增的代码。
+以及补充了几个遗漏代码。" 2020.11.22
+1.15测试 初步增加115代码 2021.08.06
+1.15测试 补充 2021.08.15-30
+英文测试版代码表 https://docs.google.com/spreadsheets/d/1aeP3pUic0IutZlgGix_cM8xR7LEH44gS4itAxETK954/
+英文正式版代码表 https://docs.google.com/spreadsheets/d/1vEku_j8QwgsTzB5oMS_IDUiHfhzZVESeSrkyrS4tndk/edit?usp=sharing
+
+逻辑参数表，有许多不在代码表内，懒得挨个实验一遍。
+underwater=true
+self.underwater
+self.isUnderwater
+ground=true
+self.gound
+self.ground
+self.isAtGroundHeight
+self.height
+flying=true
+self.flying
+self.isFlying
+self.isMoving
+self.hasActiveWaypoint
+atTopSpeed=true
+self.maxspeed
+self.isAtTopSpeed
+self.inwater
+self.isInWater
+self.overwater
+self.isOverwater
+self.isOverLiquid
+self.isOverClift
+self.isOverCliff
+self.isOverPassableTile
+type=\'LAND\'
+self.isOverOpenLand
+self.tags
+self.hasTags
+self.globalTeamTags
+self.hasGlobalTeamTags
+self.hasFlag
+self.energy
+self.energyIncludingQueued
+full=true
+self.isEnergyFull
+empty=true
+self.isEnergyEmpty
+self.transportingCount
+self.transportingUnitWithTags
+self.isTransportUnloading
+self.hp
+self.shield
+self.ammo
+self.isAmmoEmpty
+self.ammoIncludingQueued
+self.resource
+self.queueSize
+self.numberOfConnections
+self.numberOfAttachedUnits
+self.hasParent
+self.hasResources
+self.isResourceLargerThan
+self.kills
+self.timeAlive
+self.lastConverted
+self.customTimer
+self.hasTakenDamage
+self.isAttacking
+team=-1
+self.isOnNeutralTeam
+self.isControlledByAI
+numberOfUnitsInTeam
+self.numberOfUnitsInTeam
+greaterThan=0, lessThan=-1
+hasUnitInTeam
+self.hasUnitInTeam
+greaterThan=-1, lessThan=1
+noUnitInTeam
+self.noUnitInTeam
+neutralTeam=true
+numberOfUnitsInNeutralTeam
+self.numberOfUnitsInNeutralTeam
+ally=false
+numberOfUnitsInEnemyTeam
+self.numberOfUnitsInEnemyTeam
+ally=true
+numberOfUnitsInAllyTeam
+self.numberOfUnitsInAllyTeam
+numberOfUnitsInAllyNotOwnTeam
+self.numberOfUnitsInAllyNotOwnTeam
+nukesEnabled=true
+game.nukesEnabled
+true
+false
+self.
+subject.
+if
+Timestamp Untitled Question
+Timestamp Untitled Question

@@ -1,0 +1,22 @@
+刷兵		Spawn units line
+代码	代码翻译	描述	例子	值类型
+aggressiveTeam 敌对中立 bool
+spawnUnits	产生单位	用于action刷兵，大多数单位的生成键都支持多个单位且带有参数。注意：与spawnUnit不能混用spawnUnit用于抛射体。	spawnUnits:crates*10(neutralTeam=true), tank(spawnChance=0.5)	unitlist
+neutralTeam	中立	生成这个单位归属于中立队伍而不是所属玩家。	spawnUnits:cat(neutralTeam=true)	bool
+setToTeamOfLastAttacker	所属攻击者	生成单位归属于攻击者。（在[core] unitsSpawnedOnDeath上有用）	spawnUnits:cat(setToTeamOfLastAttacker=true)	bool
+spawnChance	产生几率	生成这个单位几率。 默认为1。	spawnUnits:cat(spawnChance=0.5)	float
+spawnSource	产生源	改变产生地点和产生单位的队伍到这个单位参考。	[action]spawnUnits: tank(spawnSource=memory.lastLocation)	unit ref
+maxSpawnLimit	最大生成数量	与spawnChance一起使用时，总共可以产生的最大单位数。	spawnUnits:treeA(spawnChance=0.5, maxSpawnLimit=1)	int
+gridAlign	对齐网格	将生成位置与网格对齐，对建筑物有用	spawnUnits:cat(gridAlign=true, skipIfOverlapping=true)	bool
+skipIfOverlapping	跳过条件	如果在无效的位置忽略单位生成。 例如基于LAND的单位不会产生在水中。	spawnUnits:cat(gridAlign=true, skipIfOverlapping=true)	bool
+offsetX	X偏移	生成单位位置X偏移量，单位像素	spawnUnits:cat(offsetX=10,offsetY=10)	float
+offsetY	Y偏移	生成单位位置Y偏移量	spawnUnits:cat(offsetX=10,offsetY=10)	float
+offsetRandomX	X随机偏移	生成单位位置X随机偏移量	spawnUnits:cat(offsetRandomX=10,offsetRandomY=10)	float
+offsetRandomY	Y随机偏移	生成单位位置Y随机偏移量	spawnUnits:cat(offsetRandomX=10,offsetRandomY=10)	float
+offsetRandomDir	角度随机偏移	生成单位时角度随机偏移量	spawnUnits:cat(offsetRandomDir=10)	dir
+offsetHeight	高度偏移	生成此单位的高度偏移量。	spawnUnits:cat(offsetRandomDir=10)	int
+offsetDir	角度偏移	生成单位时角度偏移量。单位度。	spawnUnits:cat(offsetHeight=10)	dir
+addResources	增加资源	给生成单位这些资源，可用于设置触发动作的标志	spawnUnits:crates(addResource=gold:30|stone:10, spawnChance=0.5)	customResource
+transportedUnitsToTransfer	载员至载具	将指定数量的单元放入刷出的单元的运输槽位中。	spawnUnits:transporter(transportedUnitsToTransfer=5)	int
+copyWaypointsFrom	复制路径来自	复制目标上的所有路径点到创建的单位。	spawnUnits: tank(copyWaypointsFrom=self)	unit ref
+alwayStartDirAtZero	朝向总是零度	刷出的单位朝向总是设置为零度。即朝右。	spawnUnits:wolf(alwayStartDirAtZero=true)	bool

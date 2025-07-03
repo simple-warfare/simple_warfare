@@ -34,13 +34,13 @@ pub struct SimpleWarfareModuleLoader {
     module_map: GcRefCell<FxHashMap<String, Module>>,
     path_url: Arc<FxHashMap<&'static str, &'static str>>,
     request_sender: Arc<Sender<SwModuleLoaderRequestEvent>>,
-    Response_receiver: Arc<Mutex<Receiver<SwModuleLoaderResponseEvent>>>,
+    response_receiver: Arc<Mutex<Receiver<SwModuleLoaderResponseEvent>>>,
 }
 
 impl SimpleWarfareModuleLoader {
     pub fn new(
         request_sender: Arc<Sender<SwModuleLoaderRequestEvent>>,
-        Response_receiver: Arc<Mutex<Receiver<SwModuleLoaderResponseEvent>>>,
+        response_receiver: Arc<Mutex<Receiver<SwModuleLoaderResponseEvent>>>,
     ) -> JsResult<Self> {
         let _timer = Profiler::global().start_event("Loader::new", "Loader");
         if cfg!(target_family = "wasm") {
@@ -55,7 +55,7 @@ impl SimpleWarfareModuleLoader {
             module_map: GcRefCell::default(),
             path_url: Arc::new(path_url),
             request_sender,
-            Response_receiver,
+            response_receiver,
         })
     }
 
@@ -91,7 +91,7 @@ impl SimpleWarfareModuleLoader {
             )))?;
 
         match self
-            .Response_receiver
+            .response_receiver
             .lock()
             .map_err(|err| {
                 JsNativeError::typ()

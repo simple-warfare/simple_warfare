@@ -1,0 +1,176 @@
+ Type    逻辑布尔值
+代码 翻译 返回 描述 例子 目标
+true  真  bool
+false  假  bool
+if  如果   所有逻辑布尔值都要以if开头，除非只使用true/false
+and  和  bool   if self.isInWater() and self.energy(greaterThan=1)
+or  或  bool   if (self.energy(greaterThan=1) or self.ammo(greaterThan=1)) and self.isFlying()
+not  不  bool   if not self.isOverLiquid()
+<  小于  bool   如果左边的数字较小，则为true。    1.15p1
+>  大于  bool   如果右边的数字较小，则为true。    1.15p1
+<=  小于等于  bool   如果左侧的数字小于或等于，则为true    1.15p1
+>=  大于等于  bool   如果右侧的数字小于或等于，则为true    1.15p1
+==  等于  bool   如果两边的数字、单位、字符串、布尔值相同，则为true    1.15p1
+!=  不等于  bool   如果两边的数字、单位、字符串、布尔值不同，则为true    1.15p1
++  加  same type   连个数字相减或连接两个字符串    1.15p1
+-  减  same type   两个数字相减    1.15p1
+/  除  same type   两个数字相除    1.15p1
+*  乘  same type   两个数字相乘    1.15p1
+%  求余  same type   两个数字相除并返回余数    1.15p1
+IGNORE 忽略，部分可用
+
+     单元定位与运动
+self.underwater/self.isUnderwater()  在水下  bool
+self.gound/self.ground/self.isAtGroundHeight()  在地面高度  bool
+self.flying/self.isFlying()  在飞行  bool
+self.isMoving()  在移动  bool
+self.isAtTopSpeed()  处于最高速度  bool
+self.inwater/self.isInWater()  在水中  bool
+self.isReversing()  在倒车  bool        1.15p7
+self.isOverwater()  在水上  bool  接触水或者在水的上空
+self.isOverLiquid()  在液体上  bool  在液体的上方(包括岩浆)
+self.isOverClift/self.isOverCliff()  在悬崖上  bool  在悬崖上方
+self.isOverPassableTile()  在可以通过的地块上  bool  (参数:type) self.isOverPassableTile(type='LAND')
+NONE、LAND、BUILDING、AIR、WATER、HOVER、OVER_CLIFF、OVER_CLIFF_WATER
+self.isOverOpenLand()  在开阔的陆地上  bool 
+self.isTransportUnloading() bool 正在卸载单位
+
+     单位统计
+greaterThan大于 lessThan小于 empty空 full满 equalTo等于
+self.hasResources()  有资源  bool  (参数: type,greaterThan,lessThan,equalTo)
+self.resource()  资源  float / bool  (参数: type,greaterThan,lessThan,equalTo)
+self.resource.RESOURCE_TYPE  资源类型  float  快捷方式:self.resource(type='RESOURCE_TYPE')        self.resource.gas            1.15
+self.isResourceLargerThan  资源大于  bool  (参数: source来源， compareTarget比较目标， byMoreThan超过， multiplyTargetBy乘数)
+self.hp()  生命  float / bool   (参数: greaterThan, lessThan, empty, full)
+self.maxHp()  最大生命  float / bool  (参数: greaterThan, lessThan, empty, full)
+self.maxShield() 最大护盾 float/boolean 
+self.maxEnergy() 最大能量 float/boolean
+self.isEnergyRecharging 自身正在充能 boolean
+self.height()  高度  float / bool  (参数: greaterThan, lessThan, empty, full)
+self.ammo()  弹药  int / bool  (参数: greaterThan, lessThan, empty, full)
+self.isAmmoEmpty()  弹药为空  bool  快捷方式:self.ammo(empty=true)
+self.ammoIncludingQueued()  包括队列中的弹药  int / bool  (参数: greaterThan, lessThan, empty, full)       if self.ammoIncludingQueued(lessThan=12)
+self.energy()  能量  float / bool  (参数:greaterThan, lessThan, empty, full)
+self.energyIncludingQueued()  包括队列中的能量  float / bool  (参数:greaterThan, lessThan, empty, full)
+self.isEnergyFull()  能量为满  bool  快捷方式:self.energy(full=true)
+self.isEnergyEmpty()  能量为空  bool  快捷方式:self.energy(empty=true)
+self.shield()  护盾  float / bool  (参数: greaterThan, lessThan, empty, full)
+self.kills()  击杀数  int / bool  (参数: greaterThan, lessThan)
+self.queueSize()  队列大小  float / bool  (参数: greaterThan, lessThan, empty, full)
+self.teamId()  队伍id  int  返回单位或标记的队伍id。从0开始(绿色为0，中立为-1)    1.15
+self.teamName()  队伍名称  string  返回队伍的名字    1.15
+self.playerName()  玩家名称  string  返回玩家的名字    1.15
+self.x(), self.y(), self.z()  x, y, z  float  返回单位的坐标    1.15
+self.dir()  方向  float  返回单位的方向    1.15
+self.priceCredits()  金钱价格  返回单位的price    1.15
+self.speed() float -自身速度
+self.id() int 自己单位id（每个单位都不同，非类型）
+self.builtAmount() int -自身建造数量(似乎不包括使用autoTrigger建造的数量)
+self.completed() bool -自身建造完成(比如建造者造了一半的建筑就是0,建造完成就是1)
+self.maxMoveSpeed() float -自身最大移动速度
+self.teamDefeatedTech() - bool -队伍失败
+self.teamWipedOut() - bool -队伍无单位(ps:都没单位了哪个单位检测队伍没单位?所以应该是只能由禁止受到攻击的单位(此单位不计入总数)来判断)
+self.teamVictory() - bool -队伍获胜
+self.isInMap() bool 自身在地图上
+self.numberOfConnections() int 自身链接数
+self.numberOfQueuedWaypoints([type]) 自身在队列的路径点 int
+
+
+     单位计时
+withinSeconds在多少秒时间内 laterThanSeconds在多少秒时间后
+self.hasTakenDamage()  收到了伤害  float / bool  (withinSeconds=X, laterThanSeconds=X)
+self.timeAlive()  存活时间  float / bool  (withinSeconds=X, laterThanSeconds=X)
+self.lastConverted()  最后转换时间  float / bool  (withinSeconds=X, laterThanSeconds=X)
+self.customTimer()  自定义计时器  float / bool  (withinSeconds=X, laterThanSeconds=X)                self.hasTakenDamage(withinSeconds=1)
+
+     杂项
+self.tags/self.hasFlag()  有标志  bool  (参数: id=0-31)  布尔标志保存到单位中，供MODS使用。(参数: id=0-31)在action使用addResource中更改此值。
+self.tags()  标签  bool  (参数: includes)
+self.globalTeamTags/self.hasGlobalTeamTags()  队伍全局标签  bool  (参数: includes)
+self.transportingCount()  运输数量  int  (参数: greaterThan, lessThan, empty, full)
+self.numberOfAttachedUnits()  自身有附属物  int / bool  (参数: withTag, greaterThan, lessThan)
+self.isAttacking()  在攻击  bool
+self.hasActiveWaypoint()  有活动的路径点  bool  (参数: type) (type=路径点类型)
+self.transportingUnitWithTags()  运输单位有标签  bool  (参数: includes)             self.transportingUnitWithTags(includes='human')
+self.hasParent()  有父单位  bool  对于附属物和运输 (参数: [withTag])
+self.isOnNeutralTeam()  是中立队伍  bool  单位队伍为中立
+numberOfUnitsInTeam()  队伍中此单位数量  int / bool  (参数: withTag, greaterThan, lessThan, withinRange, incompleteBuildings, factoryQueue)              numberOfUnitsInTeam(withTag='techUnlockBuilding', greaterThan=0)
+self.numberOfUnitsInAllyNotOwnTeam()  队友中此单位数量  int / bool  (参数: withTag, greaterThan, lessThan, withinRange, incompleteBuildings, factoryQueue)
+self.numberOfAttachedUnits() int withTag, greaterThan, lessThan, withinRange, incompleteBuildings, factoryQueue 自身附属量
+self.numberOfConnections() int 自身连接数
+numberOfUnitsInEnemyTeam/self.numberOfUnitsInEnemyTeam()  敌人中此单位数量  int / bool  (参数: withTag, greaterThan, lessThan, withinRange, incompleteBuildings, factoryQueue)
+numberOfUnitsInNeutralTeam/self.numberOfUnitsInNeutralTeam()  中立中此单位数量  int / bool  (参数: withTag, greaterThan, lessThan, withinRange, incompleteBuildings, factoryQueue)
+numberOfUnitsInAggressiveTeam/self.numberOfUnitsInAggressiveTeam()  敌对中立中此单位数量  int / bool  一个特殊的会攻击所有人的中立队伍 (参数: withTag, greaterThan, lessThan, withinRange, incompleteBuildings, factoryQueue)
+numberOfUnitsInAllTeams/self.numberOfUnitsInAllyTeam() int 所有队伍中单位 同上
+hasUnitInTeam/self.hasUnitInTeam()  队伍有单位  bool  (参数: withTag, withinRange, incompleteBuildings, factoryQueue)
+noUnitInTeam/self.noUnitInTeam()  队伍无单位  bool  (参数: withTag, withinRange, incompleteBuildings, factoryQueue)
+self.isControlledByAI()  属于AI控制  bool  此单位被ai所控制
+self.readUnitMemory()  读取单位内存  any type  (name:string, type:string{boolean,boolean[],unit,unit[]float,float[],string}, [default])            if parent.readUnitMemory('boostTarget', type='unit') == self
+parent.readUnitMemory("b",type="float[]")[0]
+parent.readUnitMemory("c",type="float[]",index=0)
+thisActionIndex (==index)动作重复次数(只包括alsoTriggerActionRepeat) int
+      1.15p1
+self.isInMap()  在地图内  bool  检测单位是否在地图范围内         1.15p6
+game.mapWidth()  地图宽度  int  返回地图宽度         1.15p6
+game.mapHeight()  地图高度  int  返回地图高度         1.15p6
+
+     单位参照        1.15p1
+thisActionTarget  是动作目标  unit / marker  当前目标或定位的位置。
+fireTurretXAtGround: mainGun (thisActionTarget==带有地面位置的标记)
+alsoTriggerAction: x (thisActionTarget==与原动作相同)
+[turret]onShoot_triggerActions: x  (thisActionTarget==被击中的目标)
+takeResources_triggerActionIfAnyCollected: x (thisActionTarget==以资源为目标)
+addWaypoint_triggerActionIfMatched: x (thisActionTarget == 移动标记/攻击目标等。注意: 如果你只想搜索，请使用addWaypoint_maxTime:0)
+autoTriggerOnEvent: tookDamage (thisActionTarget==造成伤害的单位)
+autoTriggerOnEvent: killedAnyUnit (thisActionTarget==被杀死的单位)
+autoTriggerOnEvent: transportingNewUnit (thisActionTarget==被运输的单位)
+autoTriggerOnEvent: transportUnloadedOrRemovedUnit (thisActionTarget==单位卸载)
+autoTriggerOnEvent: queuedUnitFinished (thisActionTarget==新单位创建)
+autoTriggerOnEvent: touchTargetSuccess (thisActionTarget==接触目标)
+
+attachment  附属物  unit  (参数: [slot], [withTag])             self.attachment(withTag='x').lastDamagedBy.getAsMarker()
+transporting  运载  unit  (参数: [slot])             if self.transporting(slot=0).hasResources(gold=100)
+attacking  攻击  unit  当前在攻击的目标              if attacking.tags(includes='bug') and attacking.hp < 20
+lastDamagedBy  最后一次伤害的敌人  unit
+parent  父单位(或运输)  unit  运输单位或附属物的父单位（注：单位不在运输和附属物槽中时处于暂停状态)           autoTrigger: if parent.energy > 100
+activeWaypointTarget  是路径点中的目标  unit  当前路径点上的目标，包括:攻击、运输、维修等             if distanceBetween(self, activeWaypointTarget) < 100
+customTarget1  自定义目标1  unit  自定义内存。默认为创建该单位的单位            if parent.customTarget1 == self
+customTarget2  自定义目标2  unit  自定义内存。默认为创建该单位的单位
+nearestUnit  最近的单位  unit  搜索一个单位(速度慢，不推荐在autoTrigger中使用) (withinRange=500, withTag='x', relation='any')
+globalSearchForFirstUnit  全局搜索第一个单位  unit  返回找到的与过滤器匹配的第一个(和最后一个)单位(速度慢，不推荐在autoTigger中使用) (withTag=x, relation)            self.globalSearchForFirstUnit(withTag='gameController', relation='neutral')
+nullUnit  空单位  unit  返回一个空单位引用，用于比较
+     标记功能        1.15p1
+getAsMarker  获取标记  marker  在一个单位现在所在的位置创建一个临时标记。标记的创建速度非常快，不再需要时会自动删除。不链接到任何单位并且在单位死亡时仍然存在，在源头移动时保持不变。        lastDamagedBy.getAsMarker()
+getOffsetAbsolute  获取绝对偏移值  marker  返回具有绝对偏移量的标记(-y是北，+x是东) ([x],[y],[height])
+getOffsetRelative  获取相对偏移值  marker  返回具有相对偏移量的标记(y+是前) ([x],[y],[height],[dirOffset])           self.getOffsetRelative(y=100).nearestUnit(withinRange=70, withTag='mouse') != null
+eventSource  事件源  unit / marker  autoTriggerOnEvent的当前触发器，否则为null。根据来自autoTriggerOnEvent的事件设置“目标”（基本上是thisActionTarget但对于事件）          1.15p4
+
+     全局函数        1.15p1
+memory.NAME  内存  any type  使用当前defineUnitMemory读取自身的快捷方式。不能在其他单位上使用，为此使用readUnitMemory。不要调用自己。         autoTrigger: if memory.experience > 100
+memory.x[memory.targetIndex] 返回数组
+memory.x.contains.() 检查数组是否包含 bool
+distance(x1, y1, x2, y2)  距离  float  返回两点之间的差值
+distanceSquared(x1, y1, x2, y2)  平方距离  float  返回两点之间的平方差，比distance快一点
+distanceBetween(unit1, unit2)  之间的距离  float  返回两个单位之间的距离
+distanceBetweenSquared(unit1, unit2)  平方之间的距离  float  返回两个单位之间的平方距离。比distanceBetween快一点
+game.nukesEnabled()  启动核武器  bool
+game.mapWidth() game.mapHeight() 地图高宽
+int(x)  整数  int  去整，五舍六入       int(4.2) == 4
+select(bool, textA, textB)  选择  如果bool为true，则返回文本A，否则返回文本B
+debug(logicBoolean)  调试  string  返回一个文本字符串，帮助解释当前结果的原因。可以查看嵌套逻辑、比较和运算符。
+str(x)  字符串  string  将数字、单位或布尔值转换为字符串     str(self.energy)+'x' == '100x'
+substring(text,start,end)  子字符串  string          substring('hello',0,2) == 'he'
+length(string)  长度  int  以数字形式返回字符串长度
+squareRoot(num)  平方根  float  返回一个数的平方根
+min(num1, min2)  最小  float  比较两个数，返回最小的       damage = min(self.hp, self.energy)
+max(num1, min2)  最大  float  比较两个数，返回最大的         max(5, 10) == 10
+createMarker(x, y, [height], [teamId], [dir])  创建标记  marker
+
+eventData(name, type, [default])  事件数据  any type  显示来自某个单位的指定消息的数据。仅在autoTriggerOnEvent:newMessage事件中使用。            1.15p5
+sin(angle)  正弦  float  获取指定数字的正弦值        sin(10) = 0.173            1.15p5
+cos(angle)  余弦  float  获取指定数字的余弦值        cos(60) = 0.5            1.15p5
+rnd(min, max)  随机数  float  在最小和最大之间生成一个随机数        rnd(666, 888)            1.15p5
+lowercase(string)  小写  string  将字符串中的所有字母设置为小写        "lowercase(""Spaghetti Macaroni Lasagna"") -> ""spaghetti macaroni lasagna"""            1.15p5
+uppercase(string)  大写  string  将字符串中的所有字母设置为大写          "uppercase(""fish dish wish"") -> ""FISH DISH WISH"""            1.15p5
+direction(x1, y1, x2, y2)  方向  float  返回x1/y1和x2/y2的相对角度            1.15p5
+directionBetween(unit1, unit2)  之间的方向  float  返回单位/标记A和单位/标记B的相对角度          directionBetween(self, lastDamagedBy)            1.15p5
