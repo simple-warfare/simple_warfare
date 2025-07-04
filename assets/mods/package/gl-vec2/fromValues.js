@@ -1,5 +1,3 @@
-module.exports = fromValues
-
 /**
  * Creates a new vec2 initialized with the given values
  *
@@ -13,3 +11,5 @@ function fromValues(x, y) {
     out[1] = y
     return out
 }
+
+export { fromValues };

@@ -1,4 +1,4 @@
-module.exports = copy
+export default copy
 
 /**
  * Copy the values from one vec2 to another

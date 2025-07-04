@@ -1,10 +1,14 @@
+import { TeleportType } from "std:sw/sw.mjs";
+
 const UnitType = {
     Unit: 'Unit',
     Building: 'Building',
 };
 
 class CustomUnit {
-    constructor() {
+    constructor(entity) {
+        this.entity = entity
+        console.log(JSON.stringify(entity))
         this.graphics = new Array()
         this.movement = undefined
         this._proxy = new Proxy(this, CustomUnitHandle)
@@ -13,14 +17,11 @@ class CustomUnit {
     get_proxy() {
         return this._proxy
     }
-}
 
-
-class CustomUnitBuilder {
-    constructor() {
-
+    teleportSelfTo(target) {
+        sw.teleport(TeleportType.Position, this.entity, target)
     }
-};
+}
 
 const CustomUnitHandle = {
     get(target, prop) {
@@ -35,4 +36,4 @@ const CustomUnitHandle = {
     }
 };
 
-export { CustomUnit, CustomUnitBuilder };
+export { CustomUnit };

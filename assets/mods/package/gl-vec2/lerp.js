@@ -1,4 +1,4 @@
-module.exports = lerp
+export default lerp
 
 /**
  * Performs a linear interpolation between two vec2's

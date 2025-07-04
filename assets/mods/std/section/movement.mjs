@@ -1,20 +1,21 @@
 class Movement {
     constructor({ movementType,
-        moveSpeed,
-        moveAccelerationSpeed,
-        moveDecelerationSpeed,
-        reverseSpeedPercentage,
+        maxMoveSpeed,
+        moveAcceleration,
+        moveDeceleration,
+        reversePercentage,
         maxTurnSpeed,
         turnAcceleration,
+        turnDeceleration,
     }) {
         this.movementType = movementType
-        this.moveSpeed = moveSpeed
-        this.moveAccelerationSpeed = moveAccelerationSpeed
-        this.moveDecelerationSpeed = moveDecelerationSpeed
-        this.reverseSpeedPercentage = reverseSpeedPercentage
+        this.maxMoveSpeed = maxMoveSpeed
+        this.moveAcceleration = moveAcceleration
+        this.moveDeceleration = moveDeceleration
+        this.reversePercentage = reversePercentage
         this.maxTurnSpeed = maxTurnSpeed
         this.turnAcceleration = turnAcceleration
-
+        this.turnDeceleration = turnDeceleration
     }
 }
 
@@ -26,12 +27,13 @@ class MovementBuilder {
     constructor() {
         this.params = {
             movementType: MovementType.LAND,
-            moveSpeed: 0.,
-            moveAccelerationSpeed: 0.,
-            moveDecelerationSpeed: 0.,
-            reverseSpeedPercentage: 0.,
+            maxMoveSpeed: 0.,
+            moveAcceleration: 0.,
+            moveDeceleration: 0.,
+            reversePercentage: 0.,
             maxTurnSpeed: 0.,
             turnAcceleration: 0.,
+            turnDeceleration: 0.,
         }
 
         Object.keys(this.params).forEach(key => {

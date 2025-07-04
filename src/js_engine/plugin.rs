@@ -76,7 +76,6 @@ fn module_check_js_asset_ready(
                     .0
                     .contains(&asset_server.get_id_handle(*id).unwrap())
                 {
-                    info!("加载完成");
                     sender.0.send(SwModuleLoaderResponseEvent::LoadedJsAsset(
                         js_assets.get(*id).unwrap().clone(),
                     ))?;
@@ -98,7 +97,6 @@ pub(super) fn require_receiver_request(
     if let Ok(SwRequireLoaderRequestEvent::LoadJsAsset(path)) =
         event_receiver.0.lock().unwrap().try_recv()
     {
-        info!("try load module:{}", path);
         let asset = asset_server.load(path);
         if asset_server.is_loaded_with_dependencies(asset.id()) {
             sender
@@ -129,7 +127,6 @@ fn require_check_js_asset_ready(
                     .0
                     .contains(&asset_server.get_id_handle(*id).unwrap())
                 {
-                    info!("加载完成");
                     sender.0.send(SwRequireLoaderResponseEvent::LoadedJsAsset(
                         js_assets.get(*id).unwrap().clone(),
                     ))?;

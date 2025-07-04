@@ -1,4 +1,4 @@
-module.exports = cross
+export default cross
 
 /**
  * Computes the cross product of two vec2's

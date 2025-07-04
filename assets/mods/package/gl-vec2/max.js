@@ -1,4 +1,4 @@
-module.exports = max
+export default max
 
 /**
  * Returns the maximum of two vec2's

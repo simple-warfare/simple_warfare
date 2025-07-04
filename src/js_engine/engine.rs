@@ -19,8 +19,10 @@ use crate::{
     assets::mods::js::JsAsset,
     js_engine::{
         event::{SwRequireLoaderRequestEvent, SwRequireLoaderResponseEvent},
+        global::class::entity::JsEntity,
         loader::SimpleWarfareModuleLoader,
         module::ModModule,
+        sw::{Sw, SwRequestEvent, SwResponseEvent},
     },
 };
 
@@ -28,16 +30,19 @@ pub struct JsEngine {
     pub(super) context: Context,
     pub(super) module_map: HashMap<String, Vec<ModModule>>,
     pub(super) unit_map: HashMap<Entity, JsProxy>,
+    pub(super) entity_map: HashMap<JsEntity, Entity>,
     _path_url: Arc<FxHashMap<&'static str, &'static str>>,
-    _request_sender: Arc<Sender<SwRequireLoaderRequestEvent>>,
-    _response_receiver: Arc<Mutex<Receiver<SwRequireLoaderResponseEvent>>>,
+    _require_request_sender: Arc<Sender<SwRequireLoaderRequestEvent>>,
+    _require_response_receiver: Arc<Mutex<Receiver<SwRequireLoaderResponseEvent>>>,
 }
 
 impl JsEngine {
     pub fn new(
         loader: SimpleWarfareModuleLoader,
-        request_sender: Arc<Sender<SwRequireLoaderRequestEvent>>,
-        response_receiver: Arc<Mutex<Receiver<SwRequireLoaderResponseEvent>>>,
+        require_request_sender: Arc<Sender<SwRequireLoaderRequestEvent>>,
+        require_response_receiver: Arc<Mutex<Receiver<SwRequireLoaderResponseEvent>>>,
+        sw_request_sender: Arc<Sender<SwRequestEvent>>,
+        sw_response_receiver: Arc<Mutex<Receiver<SwResponseEvent>>>,
     ) -> Self {
         let context_builder = Context::builder();
         let loader = Rc::new(loader);
@@ -48,7 +53,12 @@ impl JsEngine {
             .expect("Build Js Context error!");
 
         let ctx = RefCell::new(&mut context);
-        egister_global_property(&mut ctx.borrow_mut());
+
+        egister_global_property(
+            &mut ctx.borrow_mut(),
+            sw_request_sender,
+            sw_response_receiver,
+        );
         register_global_class(&mut ctx.borrow_mut());
 
         let mut path_url = FxHashMap::default();
@@ -58,30 +68,38 @@ impl JsEngine {
         register_global_callable(
             &mut ctx.borrow_mut(),
             path_url.clone(),
-            request_sender.clone(),
-            response_receiver.clone(),
+            require_request_sender.clone(),
+            require_response_receiver.clone(),
         );
 
         Self {
             context,
             module_map: HashMap::new(),
             unit_map: HashMap::new(),
+            entity_map: HashMap::new(),
             _path_url: path_url,
-            _request_sender: request_sender,
-            _response_receiver: response_receiver,
+            _require_request_sender: require_request_sender,
+            _require_response_receiver: require_response_receiver,
         }
     }
 }
 
-fn egister_global_property(ctx: &mut Context) {
+fn egister_global_property(
+    ctx: &mut Context,
+    sw_request_sender: Arc<Sender<SwRequestEvent>>,
+    sw_response_receiver: Arc<Mutex<Receiver<SwResponseEvent>>>,
+) {
     let console = Console::init(ctx);
     ctx.register_global_property(Console::NAME, console, Attribute::all())
         .expect("the console builtin shouldn't exist");
+
+    let sw = Sw::init(ctx, sw_request_sender, sw_response_receiver);
+
+    ctx.register_global_property(Sw::NAME, sw, Attribute::all())
+        .expect("the sw builtin shouldn't exist");
 }
 
-fn register_global_class(ctx: &mut Context) {
-    
-}
+fn register_global_class(ctx: &mut Context) {}
 pub fn get_real_path(
     path_url: Arc<FxHashMap<&'static str, &'static str>>,
     url: &Url,

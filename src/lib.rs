@@ -6,11 +6,11 @@ pub mod lua_engine;
 pub mod mod_engine;
 pub mod panel;
 pub mod scenes;
+pub mod statistics;
 pub mod unit;
 pub mod utils;
-pub mod statistics;
 
-
+use avian2d::prelude::*;
 use bevy::{app::PluginGroupBuilder, prelude::*};
 use bevy_ecs_ldtk::prelude::*;
 use bevy_fly_camera::FlyCameraPlugin;
@@ -46,6 +46,8 @@ impl Plugin for SimpleWarfarePlugin {
     fn build(&self, app: &mut App) {
         app.init_state::<AppState>()
             .register_type::<AppState>()
+            .add_plugins(PhysicsPlugins::default())
+            .add_plugins(PhysicsDebugPlugin::default())
             .add_plugins(StateInspectorPlugin::<AppState>::default())
             .add_plugins(FlyCameraPlugin)
             .add_plugins(PanicHandler::new().build())

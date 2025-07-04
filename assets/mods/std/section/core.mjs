@@ -19,7 +19,7 @@ class CoreBuilder {
             hp: 0,
             maxHp: 0,
             price: 0,
-            mass: 0,
+            mass: 0.,
             buildSpeed: 0.,
             radius: 0.,
         }

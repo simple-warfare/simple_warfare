@@ -1,4 +1,4 @@
-let create = require("package:gl-vec2/create.js");
+import { fromValues } from "package:gl-vec2/fromValues.js";
 class Graphic {
     constructor({ position, path, layer, frameWidth, frameHeight }) {
         this.position = position
@@ -12,7 +12,7 @@ class Graphic {
 class GraphicBuilder {
     constructor() {
         this.params = {
-            position: create(),
+            position: fromValues(10., 10.),
             path: '',
             layer: 1,
             frameWidth: 0,

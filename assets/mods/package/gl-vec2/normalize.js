@@ -1,4 +1,4 @@
-module.exports = normalize
+export default normalize
 
 /**
  * Normalize a vec2

@@ -1,4 +1,4 @@
-module.exports = min
+export default min
 
 /**
  * Returns the minimum of two vec2's

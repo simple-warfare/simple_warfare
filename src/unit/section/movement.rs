@@ -4,19 +4,22 @@ use boa_engine::{JsResult, prelude::*, value::TryFromJs};
 pub struct Movement {
     #[boa(rename = "movementType")]
     pub movement_type: MovementType,
-    #[boa(rename = "moveSpeed")]
-    pub move_speed: f64,
-    #[boa(rename = "moveAccelerationSpeed")]
-    pub move_acceleration_speed: f64,
-    #[boa(rename = "moveDecelerationSpeed")]
-    pub move_deceleration_speed: f64,
-    #[boa(rename = "reverseSpeedPercentage")]
-    pub reverse_speed_percentage: f64,
+    #[boa(rename = "maxMoveSpeed")]
+    pub max_move_speed: f64,
+    #[boa(rename = "moveAcceleration")]
+    pub move_acceleration: f64,
+    #[boa(rename = "moveDeceleration")]
+    pub move_deceleration: f64,
+    #[boa(rename = "reversePercentage")]
+    pub reverse_percentage: f64,
     #[boa(rename = "maxTurnSpeed")]
     pub max_turn_speed: f64,
     #[boa(rename = "turnAcceleration")]
     pub turn_acceleration: f64,
+    #[boa(rename = "turnDeceleration")]
+    pub turn_deceleration: f64,
 }
+
 #[derive(Debug, Clone, Copy, Component, Reflect)]
 pub enum MovementType {
     Land,

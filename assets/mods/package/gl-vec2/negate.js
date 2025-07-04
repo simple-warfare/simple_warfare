@@ -1,4 +1,4 @@
-module.exports = negate
+export default negate
 
 /**
  * Negates the components of a vec2

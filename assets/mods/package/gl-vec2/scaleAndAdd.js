@@ -1,4 +1,4 @@
-module.exports = scaleAndAdd
+export default scaleAndAdd
 
 /**
  * Adds two vec2's after scaling the second operand by a scalar value

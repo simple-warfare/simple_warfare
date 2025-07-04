@@ -1,4 +1,4 @@
-module.exports = multiply
+export default multiply
 
 /**
  * Multiplies two vec2's

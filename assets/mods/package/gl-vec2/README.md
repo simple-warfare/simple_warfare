@@ -1,3 +1,18 @@
+# gl-vec2-esm
+
+[gl-vec2](https://github.com/stackgl/gl-vec2) ported to ES modules, so that you can do this sort of thing...
+
+```js
+import * as vec2 from 'gl-vec2-esm';
+
+const normalized = vec2.normalize(...);
+```
+
+...and take advantage of tree-shaking via Rollup and Webpack 2, rather than having to have a separate `require` statement for each module.
+
+----
+
+
 # gl-vec2
 
 [![stable](http://badges.github.io/stability-badges/dist/stable.svg)](http://github.com/badges/stability-badges)
@@ -25,57 +40,38 @@ var scale = require('gl-vec2/scale')
 
 ## API
 
-  - [add()](#addoutvec2-avec2-bvec2)
-  - [ceil()](#ceiloutvec2-avec2)
+  - [add()](#addoutvec2avec2bvec2)
   - [clone()](#cloneavec2)
-  - [copy()](#copyoutvec2-avec2)
+  - [copy()](#copyoutvec2avec2)
   - [create()](#create)
-  - [cross()](#crossoutvec3-avec2-bvec2)
-  - [distance()](#distanceavec2-bvec2)
-  - [dist()](#distanceavec2-bvec2)
-  - [divide()](#divideoutvec2-avec2-bvec2)
-  - [div()](#divideoutvec2-avec2-bvec2)
-  - [dot()](#dotavec2-bvec2)
-  - [equals()](#equalsavec2-bvec2)
-  - [exactEquals()](#exactequalsavec2-bvec2)
-  - [floor()](#flooroutvec2-avec2)
-  - [forEach()](#foreachaarray-stridenumber-offsetnumber-countnumber-fnfunction-argobject)
-  - [fromValues()](#fromvaluesxnumber-ynumber)
-  - [inverse()](#inverseoutvec2-avec2)
+  - [cross()](#crossoutvec3avec2bvec2)
+  - [distance()](#distanceavec2bvec2)
+  - [divide()](#divideoutvec2avec2bvec2)
+  - [dot()](#dotavec2bvec2)
+  - [forEach()](#foreachaarraystridenumberoffsetnumbercountnumberfnfunctionargobject)
+  - [fromValues()](#fromvaluesxnumberynumber)
   - [length()](#lengthavec2)
-  - [len()](#lengthavec2)
-  - [lerp()](#lerpoutvec2-avec2-bvec2-tnumber)
-  - [limit()](#limitoutvec2-avec2-maxnumber)
-  - [max()](#maxoutvec2-avec2-bvec2)
-  - [min()](#minoutvec2-avec2-bvec2)
-  - [multiply()](#multiplyoutvec2-avec2-bvec2)
-  - [mul()](#multiplyoutvec2-avec2-bvec2)
-  - [negate()](#negateoutvec2-avec2)
-  - [normalize()](#normalizeoutvec2-avec2)
-  - [random()](#randomoutvec2-scalenumber)
-  - [rotate()](#rotateoutvec2-avec2-anglenumber)
-  - [round()](#roundoutvec2-avec2)
-  - [scale()](#scaleoutvec2-avec2-bnumber)
-  - [scaleAndAdd()](#scaleandaddoutvec2-avec2-bvec2-scalenumber)
-  - [set()](#setoutvec2-xnumber-ynumber)
-  - [squaredDistance()](#squareddistanceavec2-bvec2)
-  - [sqrDist()](#squareddistanceavec2-bvec2)
+  - [lerp()](#lerpoutvec2avec2bvec2tnumber)
+  - [max()](#maxoutvec2avec2bvec2)
+  - [min()](#minoutvec2avec2bvec2)
+  - [multiply()](#multiplyoutvec2avec2bvec2)
+  - [negate()](#negateoutvec2avec2)
+  - [normalize()](#normalizeoutvec2avec2)
+  - [random()](#randomoutvec2scalenumber)
+  - [scale()](#scaleoutvec2avec2bnumber)
+  - [scaleAndAdd()](#scaleandaddoutvec2avec2bvec2scalenumber)
+  - [set()](#setoutvec2xnumberynumber)
+  - [squaredDistance()](#squareddistanceavec2bvec2)
   - [squaredLength()](#squaredlengthavec2)
-  - [sqrLen()](#squaredlengthavec2)
-  - [subtract()](#subtractoutvec2-avec2-bvec2)
-  - [sub()](#subtractoutvec2-avec2-bvec2)
-  - [transformMat2()](#transformmat2outvec2-avec2-mmat2)
-  - [transformMat2d()](#transformmat2doutvec2-avec2-mmat2d)
-  - [transformMat3()](#transformmat3outvec2-avec2-mmat3)
-  - [transformMat4()](#transformmat4outvec2-avec2-mmat4)
+  - [subtract()](#subtractoutvec2avec2bvec2)
+  - [transformMat2()](#transformmat2outvec2avec2mmat2)
+  - [transformMat2d()](#transformmat2doutvec2avec2mmat2d)
+  - [transformMat3()](#transformmat3outvec2avec2mmat3)
+  - [transformMat4()](#transformmat4outvec2avec2mmat4)
 
 ## add(out:vec2, a:vec2, b:vec2)
 
   Adds two vec2's
-
-## ceil(out:vec2, a:vec2)
-
-  `Math.ceil` the components of a vec2
 
 ## clone(a:vec2)
 
@@ -96,27 +92,15 @@ var scale = require('gl-vec2/scale')
 
 ## distance(a:vec2, b:vec2)
 
-  Calculates the euclidian distance between two vec2's. Aliased as `dist`.
+  Calculates the euclidian distance between two vec2's
 
 ## divide(out:vec2, a:vec2, b:vec2)
 
-  Divides two vec2's. Aliased as `div`.
+  Divides two vec2's
 
 ## dot(a:vec2, b:vec2)
 
   Calculates the dot product of two vec2's
-
-## equals(a:vec2, b:vec2)
-
-  Returns whether or not the vectors have approximately the same elements in the same position.
-
-## exactEquals(a:vec2, b:vec2)
-
-  Returns whether or not the vectors exactly have the same elements in the same position (when compared with ===)
-
-## floor(out:vec2, a:vec2)
-
-  `Math.floor` the components of a vec2
 
 ## forEach(a:Array, stride:Number, offset:Number, count:Number, fn:Function, [arg]:Object)
 
@@ -126,21 +110,13 @@ var scale = require('gl-vec2/scale')
 
   Creates a new vec2 initialized with the given values
 
-## inverse(out:vec2, a:vec2)
-
-  Returns the inverse of the components of a vec2
-
 ## length(a:vec2)
 
-  Calculates the length of a vec2. Aliased as `len`.
+  Calculates the length of a vec2
 
 ## lerp(out:vec2, a:vec2, b:vec2, t:Number)
 
   Performs a linear interpolation between two vec2's
-
-## limit(out:vec2, a:vec2, max:Number)
-
-  Limit the magnitude of this vector to the value used for the `max` parameter
 
 ## max(out:vec2, a:vec2, b:vec2)
 
@@ -152,7 +128,7 @@ var scale = require('gl-vec2/scale')
 
 ## multiply(out:vec2, a:vec2, b:vec2)
 
-  Multiplies two vec2's. Aliased as `mul`.
+  Multiplies two vec2's
 
 ## negate(out:vec2, a:vec2)
 
@@ -165,14 +141,6 @@ var scale = require('gl-vec2/scale')
 ## random(out:vec2, [scale]:Number)
 
   Generates a random vector with the given scale
-
-## round(out:vec2, a:vec2)
-
-  `Math.round` the components of a vec2
-
-## rotate(out:vec2, a:vec2, angle:Number)
-
-  Rotates a vec2 by an angle (in radians)
 
 ## scale(out:vec2, a:vec2, b:Number)
 
@@ -188,15 +156,15 @@ var scale = require('gl-vec2/scale')
 
 ## squaredDistance(a:vec2, b:vec2)
 
-  Calculates the squared euclidian distance between two vec2's. Aliased as `sqrDist`.
+  Calculates the squared euclidian distance between two vec2's
 
 ## squaredLength(a:vec2)
 
-  Calculates the squared length of a vec2. Aliased as `sqrLen`.
+  Calculates the squared length of a vec2
 
 ## subtract(out:vec2, a:vec2, b:vec2)
 
-  Subtracts vector b from vector a. Aliased as `sub`.
+  Subtracts vector b from vector a
 
 ## transformMat2(out:vec2, a:vec2, m:mat2)
 

@@ -5,7 +5,7 @@ pub struct Core {
     pub name: String,
     pub hp: u32,
     pub price: u32,
-    pub mass: u32,
+    pub mass: f64,
     #[boa(rename = "buildSpeed")]
     pub build_peed: f64,
     pub radius: f64,

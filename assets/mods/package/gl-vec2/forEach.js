@@ -1,6 +1,8 @@
-module.exports = forEach
+export default forEach
 
-var vec = require('./create')()
+import create from './create.js';
+
+var vec = create()
 
 /**
  * Perform some operation over an array of vec2s.
@@ -23,7 +25,7 @@ function forEach(a, stride, offset, count, fn, arg) {
     if(!offset) {
         offset = 0
     }
-    
+
     if(count) {
         l = Math.min((count * stride) + offset, a.length)
     } else {
@@ -37,6 +39,6 @@ function forEach(a, stride, offset, count, fn, arg) {
         a[i] = vec[0]
         a[i+1] = vec[1]
     }
-    
+
     return a
 }

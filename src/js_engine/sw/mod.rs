@@ -1,0 +1,109 @@
+pub mod plugin;
+use bevy::prelude::*;
+use boa_engine::{
+    JsResult, js_string, object::ObjectInitializer, prelude::*, property::Attribute,
+    value::TryFromJs,
+};
+use std::sync::{
+    Arc, Mutex,
+    mpsc::{Receiver, Sender},
+};
+
+use crate::{
+    bevy_ext::try_from_js::try_from_js_to_vec2, js_engine::global::class::entity::JsEntity,
+};
+
+#[derive(Resource)]
+pub struct SwRequestReceiver(pub Arc<Mutex<Receiver<SwRequestEvent>>>);
+
+#[derive(Resource, Clone)]
+pub struct SwResponseSender(pub Arc<Sender<SwResponseEvent>>);
+
+#[derive(Debug, Default, Trace, Finalize, JsData)]
+pub struct Sw;
+
+#[derive(Event, Clone)]
+pub enum SwRequestEvent {
+    Teleport(TeleportType),
+}
+
+#[derive(Event, Clone)]
+pub enum SwResponseEvent {
+    Teleported(TeleportType),
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum TeleportType {
+    Position(JsEntity, Vec2),
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum JsTeleportType {
+    Position,
+}
+
+impl TryFromJs for JsTeleportType {
+    fn try_from_js(value: &JsValue, _context: &mut Context) -> JsResult<Self> {
+        match value {
+            JsValue::String(teleport_type) => match teleport_type.to_std_string_lossy().as_str() {
+                "Position" => Ok(JsTeleportType::Position),
+                _ => Err(JsNativeError::typ()
+                    .with_message("cannot convert value to a JsTeleportType")
+                    .into()),
+            },
+            _ => Err(JsNativeError::typ()
+                .with_message("cannot convert value to a JsTeleportType")
+                .into()),
+        }
+    }
+}
+
+impl Sw {
+    pub const NAME: JsString = js_string!("sw");
+
+    pub fn init(
+        context: &mut Context,
+        sw_request_sender: Arc<Sender<SwRequestEvent>>,
+        sw_response_receiver: Arc<Mutex<Receiver<SwResponseEvent>>>,
+    ) -> JsObject {
+        let teleport = unsafe {
+            NativeFunction::from_closure(move |_referrer, args, ctx| {
+                let js_teleport_type = JsTeleportType::try_from_js(args.first().unwrap(), ctx)?;
+                match js_teleport_type {
+                    JsTeleportType::Position => {
+                        let target = try_from_js_to_vec2(args.get(2).unwrap(), ctx)?;
+                        sw_request_sender
+                            .send(SwRequestEvent::Teleport(TeleportType::Position(
+                                JsEntity::try_from_js(args.get(1).unwrap(), ctx)?,
+                                target,
+                            )))
+                            .unwrap();
+                    }
+                }
+                //let this = args.get(0).unwrap().to_object(ctx)?;
+                //let target = args.get(1).unwrap().to_object(ctx)?;
+
+                //sw_sender
+                //    .send(SwRequestEvent::Teleport(
+                //        JsEntity::try_from_js(&this.get(js_string!("entity"), ctx)?, ctx)?.index(),
+                //        JsEntity::try_from_js(&target.get(js_string!("entity"), ctx)?, ctx)?
+                //            .generation(),
+                //    ))
+                //    .expect("SwRequestSender send error");
+                Ok(JsValue::undefined())
+            })
+        };
+        ObjectInitializer::with_native_data_and_proto(
+            Self::default(),
+            JsObject::with_object_proto(context.realm().intrinsics()),
+            context,
+        )
+        .property(
+            JsSymbol::to_string_tag(),
+            Self::NAME,
+            Attribute::CONFIGURABLE,
+        )
+        .function(teleport, js_string!("teleport"), 0)
+        .build()
+    }
+}

@@ -1,4 +1,4 @@
-module.exports = squaredDistance
+export default squaredDistance
 
 /**
  * Calculates the squared euclidian distance between two vec2's

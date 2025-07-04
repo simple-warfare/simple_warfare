@@ -1,4 +1,4 @@
-module.exports = squaredLength
+export default squaredLength
 
 /**
  * Calculates the squared length of a vec2

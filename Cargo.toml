@@ -33,7 +33,7 @@ bevy_prng = { version = "0.11.1", features = ["rand_chacha", "wyrand"] }
 bevy_light_2d = "0.6.0"
 bevy_fly_camera = "0.16.0"
 bevy-panic-handler = "5.0.0"
-bevy_rapier2d = "0.30.0"
+avian2d = "0.3"
 bevy_spritesheet_animation = { git = "https://github.com/merwaaan/bevy_spritesheet_animation", features = [
   "custom_cursor",
 ] }
@@ -46,6 +46,7 @@ image = "0.25.6"
 [dependencies.bevy]
 version = "0.16.1"
 features = ["jpeg"]
+
 [dev-dependencies.bevy]
 version = "0.16.1"
 features = ["jpeg", "dynamic_linking"]

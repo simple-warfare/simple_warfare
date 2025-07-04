@@ -1,4 +1,4 @@
-module.exports = length
+export default length
 
 /**
  * Calculates the length of a vec2

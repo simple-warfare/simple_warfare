@@ -1,9 +1,12 @@
 mod context;
 mod engine;
 pub mod event;
+pub mod global;
 pub mod loader;
 pub mod module;
 pub mod plugin;
+pub mod sw;
+
 use std::sync::{
     Arc, Mutex,
     mpsc::{self, Receiver, Sender},
@@ -14,12 +17,13 @@ use crate::{
     js_engine::{
         context::*,
         engine::JsEngine,
-        event::{JsEngineRequestEvent, JsEngineResponseEvent},
+        event::{EventPlugin, JsEngineRequestEvent, JsEngineResponseEvent},
         loader::{
             SimpleWarfareModuleLoader, SwModuleLoaderRequestReceiver, SwModuleLoaderResponseSender,
             SwRequireLoaderRequestReceiver, SwRequireLoaderResponseSender,
         },
         plugin::SwLoaderPlugin,
+        sw::{plugin::SwPlugin, SwRequestReceiver, SwResponseSender},
     },
 };
 use bevy::prelude::*;
@@ -40,8 +44,8 @@ pub struct JsEnginePlugin;
 impl Plugin for JsEnginePlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(SwLoaderPlugin)
-            .add_event::<JsEngineRequestEvent>()
-            .add_event::<JsEngineResponseEvent>()
+            .add_plugins(EventPlugin)
+            .add_plugins(SwPlugin)
             .add_systems(OnEnter(AppState::InitJsContext), init_js_context)
             .add_systems(
                 Update,
@@ -67,8 +71,8 @@ fn init_js_context(mut commands: Commands) -> Result {
     //与js线程的双向通道
     let (je_request_sender, je_request_receiver) = mpsc::channel();
     let (je_response_sender, je_response_receiver) = mpsc::channel();
-
-    commands.insert_resource(JsEngineEventRequestSender(Arc::new(je_request_sender)));
+    let je_request_sender = Arc::new(je_request_sender);
+    commands.insert_resource(JsEngineEventRequestSender(je_request_sender));
     commands.insert_resource(JsEngineEventResponseReciver(Arc::new(Mutex::new(
         je_response_receiver,
     ))));
@@ -91,6 +95,10 @@ fn init_js_context(mut commands: Commands) -> Result {
         sw_require_request_receiver,
     ))));
 
+    let (sw_request_sender, sw_request_receiver) = mpsc::channel();
+    let (sw_response_sender, sw_response_receiver) = mpsc::channel();
+    commands.insert_resource(SwResponseSender(Arc::new(sw_response_sender.clone())));
+    commands.insert_resource(SwRequestReceiver(Arc::new(Mutex::new(sw_request_receiver))));
     std::thread::spawn(move || {
         let engine = &mut JsEngine::new(
             SimpleWarfareModuleLoader::new(
@@ -100,6 +108,8 @@ fn init_js_context(mut commands: Commands) -> Result {
             .unwrap(),
             Arc::new(sw_require_request_sender),
             Arc::new(Mutex::new(sw_require_response_receiver)),
+            Arc::new(sw_request_sender),
+            Arc::new(Mutex::new(sw_response_receiver)),
         );
         let je_response_sender = Arc::new(je_response_sender);
         // 开始监听

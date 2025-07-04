@@ -51,6 +51,7 @@ impl SimpleWarfareModuleLoader {
 
         let mut path_url = FxHashMap::default();
         path_url.insert("std", "mods/std/");
+        path_url.insert("package", "mods/package/");
         Ok(Self {
             module_map: GcRefCell::default(),
             path_url: Arc::new(path_url),

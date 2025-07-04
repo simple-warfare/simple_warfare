@@ -1,4 +1,4 @@
-module.exports = set
+export default set
 
 /**
  * Set the components of a vec2 to the given values

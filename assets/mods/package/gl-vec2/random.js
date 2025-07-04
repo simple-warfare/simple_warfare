@@ -1,4 +1,4 @@
-module.exports = random
+export default random
 
 /**
  * Generates a random vector with the given scale

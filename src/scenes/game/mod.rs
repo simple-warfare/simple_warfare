@@ -44,4 +44,5 @@ impl Scene for GameScene {
 fn setup(mut commands: Commands, game_asset: Res<GameAsset>, mod_server: Res<ModServer>) {
     commands.spawn((GameSceneMark, Camera2d, FlyCamera2d::default()));
     mod_server.spawn_unit(commands.spawn_empty().id(), "example:Tank");
+    mod_server.spawn_unit(commands.spawn_empty().id(), "example:Builder");
 }

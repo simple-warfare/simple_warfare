@@ -1,5 +1,5 @@
 use crate::{
-    js_engine::{engine::JsEngine, event::*, module::ModModule},
+    js_engine::{engine::JsEngine, event::*, global::class::entity::JsEntity, module::ModModule},
     unit::{
         custom_unit::SpawnedUnitData,
         section::{
@@ -11,8 +11,12 @@ use crate::{
 };
 use bevy::prelude::*;
 use boa_engine::{
-    JsResult, builtins::promise::PromiseState, js_string, object::builtins::JsProxy, prelude::*,
-    value::TryFromJs,
+    JsResult,
+    builtins::promise::PromiseState,
+    js_string,
+    object::{Object, builtins::JsProxy},
+    prelude::*,
+    value::{TryFromJs, TryIntoJs},
 };
 use std::{
     path::Path,
@@ -36,6 +40,7 @@ pub(super) fn process_js_event(
     let context = &mut engine.context;
     let module_map = &mut engine.module_map;
     let unit_map = &mut engine.unit_map;
+    let entity_map = &mut engine.entity_map;
 
     match event {
         JsEngineRequestEvent::LoadMod(mod_enable, mod_info) => {
@@ -87,9 +92,10 @@ pub(super) fn process_js_event(
                             .namespace(context)
                             .get(js_string!(unit_from[1]), context)?;
 
+                        let js_entity = JsEntity::from_entity(&entity);
                         let class_obj = class
                             .to_object(context)?
-                            .construct(&[], None, context)
+                            .construct(&[js_entity.try_into_js(context)?], None, context)
                             .expect("construct error");
 
                         let unit_proxy = JsProxy::from_object(
@@ -123,6 +129,7 @@ pub(super) fn process_js_event(
                         )?;
 
                         unit_map.insert(entity, unit_proxy);
+                        entity_map.insert(js_entity, entity);
                         sender
                             .send(JsEngineResponseEvent::SpawnedUnit(
                                 entity,
@@ -133,6 +140,13 @@ pub(super) fn process_js_event(
                     }
                 }
             }
+        }
+        JsEngineRequestEvent::GetEntityToTeleport(js_entity,vec2) => {
+            sender.send(JsEngineResponseEvent::GetedEntityToTeleport(
+                js_entity,
+                *entity_map.get(&js_entity).unwrap(),
+                vec2
+            )).unwrap();
         }
     }
     Ok(())

@@ -1,4 +1,4 @@
-module.exports = add
+export default add
 
 /**
  * Adds two vec2's

@@ -1,4 +1,4 @@
-module.exports = transformMat2
+export default transformMat2
 
 /**
  * Transforms the vec2 with a mat2

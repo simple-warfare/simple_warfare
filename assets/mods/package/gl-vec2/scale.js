@@ -1,4 +1,4 @@
-module.exports = scale
+export default scale
 
 /**
  * Scales a vec2 by a scalar number
