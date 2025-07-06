@@ -123,7 +123,7 @@ impl SimpleWarfareModuleLoader {
 impl ModuleLoader for SimpleWarfareModuleLoader {
     fn load_imported_module(
         &self,
-        referrer: Referrer,
+        _referrer: Referrer,
         specifier: JsString,
         finish_load: Box<dyn FnOnce(JsResult<Module>, &mut Context)>,
         context: &mut Context,

@@ -1,12 +1,10 @@
-use std::iter::zip;
-
 use bevy::{color::palettes::css::*, input::mouse::MouseButtonInput, prelude::*};
 
 use crate::{
     custom_unit::{
         physics::EnablePhysics,
         unit::CustomUnit,
-        way_point::{self, WayPoint, WayPointQueue},
+        way_point::{WayPoint, WayPointQueue},
     },
     scenes::SceneState,
     statistics::*,

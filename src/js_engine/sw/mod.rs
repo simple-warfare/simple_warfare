@@ -1,7 +1,7 @@
 pub mod plugin;
 use bevy::prelude::*;
 use boa_engine::{
-    JsArgs, JsResult, js_string, object::ObjectInitializer, prelude::*, property::Attribute,
+    JsResult, js_string, object::ObjectInitializer, prelude::*, property::Attribute,
     value::TryFromJs,
 };
 use std::sync::{
@@ -9,14 +9,10 @@ use std::sync::{
     mpsc::{Receiver, Sender},
 };
 
-use crate::{
-    bevy_ext::try_from_js::try_from_js_to_vec2,
-    js_engine::{
-        event::SafetyJsValue,
-        global::class::entity::JsEntity,
-        signal::{EmitSignal, HostDefinedSignalSystem},
-    },
-};
+use crate::{bevy_ext::try_from_js::vec2_try_from_js, js_engine::{
+    global::class::entity::JsEntity,
+    signal::{EmitSignal, HostDefinedSignalSystem},
+}};
 
 #[derive(Resource)]
 pub struct SwRequestReceiver(pub Arc<Mutex<Receiver<SwRequestEvent>>>);
@@ -78,7 +74,7 @@ impl Sw {
                 let js_teleport_type = JsTeleportType::try_from_js(args.first().unwrap(), ctx)?;
                 match js_teleport_type {
                     JsTeleportType::Position => {
-                        let target = try_from_js_to_vec2(args.get(2).unwrap(), ctx)?;
+                        let target = vec2_try_from_js(args.get(2).unwrap(), ctx)?;
                         sw_request_sender
                             .send(SwRequestEvent::Teleport(TeleportType::Position(
                                 JsEntity::try_from_js(args.get(1).unwrap(), ctx)?,
@@ -90,21 +86,6 @@ impl Sw {
                 Ok(JsValue::undefined())
             })
         };
-        /*
-               let register_signal = unsafe {
-                   NativeFunction::from_closure(|_referrer, args, ctx| {
-                       let signal = args.first().unwrap().to_object(ctx)?;
-                       let signal_name = signal.get(js_string!("name"), ctx)?.to_string(ctx)?;
-                       ctx.realm()
-                           .host_defined_mut()
-                           .get_mut::<HostDefinedSignalSystem>()
-                           .unwrap()
-                           .signal_map
-                           .insert(signal_name.clone(), signal);
-                       Ok(JsValue::undefined())
-                   })
-               };
-        */
         let signal_emit = unsafe {
             let sw_request_sender = sw_request_sender.clone();
             NativeFunction::from_closure(move |_referrer, args, ctx| {

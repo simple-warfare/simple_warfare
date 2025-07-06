@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use bevy_light_2d::light::PointLight2d;
-use boa_engine::{JsResult, js_string, prelude::*, value::TryFromJs};
+use boa_engine::{JsResult, js_string, object::builtins::JsArray, prelude::*, value::TryFromJs};
 
 #[derive(Debug, Clone, Component, Reflect)]
 pub struct JsPointLight2d {
@@ -33,8 +33,55 @@ impl Default for JsPointLight2d {
 impl TryFromJs for JsPointLight2d {
     fn try_from_js(value: &JsValue, context: &mut Context) -> JsResult<Self> {
         let point_light2d_object = value.to_object(context)?;
-        
-        Ok(Self::default())
+        let color_object = point_light2d_object
+            .get(js_string!("color"), context)?
+            .to_object(context)?;
+
+        let color = JsArray::from_object(
+            color_object
+                .get(js_string!("color"), context)?
+                .to_object(context)?,
+        )?;
+        let valpha = color_object
+            .get(js_string!("valpha"), context)?
+            .to_f32(context)?;
+        info!("{:?}", color.length(context));
+        info!(
+            "r:{}g:{}b:{}a:{}",
+            color.at(0, context)?.to_f32(context)?,
+            color.at(1, context)?.to_f32(context)?,
+            color.at(2, context)?.to_f32(context)?,
+            valpha
+        );
+        let model = color_object
+            .get(js_string!("model"), context)?
+            .to_string(context)?
+            .to_std_string_lossy();
+
+        info!("{model}");
+        match model.as_str() {
+            "rgb" => Ok(Self {
+                color: Color::LinearRgba(LinearRgba::new(
+                    color.at(0, context)?.to_f32(context)?,
+                    color.at(1, context)?.to_f32(context)?,
+                    color.at(2, context)?.to_f32(context)?,
+                    valpha,
+                )),
+                intensity: point_light2d_object
+                    .get(js_string!("intensity"), context)?
+                    .to_f32(context)?,
+                radius: point_light2d_object
+                    .get(js_string!("radius"), context)?
+                    .to_f32(context)?,
+                falloff: point_light2d_object
+                    .get(js_string!("falloff"), context)?
+                    .to_f32(context)?,
+                cast_shadows: point_light2d_object
+                    .get(js_string!("cast_shadows"), context)?
+                    .to_boolean(),
+            }),
+            _ => Ok(Self::default()),
+        }
     }
 }
 

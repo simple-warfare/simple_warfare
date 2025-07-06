@@ -2,7 +2,7 @@ import { CoreBuilder } from "std:section/core.mjs"
 import { CustomUnit } from "std:custom/unit.mjs"
 import { GraphicBuilder } from "std:section/graphic.mjs"
 import { MovementBuilder } from "std:section/movement.mjs";
-import { fromValues } from "package:gl-vec2/fromValues.js";
+import { fromValues } from "package:gl-matrix/vec2.js";
 import { CircleCollider, ColliderType } from "std:physics/collider.mjs";
 class Tank extends CustomUnit {
     constructor(entity) {

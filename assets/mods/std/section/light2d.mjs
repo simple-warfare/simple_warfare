@@ -3,7 +3,7 @@ import Color from "package:color/index.js";
 class PointLight2d {
     constructor(
         radius = 0.5,
-        color = Color({ r: 255, g: 255, b: 255 }),
+        color = Color({ r: 255, g: 255, b: 255, alpha: 0.5 }),
         intensity = 1.0,
         falloff = 0.0,
         cast_shadows = false

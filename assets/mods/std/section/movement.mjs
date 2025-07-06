@@ -1,5 +1,5 @@
 class Movement {
-    constructor({ movementType,
+    constructor({ movementType = MovementType.LAND,
         maxMoveSpeed,
         moveAcceleration,
         moveDeceleration,

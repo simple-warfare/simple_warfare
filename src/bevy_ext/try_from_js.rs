@@ -1,25 +1,29 @@
 use bevy::prelude::*;
 use boa_engine::{JsResult, object::builtins::JsTypedArray, prelude::*};
 
-pub fn try_from_js_to_vec2(value: &JsValue, context: &mut Context) -> JsResult<Vec2> {
-    match value {
-        JsValue::Object(vec2_object) => {
-            let vec2_arry = JsTypedArray::from_object(vec2_object.clone())?;
-            let maybe_x = vec2_arry.at(0, context)?;
-            let maybe_y = vec2_arry.at(1, context)?;
-            if vec2_arry.length(context)? == 2 && maybe_x.is_double() && maybe_y.is_double() {
-                Ok(Vec2::new(
-                    maybe_x.to_f32(context)?,
-                    maybe_y.to_f32(context)?,
-                ))
-            } else {
-                Err(JsNativeError::typ()
-                    .with_message("cannot convert value to an vec2")
-                    .into())
-            }
-        }
-        _ => Err(JsNativeError::typ()
-            .with_message("cannot convert value to an vec2")
-            .into()),
-    }
+pub fn vec2_try_from_js(value: &JsValue, context: &mut Context) -> JsResult<Vec2> {
+    let vec2_array = JsTypedArray::from_object(value.to_object(context)?)?;
+    Ok(Vec2::new(
+        vec2_array.at(0, context)?.to_f32(context)?,
+        vec2_array.at(1, context)?.to_f32(context)?,
+    ))
+}
+
+pub fn vec3_try_from_js(value: &JsValue, context: &mut Context) -> JsResult<Vec3> {
+    let vec3_array = JsTypedArray::from_object(value.to_object(context)?)?;
+    Ok(Vec3::new(
+        vec3_array.at(0, context)?.to_f32(context)?,
+        vec3_array.at(1, context)?.to_f32(context)?,
+        vec3_array.at(2, context)?.to_f32(context)?,
+    ))
+}
+
+pub fn quat_try_from_js(value: &JsValue, context: &mut Context) -> JsResult<Quat> {
+    let quat_array = JsTypedArray::from_object(value.to_object(context)?)?;
+    Ok(Quat::from_xyzw(
+        quat_array.at(0, context)?.to_f32(context)?,
+        quat_array.at(1, context)?.to_f32(context)?,
+        quat_array.at(2, context)?.to_f32(context)?,
+        quat_array.at(3, context)?.to_f32(context)?,
+    ))
 }

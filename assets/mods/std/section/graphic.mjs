@@ -1,7 +1,8 @@
-import { fromValues } from "package:gl-vec2/fromValues.js";
+import { Transform } from "std:bevy/transform/transform.mjs"
+
 class Graphic {
-    constructor({ position, path, layer, frameWidth, frameHeight }) {
-        this.position = position
+    constructor({ transform = new Transform(), path, layer, frameWidth, frameHeight }) {
+        this.transform = transform
         this.path = path
         this.layer = layer
         this.frameWidth = frameWidth
@@ -12,7 +13,7 @@ class Graphic {
 class GraphicBuilder {
     constructor() {
         this.params = {
-            position: fromValues(10., 10.),
+            transform: new Transform(),
             path: '',
             layer: 1,
             frameWidth: 0,

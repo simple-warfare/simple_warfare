@@ -3,6 +3,8 @@ pub mod section;
 pub mod unit;
 pub mod way_point;
 pub mod light2d;
+pub mod graphic;
+pub mod transform;
 
 use bevy::prelude::*;
 

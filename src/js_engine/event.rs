@@ -6,13 +6,8 @@ use crate::{
         js::JsAsset,
     },
     custom_unit::unit::SpawnedUnitData,
-    js_engine::{global::class::entity::JsEntity},
+    js_engine::global::class::entity::JsEntity,
 };
-
-#[derive(Debug, Clone)]
-pub enum SafetyJsValue {
-    JsEntity(JsEntity)
-}
 
 #[derive(Debug, Event, Clone)]
 pub enum JsEngineRequestEvent {
@@ -22,7 +17,7 @@ pub enum JsEngineRequestEvent {
 
     //Signal
     SignalEmit,
-    SignalConnect
+    SignalConnect,
 }
 
 #[derive(Debug, Event, Clone)]

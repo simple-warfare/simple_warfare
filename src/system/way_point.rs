@@ -1,8 +1,6 @@
-use avian2d::{
-    math::Vector,
-    parry::na::clamp,
-    prelude::{AngularDamping, AngularVelocity, ExternalForce, LinearVelocity},
-};
+use avian2d::
+    prelude::{AngularVelocity, ExternalForce, LinearVelocity}
+;
 use bevy::prelude::*;
 
 use crate::{
@@ -69,10 +67,10 @@ fn handle_move_way_point(
             angle_diff = (angle_diff + PI).rem_euclid(TWO_PI) - PI;
 
             if angle_diff.abs() > ANGLE_THRESHOLD_MAX {
-                angular_velocity.0 += angle_diff.signum() * 0.5 * delta_time;
+                angular_velocity.0 += angle_diff.signum() * movement.move_acceleration * delta_time;
                 continue;
             } else if angle_diff.abs() > ANGLE_THRESHOLD_MIN {
-                angular_velocity.0 += angle_diff.signum() * 0.5 * delta_time;
+                angular_velocity.0 += angle_diff.signum() * movement.move_acceleration * delta_time;
             } else {
                 angular_velocity.0 = 0.;
             }

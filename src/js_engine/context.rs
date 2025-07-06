@@ -24,14 +24,10 @@ use boa_engine::{
     JsResult,
     builtins::promise::PromiseState,
     js_string,
-    object::{
-        FunctionObjectBuilder,
-        builtins::{JsArray, JsFunction, JsProxy},
-    },
+    object::builtins::{JsArray, JsProxy},
     prelude::*,
     value::{TryFromJs, TryIntoJs},
 };
-use rustc_hash::FxHashMap;
 use std::{
     path::Path,
     sync::{Arc, mpsc::Sender},

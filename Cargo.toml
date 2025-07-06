@@ -43,15 +43,87 @@ rustc-hash = "2.1.1"
 url = "2.5.4"
 image = "0.25.6"
 bevy_polyline = "0.12.0"
-tokio = {version = "1.46.1", features = ["rt", "rt-multi-thread", "time"]}
+tokio = { version = "1.46.1", features = ["rt", "rt-multi-thread", "time"] }
+
+vleue_navigator = "0.12.0"
+bevy_seedling = "0.4.3" #audio
+bevy_hanabi = { version = "0.16", default-features = false, features = [
+  "2d",
+  "serde",
+] }
+
+bevy_enhanced_input = "0.14.1"
 
 [dependencies.bevy]
 version = "0.16.1"
-features = ["jpeg"]
+features = [
+  "animation",
+  "bevy_asset",
+  "bevy_color",
+  "bevy_core_pipeline",
+  "bevy_gilrs",
+  "bevy_gizmos",
+  "bevy_gltf",
+  "bevy_mesh_picking_backend",
+  "bevy_picking",
+  "bevy_render",
+  "bevy_scene",
+  "bevy_sprite",
+  "bevy_sprite_picking_backend",
+  "bevy_state",
+  "bevy_text",
+  "bevy_ui",
+  "bevy_ui_picking_backend",
+  "bevy_window",
+  "bevy_winit",
+  "custom_cursor",
+  "default_font",
+  "hdr",
+  "multi_threaded",
+  "png",
+  "smaa_luts",
+  "sysinfo_plugin",
+  "tonemapping_luts",
+  "webgl2",
+  "x11",
+  "jpeg",
+]
 
 [dev-dependencies.bevy]
 version = "0.16.1"
-features = ["jpeg", "dynamic_linking"]
+features = [
+  "animation",
+  "bevy_asset",
+  "bevy_color",
+  "bevy_core_pipeline",
+  "bevy_gilrs",
+  "bevy_gizmos",
+  "bevy_gltf",
+  "bevy_mesh_picking_backend",
+  "bevy_picking",
+  "bevy_render",
+  "bevy_scene",
+  "bevy_sprite",
+  "bevy_sprite_picking_backend",
+  "bevy_state",
+  "bevy_text",
+  "bevy_ui",
+  "bevy_ui_picking_backend",
+  "bevy_window",
+  "bevy_winit",
+  "custom_cursor",
+  "default_font",
+  "hdr",
+  "multi_threaded",
+  "png",
+  "smaa_luts",
+  "sysinfo_plugin",
+  "tonemapping_luts",
+  "webgl2",
+  "x11",
+  "jpeg",
+  "dynamic_linking",
+]
 
 [profile.release]
 opt-level = 3           # 使用稍高一些的优化级别，最低是0，最高是3
