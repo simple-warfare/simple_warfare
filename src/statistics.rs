@@ -1,5 +1,8 @@
 use bevy::prelude::*;
 
+pub type Avian2dCollider = avian2d::collision::collider::Collider;
+
+
 #[derive(Default, Debug, Resource)]
 pub struct Statistics {
     pub player_name: String,
@@ -11,10 +14,43 @@ pub enum GameType {
     SandBox,
 }
 
+#[derive(Resource, Default, Debug)]
+pub struct SelectionState {
+    pub start: Vec2,
+    pub end: Vec2,
+    pub real_start: Vec2,
+    pub real_end: Vec2,
+    pub is_selecting: bool,
+}
+
+#[derive(Debug, Component)]
+pub struct Selectable;
+
+#[derive(Debug, Component)]
+pub struct Selected;
+
+impl SelectionState {
+    pub fn clear(&mut self) {
+        *self = Self::default();
+    }
+}
+#[derive(Clone, Default, Resource)]
+pub struct MousePosition {
+    pub windows: Option<Vec2>,
+    pub world: Option<Vec2>,
+}
+
+#[derive(States, Default, Debug, Hash, Eq, Ord, PartialEq, PartialOrd, Clone, Copy)]
+pub enum MouseState {
+    #[default]
+    Nothing,
+    Selected,
+}
+
 pub struct StatistcsPlugin;
 
 impl Plugin for StatistcsPlugin {
     fn build(&self, app: &mut App) {
-        app.init_resource::<Statistics>();
+        app.init_resource::<Statistics>().init_state::<MouseState>();
     }
 }

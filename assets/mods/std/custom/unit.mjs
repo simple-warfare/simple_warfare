@@ -1,3 +1,4 @@
+import { Signal } from "std:signal/signal.mjs";
 import { TeleportType } from "std:sw/sw.mjs";
 
 const UnitType = {
@@ -8,9 +9,9 @@ const UnitType = {
 class CustomUnit {
     constructor(entity) {
         this.entity = entity
-        console.log(JSON.stringify(entity))
         this.graphics = new Array()
         this.movement = undefined
+        this.created = new Signal()
         this._proxy = new Proxy(this, CustomUnitHandle)
     }
 
@@ -21,6 +22,7 @@ class CustomUnit {
     teleportSelfTo(target) {
         sw.teleport(TeleportType.Position, this.entity, target)
     }
+    
 }
 
 const CustomUnitHandle = {

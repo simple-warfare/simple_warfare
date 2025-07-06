@@ -1,7 +1,7 @@
 pub mod plugin;
 use bevy::prelude::*;
 use boa_engine::{
-    JsResult, js_string, object::ObjectInitializer, prelude::*, property::Attribute,
+    JsArgs, JsResult, js_string, object::ObjectInitializer, prelude::*, property::Attribute,
     value::TryFromJs,
 };
 use std::sync::{
@@ -10,7 +10,12 @@ use std::sync::{
 };
 
 use crate::{
-    bevy_ext::try_from_js::try_from_js_to_vec2, js_engine::global::class::entity::JsEntity,
+    bevy_ext::try_from_js::try_from_js_to_vec2,
+    js_engine::{
+        event::SafetyJsValue,
+        global::class::entity::JsEntity,
+        signal::{EmitSignal, HostDefinedSignalSystem},
+    },
 };
 
 #[derive(Resource)]
@@ -25,6 +30,7 @@ pub struct Sw;
 #[derive(Event, Clone)]
 pub enum SwRequestEvent {
     Teleport(TeleportType),
+    EmitSignal,
 }
 
 #[derive(Event, Clone)]
@@ -64,9 +70,10 @@ impl Sw {
     pub fn init(
         context: &mut Context,
         sw_request_sender: Arc<Sender<SwRequestEvent>>,
-        sw_response_receiver: Arc<Mutex<Receiver<SwResponseEvent>>>,
+        _sw_response_receiver: Arc<Mutex<Receiver<SwResponseEvent>>>,
     ) -> JsObject {
         let teleport = unsafe {
+            let sw_request_sender = sw_request_sender.clone();
             NativeFunction::from_closure(move |_referrer, args, ctx| {
                 let js_teleport_type = JsTeleportType::try_from_js(args.first().unwrap(), ctx)?;
                 match js_teleport_type {
@@ -80,19 +87,42 @@ impl Sw {
                             .unwrap();
                     }
                 }
-                //let this = args.get(0).unwrap().to_object(ctx)?;
-                //let target = args.get(1).unwrap().to_object(ctx)?;
-
-                //sw_sender
-                //    .send(SwRequestEvent::Teleport(
-                //        JsEntity::try_from_js(&this.get(js_string!("entity"), ctx)?, ctx)?.index(),
-                //        JsEntity::try_from_js(&target.get(js_string!("entity"), ctx)?, ctx)?
-                //            .generation(),
-                //    ))
-                //    .expect("SwRequestSender send error");
                 Ok(JsValue::undefined())
             })
         };
+        /*
+               let register_signal = unsafe {
+                   NativeFunction::from_closure(|_referrer, args, ctx| {
+                       let signal = args.first().unwrap().to_object(ctx)?;
+                       let signal_name = signal.get(js_string!("name"), ctx)?.to_string(ctx)?;
+                       ctx.realm()
+                           .host_defined_mut()
+                           .get_mut::<HostDefinedSignalSystem>()
+                           .unwrap()
+                           .signal_map
+                           .insert(signal_name.clone(), signal);
+                       Ok(JsValue::undefined())
+                   })
+               };
+        */
+        let signal_emit = unsafe {
+            let sw_request_sender = sw_request_sender.clone();
+            NativeFunction::from_closure(move |_referrer, args, ctx| {
+                let signal = args.first().unwrap().to_object(ctx)?;
+
+                let signal_args = args[1..].to_owned();
+                info!("{:?}", signal_args);
+                ctx.realm()
+                    .host_defined_mut()
+                    .get_mut::<HostDefinedSignalSystem>()
+                    .unwrap()
+                    .insert_emit_signal(EmitSignal::new(signal, signal_args));
+
+                sw_request_sender.send(SwRequestEvent::EmitSignal).unwrap();
+                Ok(JsValue::undefined())
+            })
+        };
+
         ObjectInitializer::with_native_data_and_proto(
             Self::default(),
             JsObject::with_object_proto(context.realm().intrinsics()),
@@ -103,7 +133,9 @@ impl Sw {
             Self::NAME,
             Attribute::CONFIGURABLE,
         )
-        .function(teleport, js_string!("teleport"), 0)
+        .function(teleport, js_string!("teleport"), 3)
+        //.function(register_signal, js_string!("register_signal"), 1)
+        .function(signal_emit, js_string!("signal_emit"), 2)
         .build()
     }
 }

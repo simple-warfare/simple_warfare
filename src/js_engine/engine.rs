@@ -22,6 +22,7 @@ use crate::{
         global::class::entity::JsEntity,
         loader::SimpleWarfareModuleLoader,
         module::ModModule,
+        signal::HostDefinedSignalSystem,
         sw::{Sw, SwRequestEvent, SwResponseEvent},
     },
 };
@@ -31,9 +32,6 @@ pub struct JsEngine {
     pub(super) module_map: HashMap<String, Vec<ModModule>>,
     pub(super) unit_map: HashMap<Entity, JsProxy>,
     pub(super) entity_map: HashMap<JsEntity, Entity>,
-    _path_url: Arc<FxHashMap<&'static str, &'static str>>,
-    _require_request_sender: Arc<Sender<SwRequireLoaderRequestEvent>>,
-    _require_response_receiver: Arc<Mutex<Receiver<SwRequireLoaderResponseEvent>>>,
 }
 
 impl JsEngine {
@@ -54,6 +52,7 @@ impl JsEngine {
 
         let ctx = RefCell::new(&mut context);
 
+        insert_host_defined_data(&mut ctx.borrow_mut());
         egister_global_property(
             &mut ctx.borrow_mut(),
             sw_request_sender,
@@ -77,9 +76,6 @@ impl JsEngine {
             module_map: HashMap::new(),
             unit_map: HashMap::new(),
             entity_map: HashMap::new(),
-            _path_url: path_url,
-            _require_request_sender: require_request_sender,
-            _require_response_receiver: require_response_receiver,
         }
     }
 }
@@ -99,7 +95,7 @@ fn egister_global_property(
         .expect("the sw builtin shouldn't exist");
 }
 
-fn register_global_class(ctx: &mut Context) {}
+fn register_global_class(_ctx: &mut Context) {}
 pub fn get_real_path(
     path_url: Arc<FxHashMap<&'static str, &'static str>>,
     url: &Url,
@@ -156,7 +152,6 @@ fn register_global_callable(
                     js_string!(format!("request_sender could not send `{real_path}`")).into(),
                 )))?;
             // Read the module source file
-            println!("Loading: {real_path}");
             let response_receiver = response_receiver.clone();
             let js_asset = match response_receiver
                 .lock()
@@ -200,4 +195,14 @@ fn register_global_callable(
         })
     })
     .unwrap();
+}
+
+fn insert_host_defined_data(ctx: &mut Context) {
+    let signal_system = HostDefinedSignalSystem::default();
+    //signal_system.signal_map.insert(
+    //    js_string!("custom_unit_spwaned"),
+    //    Signal::new(js_string!("custom_unit_spwaned")),
+    //);
+
+    ctx.realm().host_defined_mut().insert(signal_system);
 }

@@ -5,6 +5,7 @@ pub mod global;
 pub mod loader;
 pub mod module;
 pub mod plugin;
+pub mod signal;
 pub mod sw;
 
 use std::sync::{
@@ -23,7 +24,7 @@ use crate::{
             SwRequireLoaderRequestReceiver, SwRequireLoaderResponseSender,
         },
         plugin::SwLoaderPlugin,
-        sw::{plugin::SwPlugin, SwRequestReceiver, SwResponseSender},
+        sw::{SwRequestReceiver, SwResponseSender, plugin::SwPlugin},
     },
 };
 use bevy::prelude::*;
@@ -69,12 +70,12 @@ pub struct JsEngineEventResponseReciver(pub Arc<Mutex<Receiver<JsEngineResponseE
 
 fn init_js_context(mut commands: Commands) -> Result {
     //与js线程的双向通道
-    let (je_request_sender, je_request_receiver) = mpsc::channel();
-    let (je_response_sender, je_response_receiver) = mpsc::channel();
-    let je_request_sender = Arc::new(je_request_sender);
-    commands.insert_resource(JsEngineEventRequestSender(je_request_sender));
+    let (js_request_sender, js_request_receiver) = mpsc::channel();
+    let (js_response_sender, js_response_receiver) = mpsc::channel();
+    let js_request_sender = Arc::new(js_request_sender);
+    commands.insert_resource(JsEngineEventRequestSender(js_request_sender.clone()));
     commands.insert_resource(JsEngineEventResponseReciver(Arc::new(Mutex::new(
-        je_response_receiver,
+        js_response_receiver,
     ))));
 
     let (sw_module_request_sender, sw_module_request_receiver) = mpsc::channel();
@@ -111,16 +112,21 @@ fn init_js_context(mut commands: Commands) -> Result {
             Arc::new(sw_request_sender),
             Arc::new(Mutex::new(sw_response_receiver)),
         );
-        let je_response_sender = Arc::new(je_response_sender);
+        let js_response_sender = Arc::new(js_response_sender.clone());
         // 开始监听
         // 由bevy的EventWriter写入事件并经js_event_bridge中转到此
-        je_response_sender
+        js_response_sender
             .send(JsEngineResponseEvent::EngineInited)
             .expect("Faied to send EngineInited event");
 
-        while let Ok(event) = je_request_receiver.recv() {
-            process_js_event(engine, event, je_response_sender.clone())
-                .expect("process_js_event error")
+        while let Ok(event) = js_request_receiver.recv() {
+            process_js_event(
+                engine,
+                event,
+                js_request_sender.clone(),
+                js_response_sender.clone(),
+            )
+            .expect("process_js_event error")
         }
     });
     Ok(())

@@ -1,12 +1,12 @@
 use bevy::prelude::*;
 
 use crate::{
+    custom_unit::unit::CustomUnit,
     js_engine::{
         JsEngineEventRequestSender,
         event::{JsEngineRequestEvent, JsEngineResponseEvent},
         sw::{SwRequestEvent, SwRequestReceiver, TeleportType},
     },
-    unit::custom_unit::CustomUnit,
 };
 pub struct SwPlugin;
 
@@ -40,6 +40,9 @@ fn handle_sw_event(
                     //transform.translation = Vec3::new(vec2.x, vec2.y, transform.translation.z);
                 }
             },
+            SwRequestEvent::EmitSignal => js_engine_event_sender
+                .0
+                .send(JsEngineRequestEvent::SignalEmit)?,
         }
     }
 

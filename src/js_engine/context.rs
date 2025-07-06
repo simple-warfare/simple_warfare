@@ -1,12 +1,20 @@
 use crate::{
-    js_engine::{engine::JsEngine, event::*, global::class::entity::JsEntity, module::ModModule},
-    unit::{
-        custom_unit::SpawnedUnitData,
+    custom_unit::{
+        physics::collider::Collider,
         section::{
+            collider::Colliders,
             core::Core,
             graphic::{Graphic, Graphics},
             movement::Movement,
         },
+        unit::SpawnedUnitData,
+    },
+    js_engine::{
+        engine::JsEngine,
+        event::*,
+        global::class::entity::JsEntity,
+        module::ModModule,
+        signal::{EmitSignal, HostDefinedSignalSystem},
     },
 };
 use bevy::prelude::*;
@@ -14,10 +22,14 @@ use boa_engine::{
     JsResult,
     builtins::promise::PromiseState,
     js_string,
-    object::{Object, builtins::JsProxy},
+    object::{
+        FunctionObjectBuilder,
+        builtins::{JsArray, JsFunction, JsProxy},
+    },
     prelude::*,
     value::{TryFromJs, TryIntoJs},
 };
+use rustc_hash::FxHashMap;
 use std::{
     path::Path,
     sync::{Arc, mpsc::Sender},
@@ -35,7 +47,8 @@ pub enum JsEngineError {
 pub(super) fn process_js_event(
     engine: &mut JsEngine,
     event: JsEngineRequestEvent,
-    sender: Arc<Sender<JsEngineResponseEvent>>,
+    request_sender: Arc<Sender<JsEngineRequestEvent>>,
+    response_sender: Arc<Sender<JsEngineResponseEvent>>,
 ) -> JsResult<()> {
     let context = &mut engine.context;
     let module_map = &mut engine.module_map;
@@ -79,7 +92,6 @@ pub(super) fn process_js_event(
             }
         }
         JsEngineRequestEvent::SpawnUnit(entity, unit_str) => {
-            info!("SpawnUnit:{}", unit_str);
             let unit_from: Vec<&str> = unit_str.split(':').collect();
             if let Some(modules) = module_map.get(unit_from[0]) {
                 for module in modules {
@@ -128,26 +140,90 @@ pub(super) fn process_js_event(
                             context,
                         )?;
 
+                        let colliders = Colliders::new(Vec::<Collider>::try_from_js(
+                            &JsValue::Object(
+                                unit_proxy
+                                    .get(js_string!("colliders"), context)?
+                                    .to_object(context)?,
+                            ),
+                            context,
+                        )?);
+
+                        let created_signal = unit_proxy
+                            .get(js_string!("created"), context)?
+                            .to_object(context)?
+                            .clone();
+                        
+                        context
+                            .realm()
+                            .host_defined_mut()
+                            .get_mut::<HostDefinedSignalSystem>()
+                            .unwrap()
+                            .insert_emit_signal(EmitSignal::new(created_signal, &[]));
+                        request_sender
+                            .send(JsEngineRequestEvent::SignalEmit)
+                            .unwrap();
+
                         unit_map.insert(entity, unit_proxy);
                         entity_map.insert(js_entity, entity);
-                        sender
+
+                        response_sender
                             .send(JsEngineResponseEvent::SpawnedUnit(
                                 entity,
                                 module_path,
-                                SpawnedUnitData::new(core, graphics, movement),
+                                SpawnedUnitData::new(core, graphics, movement, colliders),
                             ))
                             .unwrap();
                     }
                 }
             }
         }
-        JsEngineRequestEvent::GetEntityToTeleport(js_entity,vec2) => {
-            sender.send(JsEngineResponseEvent::GetedEntityToTeleport(
-                js_entity,
-                *entity_map.get(&js_entity).unwrap(),
-                vec2
-            )).unwrap();
+        JsEngineRequestEvent::GetEntityToTeleport(js_entity, vec2) => {
+            response_sender
+                .send(JsEngineResponseEvent::GetedEntityToTeleport(
+                    js_entity,
+                    *entity_map.get(&js_entity).unwrap(),
+                    vec2,
+                ))
+                .unwrap();
         }
+        JsEngineRequestEvent::SignalEmit => {
+            if context
+                .realm()
+                .host_defined()
+                .get::<HostDefinedSignalSystem>()
+                .unwrap()
+                .signal_emit_queue
+                .is_empty()
+            {
+                return Ok(());
+            }
+            let signal_emit_queue: Vec<EmitSignal> = context
+                .realm()
+                .host_defined_mut()
+                .get_mut::<HostDefinedSignalSystem>()
+                .unwrap()
+                .signal_emit_queue
+                .drain(..)
+                .collect();
+
+            for emit_signal in signal_emit_queue {
+                let signal = &emit_signal.signal;
+
+                let connect_array = JsArray::from_object(
+                    signal
+                        .get(js_string!("connectArray"), context)?
+                        .to_object(context)?,
+                )?;
+
+                let func = connect_array
+                    .get(js_string!("0"), context)?
+                    .as_function()
+                    .unwrap();
+                func.call(&JsValue::Undefined, &emit_signal.args, context)?;
+            }
+        }
+        JsEngineRequestEvent::SignalConnect => todo!(),
     }
     Ok(())
 }

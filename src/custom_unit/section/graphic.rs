@@ -14,7 +14,7 @@ pub struct Graphic {
     pub frame_height: Option<u32>,
 }
 
-#[derive(Debug, Clone, Component, Reflect, TryFromJs)]
+#[derive(Debug, Default, Clone, Component, Reflect, TryFromJs)]
 pub struct Graphics {
     pub data: Vec<Graphic>,
 }

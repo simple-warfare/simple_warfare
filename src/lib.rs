@@ -1,13 +1,14 @@
 pub mod app_state;
 pub mod assets;
 pub mod bevy_ext;
+pub mod custom_unit;
 pub mod js_engine;
 pub mod lua_engine;
 pub mod mod_engine;
 pub mod panel;
 pub mod scenes;
 pub mod statistics;
-pub mod unit;
+pub mod system;
 pub mod utils;
 
 use avian2d::prelude::*;
@@ -20,8 +21,9 @@ use bevy_panic_handler::PanicHandler;
 use js_engine::JsEnginePlugin;
 
 use crate::{
-    app_state::AppState, assets::AssetsPlugin, lua_engine::LuaEnginePlugin,
-    mod_engine::ModEnginePlugin, scenes::ScenePlugin, unit::UnitPlugin,
+    app_state::AppState, assets::AssetsPlugin, custom_unit::CustomUnitPlugin,
+    lua_engine::LuaEnginePlugin, mod_engine::ModEnginePlugin, scenes::ScenePlugin,
+    statistics::StatistcsPlugin, system::SystemPlugin,
 };
 
 pub struct SimpleWarfarePlugins;
@@ -35,7 +37,9 @@ impl PluginGroup for SimpleWarfarePlugins {
             .add(LuaEnginePlugin)
             .add(ScenePlugin)
             .add(ModEnginePlugin)
-            .add(UnitPlugin);
+            .add(SystemPlugin)
+            .add(StatistcsPlugin)
+            .add(CustomUnitPlugin);
         group
     }
 }
@@ -54,6 +58,7 @@ impl Plugin for SimpleWarfarePlugin {
             .add_plugins(LdtkPlugin)
             .insert_resource(LevelSelection::default())
             .add_plugins(Light2dPlugin)
-            .add_plugins(SimpleWarfarePlugins);
+            .add_plugins(SimpleWarfarePlugins)
+            .insert_resource(Gravity(Vec2::ZERO));
     }
 }

@@ -5,20 +5,30 @@ use crate::{
         info::{ModEnable, ModInfo},
         js::JsAsset,
     },
-    js_engine::global::class::entity::JsEntity,
-    unit::custom_unit::SpawnedUnitData,
+    custom_unit::unit::SpawnedUnitData,
+    js_engine::{global::class::entity::JsEntity},
 };
+
+#[derive(Debug, Clone)]
+pub enum SafetyJsValue {
+    JsEntity(JsEntity)
+}
 
 #[derive(Debug, Event, Clone)]
 pub enum JsEngineRequestEvent {
     LoadMod(ModEnable, ModInfo),
     SpawnUnit(Entity, String),
     GetEntityToTeleport(JsEntity, Vec2),
+
+    //Signal
+    SignalEmit,
+    SignalConnect
 }
 
 #[derive(Debug, Event, Clone)]
 pub enum JsEngineResponseEvent {
     EngineInited,
+    //Mod
     SpawnedUnit(Entity, String, SpawnedUnitData),
     GetedEntityToTeleport(JsEntity, Entity, Vec2),
 }
