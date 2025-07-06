@@ -2,6 +2,7 @@ pub mod physics;
 pub mod section;
 pub mod unit;
 pub mod way_point;
+pub mod light2d;
 
 use bevy::prelude::*;
 

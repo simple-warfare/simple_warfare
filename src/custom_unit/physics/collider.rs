@@ -1,15 +1,14 @@
+use avian2d::prelude::Collider;
 use bevy::prelude::*;
 use boa_engine::{JsResult, js_string, prelude::*, value::TryFromJs};
 
-use crate::statistics::Avian2dCollider;
-
 #[derive(Debug, Clone, Component, Reflect)]
-pub enum Collider {
+pub enum JsCollider {
     Circle(f32),
     Rectangle(f32, f32),
 }
 
-impl TryFromJs for Collider {
+impl TryFromJs for JsCollider {
     fn try_from_js(value: &JsValue, context: &mut Context) -> JsResult<Self> {
         let collider_object = value.to_object(context)?;
         match collider_object
@@ -38,15 +37,11 @@ impl TryFromJs for Collider {
     }
 }
 
-impl Collider {
-    pub fn to_avian2d(&self) -> Avian2dCollider {
+impl JsCollider {
+    pub fn to_avian2d(&self) -> Collider {
         match self {
-            Collider::Circle(radius) => {
-                Avian2dCollider::circle(*radius)
-            }
-            Collider::Rectangle(x_length, y_length) => {
-                Avian2dCollider::rectangle(*x_length, *y_length)
-            }
+            JsCollider::Circle(radius) => Collider::circle(*radius),
+            JsCollider::Rectangle(x_length, y_length) => Collider::rectangle(*x_length, *y_length),
         }
     }
 }

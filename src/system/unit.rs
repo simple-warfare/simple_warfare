@@ -8,6 +8,7 @@ use crate::{
         NewSpawnedUnit,
         physics::EnablePhysics,
         section::{
+            Section,
             core::Core,
             graphic::{Graphic, Graphics},
             movement::Movement,
@@ -45,26 +46,28 @@ fn check_new_unit(
             let graphics = &spawned_unit_data.graphics;
             let movement = spawned_unit_data.movement;
             let colliders = &spawned_unit_data.colliders;
+            let point_lights = &spawned_unit_data.point_lights;
             commands
                 .entity(*entity)
-                .insert(ComputedMass::new(core.mass));
-            commands
-                .entity(*entity)
+                .insert((CustomUnit, EnablePhysics))
                 .insert((
                     Name::new(core.name.clone()),
-                    core.clone(),
-                    graphics.clone(),
-                    colliders.clone(),
-                    movement,
-                    CustomUnit,
-                    Selectable,
+                    Section::new(
+                        core.clone(),
+                        colliders.clone(),
+                        graphics.clone(),
+                        movement,
+                        point_lights.clone(),
+                    ),
                     EnablePhysics,
+                    Selectable,
                     WayPointQueue::default(),
-                    ExternalForce::default().with_persistence(false),
                     RigidBody::Dynamic,
                     MaxLinearSpeed(40.),
                     AngularDamping(0.8),
                     LinearDamping(0.8),
+                    ExternalForce::default().with_persistence(false),
+                    ComputedMass::new(core.mass),
                     Sprite {
                         image: asset_server.load(
                             Path::new(form)
@@ -78,6 +81,9 @@ fn check_new_unit(
                 .with_children(|parent| {
                     for collider in colliders.to_avian2d().iter() {
                         parent.spawn(collider.clone());
+                    }
+                    for point_light in point_lights.to_point_light2d().iter() {
+                        parent.spawn(point_light.clone());
                     }
                 });
             writer.write(NewSpawnedUnit(*entity));

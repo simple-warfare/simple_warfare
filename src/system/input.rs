@@ -24,7 +24,7 @@ impl Plugin for InputSystemPlugin {
                     handle_cursor_move,
                     handle_mouse_input,
                     calculate_world_position_of_selection,
-                    (updata_selected_unit, add_move_way_point),
+                    (update_selected_unit, add_move_way_point),
                     (
                         draw_selection_box,
                         draw_selected_unit,
@@ -123,7 +123,7 @@ pub fn draw_selection_box(
     Ok(())
 }
 
-pub fn updata_selected_unit(
+pub fn update_selected_unit(
     mut commands: Commands,
     selection_state: Res<SelectionState>,
     units: Query<(Entity, &Transform), With<CustomUnit>>,

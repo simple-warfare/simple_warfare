@@ -123,13 +123,15 @@ impl SimpleWarfareModuleLoader {
 impl ModuleLoader for SimpleWarfareModuleLoader {
     fn load_imported_module(
         &self,
-        _referrer: Referrer,
+        referrer: Referrer,
         specifier: JsString,
         finish_load: Box<dyn FnOnce(JsResult<Module>, &mut Context)>,
         context: &mut Context,
     ) {
         let result = (|| {
+            
             let specifier = specifier.to_std_string_escaped();
+            
             let specifier_url = Url::parse(&specifier).map_err(|err| {
                 JsNativeError::typ()
                     .with_message(format!("could not parse url `{specifier}`"))

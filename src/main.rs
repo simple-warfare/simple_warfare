@@ -28,22 +28,3 @@ fn main() {
     .add_plugins(SimpleWarfarePlugin)
     .run();
 }
-
-/*
-fn set_embedded_icon(
-    windows: NonSend<WinitWindows>,
-    primary_window: Single<Entity, With<PrimaryWindow>>,
-) {
-    const ICON_DATA: &[u8] = include_bytes!("../assets/texture/icons/logo.png");
-    let image = image::load_from_memory(ICON_DATA)
-        .expect("图标解码失败")
-        .into_rgba8();
-    let (width, height) = image.dimensions();
-    let rgba = image.into_raw();
-
-    let icon = Icon::from_rgba(rgba, width, height).unwrap();
-    if let Some(win) = windows.get_window(*primary_window) {
-        win.set_window_icon(Some(icon));
-    }
-}
-*/

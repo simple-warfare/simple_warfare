@@ -10,6 +10,8 @@ class CustomUnit {
     constructor(entity) {
         this.entity = entity
         this.graphics = new Array()
+        this.colliders = new Array()
+        this.pointLights = new Array()
         this.movement = undefined
         this.created = new Signal()
         this._proxy = new Proxy(this, CustomUnitHandle)

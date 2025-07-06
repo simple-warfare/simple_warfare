@@ -2,21 +2,18 @@ import { CoreBuilder } from "std:section/core.mjs"
 import { CustomUnit } from "std:custom/unit.mjs"
 import { GraphicBuilder } from "std:section/graphic.mjs"
 import { MovementBuilder } from "std:section/movement.mjs";
-
 import { CircleCollider, ColliderType } from "std:physics/collider.mjs";
 import { Signal } from "std:signal/signal.mjs";
+import { PointLight2d } from "std:section/light2d.mjs";
+
+
 class Builder extends CustomUnit {
     constructor(entity) {
         super(entity)
-        this.graphics = new Array()
-        this.colliders = new Array()
-        let main_graphics = new GraphicBuilder().withPath("builder.png").withFrameHeight(100).withFrameWidth(100).build()
-        this.graphics.push(main_graphics)
-        this.movement = new MovementBuilder().withMaxMoveSpeed(3.).build()
-        this.name = "Builder"
-        let collider = new CircleCollider(ColliderType.Circle, 30.)
-        this.colliders.push(collider)
         this.core = new CoreBuilder().withName("建造者").withMass(100.).build()
+        this.graphics.push(new GraphicBuilder().withPath("builder.png").withFrameHeight(100).withFrameWidth(100).build())
+        this.movement = new MovementBuilder().withMaxMoveSpeed(3.).build()
+        this.colliders.push(new CircleCollider(ColliderType.Circle, 30.))
 
         this.created_func = () => {
             console.log("created")
@@ -31,8 +28,7 @@ class Builder extends CustomUnit {
         this.print_string_when_created = new Signal()
         this.print_string_when_created.connect(this.print_string)
 
-
-
+        this.pointLights.push(new PointLight2d())
     }
 }
 

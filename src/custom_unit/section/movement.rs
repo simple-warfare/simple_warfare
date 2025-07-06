@@ -1,7 +1,7 @@
 use avian2d::math::Scalar;
 use bevy::prelude::*;
 use boa_engine::{JsResult, js_string, prelude::*, value::TryFromJs};
-#[derive(Debug, Clone, Copy, Component, Reflect)]
+#[derive(Debug, Default, Clone, Copy, Component, Reflect)]
 pub struct Movement {
     pub movement_type: MovementType,
     pub max_move_speed: Scalar,
@@ -67,8 +67,9 @@ impl TryFromJs for Movement {
     }
 }
 
-#[derive(Debug, Clone, Copy, Component, Reflect)]
+#[derive(Debug, Default, Clone, Copy, Component, Reflect)]
 pub enum MovementType {
+    #[default]
     Land,
 }
 

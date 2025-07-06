@@ -1,10 +1,12 @@
 use crate::{
     custom_unit::{
-        physics::collider::Collider,
+        light2d::point_light2d::JsPointLight2d,
+        physics::collider::JsCollider,
         section::{
-            collider::Colliders,
+            collider::JsColliders,
             core::Core,
             graphic::{Graphic, Graphics},
+            light2d::JsPointLights2d,
             movement::Movement,
         },
         unit::SpawnedUnitData,
@@ -140,7 +142,7 @@ pub(super) fn process_js_event(
                             context,
                         )?;
 
-                        let colliders = Colliders::new(Vec::<Collider>::try_from_js(
+                        let colliders = JsColliders::new(Vec::<JsCollider>::try_from_js(
                             &JsValue::Object(
                                 unit_proxy
                                     .get(js_string!("colliders"), context)?
@@ -149,11 +151,21 @@ pub(super) fn process_js_event(
                             context,
                         )?);
 
+                        let point_lights =
+                            JsPointLights2d::new(Vec::<JsPointLight2d>::try_from_js(
+                                &JsValue::Object(
+                                    unit_proxy
+                                        .get(js_string!("pointLights"), context)?
+                                        .to_object(context)?,
+                                ),
+                                context,
+                            )?);
+
                         let created_signal = unit_proxy
                             .get(js_string!("created"), context)?
                             .to_object(context)?
                             .clone();
-                        
+
                         context
                             .realm()
                             .host_defined_mut()
@@ -171,7 +183,13 @@ pub(super) fn process_js_event(
                             .send(JsEngineResponseEvent::SpawnedUnit(
                                 entity,
                                 module_path,
-                                SpawnedUnitData::new(core, graphics, movement, colliders),
+                                SpawnedUnitData::new(
+                                    core,
+                                    graphics,
+                                    movement,
+                                    colliders,
+                                    point_lights,
+                                ),
                             ))
                             .unwrap();
                     }

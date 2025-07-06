@@ -111,7 +111,6 @@ impl Sw {
                 let signal = args.first().unwrap().to_object(ctx)?;
 
                 let signal_args = args[1..].to_owned();
-                info!("{:?}", signal_args);
                 ctx.realm()
                     .host_defined_mut()
                     .get_mut::<HostDefinedSignalSystem>()

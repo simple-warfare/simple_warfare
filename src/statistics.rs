@@ -1,8 +1,5 @@
 use bevy::prelude::*;
 
-pub type Avian2dCollider = avian2d::collision::collider::Collider;
-
-
 #[derive(Default, Debug, Resource)]
 pub struct Statistics {
     pub player_name: String,

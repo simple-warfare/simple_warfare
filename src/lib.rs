@@ -57,6 +57,12 @@ impl Plugin for SimpleWarfarePlugin {
             .add_plugins(PanicHandler::new().build())
             .add_plugins(LdtkPlugin)
             .insert_resource(LevelSelection::default())
+            .insert_resource(LdtkSettings {
+                level_spawn_behavior: LevelSpawnBehavior::UseWorldTranslation {
+                    load_level_neighbors: true,
+                },
+                ..Default::default()
+            })
             .add_plugins(Light2dPlugin)
             .add_plugins(SimpleWarfarePlugins)
             .insert_resource(Gravity(Vec2::ZERO));

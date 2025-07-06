@@ -138,8 +138,10 @@ fn register_global_callable(
 
     ctx.register_global_callable("require".into(), 0, unsafe {
         NativeFunction::from_closure(move |_referrer, args, ctx| {
+            
             let arg = args.get_or_undefined(0);
             let lib_file = arg.to_string(ctx)?.to_std_string_escaped();
+
             let url = Url::parse(&lib_file).map_err(|err| {
                 JsNativeError::typ()
                     .with_message(format!("could not parse url `{lib_file}`"))
