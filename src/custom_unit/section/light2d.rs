@@ -8,14 +8,14 @@ pub struct JsPointLights2d {
 }
 
 impl JsPointLights2d {
-    pub fn new(colliders: Vec<JsPointLight2d>) -> Self {
-        Self { data: colliders }
+    pub fn new(js_point_light2d: Vec<JsPointLight2d>) -> Self {
+        Self { data: js_point_light2d }
     }
 
     pub fn to_point_light2d(&self) -> Vec<impl Bundle> {
         self.data
             .iter()
-            .map(|collider| collider.to_point_light2d())
+            .map(|js_point_light2d| js_point_light2d.to_point_light2d())
             .collect()
     }
 }

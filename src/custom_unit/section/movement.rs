@@ -1,15 +1,30 @@
+use crate::bevy_ext::try_from_js::*;
 use avian2d::math::Scalar;
 use bevy::prelude::*;
-use boa_engine::{JsResult, js_string, prelude::*, value::TryFromJs};
-#[derive(Debug, Default, Clone, Copy, Component, Reflect)]
+use boa_engine::{JsResult, prelude::*, value::TryFromJs};
+#[derive(Debug, Default, Clone, Copy, Component, Reflect, TryFromJs)]
 pub struct Movement {
     pub movement_type: MovementType,
+    #[boa(from_js_with = "f32_try_from_js")]
+    #[boa(rename = "maxMoveSpeed")]
     pub max_move_speed: Scalar,
+    #[boa(from_js_with = "f32_try_from_js")]
+    #[boa(rename = "moveAcceleration")]
     pub move_acceleration: Scalar,
+    #[boa(from_js_with = "f32_try_from_js")]
+    #[boa(rename = "moveDeceleration")]
     pub move_deceleration: Scalar,
+    #[boa(from_js_with = "f32_try_from_js")]
+    #[boa(rename = "reversePercentage")]
     pub reverse_percentage: Scalar,
+    #[boa(from_js_with = "f32_try_from_js")]
+    #[boa(rename = "maxTurnSpeed")]
     pub max_turn_speed: Scalar,
+    #[boa(from_js_with = "f32_try_from_js")]
+    #[boa(rename = "turnAcceleration")]
     pub turn_acceleration: Scalar,
+    #[boa(from_js_with = "f32_try_from_js")]
+    #[boa(rename = "turnDeceleration")]
     pub turn_deceleration: Scalar,
 }
 
@@ -34,36 +49,6 @@ impl Movement {
             turn_acceleration,
             turn_deceleration,
         }
-    }
-}
-
-impl TryFromJs for Movement {
-    fn try_from_js(value: &JsValue, context: &mut Context) -> JsResult<Self> {
-        let object = value.to_object(context)?;
-        Ok(Movement::new(
-            MovementType::try_from_js(&object.get(js_string!("movementType"), context)?, context)?,
-            object
-                .get(js_string!("maxMoveSpeed"), context)?
-                .to_f32(context)?,
-            object
-                .get(js_string!("moveAcceleration"), context)?
-                .to_f32(context)?,
-            object
-                .get(js_string!("moveDeceleration"), context)?
-                .to_f32(context)?,
-            object
-                .get(js_string!("reversePercentage"), context)?
-                .to_f32(context)?,
-            object
-                .get(js_string!("maxTurnSpeed"), context)?
-                .to_f32(context)?,
-            object
-                .get(js_string!("turnAcceleration"), context)?
-                .to_f32(context)?,
-            object
-                .get(js_string!("turnDeceleration"), context)?
-                .to_f32(context)?,
-        ))
     }
 }
 

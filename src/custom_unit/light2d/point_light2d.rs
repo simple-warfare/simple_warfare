@@ -1,21 +1,25 @@
 use bevy::prelude::*;
 use bevy_light_2d::light::PointLight2d;
-use boa_engine::{JsResult, js_string, object::builtins::JsArray, prelude::*, value::TryFromJs};
+use boa_engine::value::TryFromJs;
 
+use crate::bevy_ext::try_from_js::*;
 use crate::custom_unit::transform::transform::JsTransform;
-
-#[derive(Debug, Clone, Component, Reflect)]
+#[derive(Debug, Clone, Component, Reflect, TryFromJs)]
 pub struct JsPointLight2d {
     pub transform: JsTransform,
     /// The light's color tint.
+    #[boa(from_js_with = "color_try_from_js")]
     pub color: Color,
     /// The intensity of the light. The light's attenutation is multiplied by this value.
     /// The higher the intensity, the brighter the light.
+    #[boa(from_js_with = "f32_try_from_js")]
     pub intensity: f32,
     /// The radius of the light. Illumination will only occur within the light's radius.
+    #[boa(from_js_with = "f32_try_from_js")]
     pub radius: f32,
     /// How quickly illumination from the light should deteriorate over distance.
     /// A higher falloff value will result in less illumination at the light's maximum radius.
+    #[boa(from_js_with = "f32_try_from_js")]
     pub falloff: f32,
     /// Whether the light should cast shadows.
     pub cast_shadows: bool,
@@ -33,58 +37,6 @@ impl Default for JsPointLight2d {
         }
     }
 }
-
-impl TryFromJs for JsPointLight2d {
-    fn try_from_js(value: &JsValue, context: &mut Context) -> JsResult<Self> {
-        let point_light2d_object = value.to_object(context)?;
-        let color_object = point_light2d_object
-            .get(js_string!("color"), context)?
-            .to_object(context)?;
-
-        let color = JsArray::from_object(
-            color_object
-                .get(js_string!("color"), context)?
-                .to_object(context)?,
-        )?;
-        let valpha = color_object
-            .get(js_string!("valpha"), context)?
-            .to_f32(context)?;
-
-        let model = color_object
-            .get(js_string!("model"), context)?
-            .to_string(context)?
-            .to_std_string_lossy();
-
-        match model.as_str() {
-            "rgb" => Ok(Self {
-                transform: JsTransform::try_from_js(
-                    &point_light2d_object.get(js_string!("transform"), context)?,
-                    context,
-                )?,
-                color: Color::LinearRgba(LinearRgba::new(
-                    color.at(0, context)?.to_f32(context)?,
-                    color.at(1, context)?.to_f32(context)?,
-                    color.at(2, context)?.to_f32(context)?,
-                    valpha,
-                )),
-                intensity: point_light2d_object
-                    .get(js_string!("intensity"), context)?
-                    .to_f32(context)?,
-                radius: point_light2d_object
-                    .get(js_string!("radius"), context)?
-                    .to_f32(context)?,
-                falloff: point_light2d_object
-                    .get(js_string!("falloff"), context)?
-                    .to_f32(context)?,
-                cast_shadows: point_light2d_object
-                    .get(js_string!("cast_shadows"), context)?
-                    .to_boolean(),
-            }),
-            _ => Ok(Self::default()),
-        }
-    }
-}
-
 impl JsPointLight2d {
     pub fn to_point_light2d(&self) -> impl Bundle {
         (
