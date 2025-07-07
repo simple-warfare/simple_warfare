@@ -4,6 +4,7 @@ use crate::{
         unit::CustomUnit,
         way_point::{WayPoint, WayPointQueue},
     },
+    js_engine::{JsEngineEventRequestSender, event::JsEngineRequestEvent},
     scenes::SceneState,
     statistics::*,
 };
@@ -114,7 +115,8 @@ pub fn update_selected_unit(
     mut commands: Commands,
     selection_state: Res<SelectionState>,
     units: Query<(Entity, &Transform), With<CustomUnit>>,
-) {
+    js_engine_request_sender: Res<JsEngineEventRequestSender>,
+) -> Result {
     if selection_state.is_selecting {
         let selection_rect =
             calculate_selection_rect(selection_state.real_start, selection_state.real_end);
@@ -122,11 +124,15 @@ pub fn update_selected_unit(
             let position = transform.translation.xy();
             if selection_rect.contains(position) {
                 commands.entity(entity).insert(Selected);
+                js_engine_request_sender
+                    .0
+                    .send(JsEngineRequestEvent::SelectedSignalEmit)?;
             } else {
                 commands.entity(entity).try_remove::<Selected>();
             }
         }
     }
+    Ok(())
 }
 
 fn calculate_selection_rect(start: Vec2, end: Vec2) -> Rect {

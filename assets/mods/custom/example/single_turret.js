@@ -1,8 +1,11 @@
 import { Turret } from "std:custom/turret.mjs"
-import { fromValues as TransformfromValues } from "std:bevy/transform/transform.mjs";
-import { fromValues as Vec3fromValues } from "package:gl-matrix/vec3.js"
-class SingleTurret extends Turret {
+import { fromValues as transFormFromValues } from "std:bevy/transform/transform.mjs";
+import { fromValues as vec3FromValues } from "package:gl-matrix/vec3.js"
+import { fromValues as graphicFromValues } from "std:section/graphic.mjs"
+
+export class SingleTurret extends Turret {
     constructor() {
-        super(TransformfromValues(Vec3fromValues(0., 5., 0.), undefined, undefined),)
+        super(transFormFromValues(vec3FromValues(0., 5., 1.), undefined, undefined),
+            graphicFromValues (undefined, "single_turret.png", undefined, undefined, undefined),666., true)
     }
-}
+};

@@ -6,11 +6,11 @@ pub struct Core {
     pub name: String,
     pub hp: u32,
     pub price: u32,
+    #[boa(rename = "maxHp")]
     pub max_hp: u32,
     #[boa(from_js_with = "f32_try_from_js")]
     pub mass: f32,
-    #[boa(from_js_with = "f32_try_from_js")]
-    #[boa(rename = "buildSpeed")]
+    #[boa(from_js_with = "f32_try_from_js", rename = "buildSpeed")]
     pub build_speed: f32,
     #[boa(from_js_with = "f32_try_from_js")]
     pub radius: f32,

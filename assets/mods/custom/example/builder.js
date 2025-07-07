@@ -1,7 +1,7 @@
-import { fromValues as CoreFromValues } from "std:section/core.mjs"
+import { fromValues as coreFromValues } from "std:section/core.mjs"
 import { CustomUnit } from "std:custom/unit.mjs"
-import { fromValues as GraphicFromValues } from "std:section/graphic.mjs"
-import { fromValues as movementFromValues } from "std:section/movement.mjs";
+import { fromValues as graphicFromValues } from "std:section/graphic.mjs"
+import { fromValues as movementFromValues, MovementType } from "std:section/movement.mjs";
 import { CircleCollider, ColliderType } from "std:physics/collider.mjs";
 import { Signal } from "std:signal/signal.mjs";
 import { PointLight2d } from "std:section/light2d.mjs";
@@ -14,10 +14,10 @@ import { fromValues as vec2FromValues } from "package:gl-matrix/vec2.js"
 class Builder extends CustomUnit {
     constructor(entity) {
         super(entity)
-        this.core = CoreFromValues("建造者", 100, 100, 100, 100., 10., 50., true)
-        this.graphics.push(GraphicFromValues(undefined, "builder.png", undefined, undefined, undefined))
-        this.movement = movementFromValues(undefined,10., 3., 3., 10., 10., 10., 10.)
-        this.colliders.push(new CircleCollider(ColliderType.Circle, 30.))
+        this.core = coreFromValues("建造者", 100, 100, 100, 100., 100., 100., true)
+        this.graphics.push(graphicFromValues(undefined, "builder.png", undefined, undefined, undefined))
+        this.movement = movementFromValues(MovementType.LAND,10., 3., 3., 10., 10., 10., 10.)
+        this.colliders.push(new CircleCollider(ColliderType.Circle, 20.))
 
         this.created_func = () => {
             this.teleportSelfTo(vec2FromValues(

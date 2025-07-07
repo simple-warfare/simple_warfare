@@ -8,6 +8,7 @@ use std::{
 };
 
 use bevy::{platform::collections::HashMap, prelude::*};
+use bevy_inspector_egui::egui::ahash::HashMapExt;
 use boa_engine::{
     JsArgs, JsResult, js_string, object::builtins::JsProxy, prelude::*, property::Attribute,
 };
@@ -32,6 +33,7 @@ pub struct JsEngine {
     pub(super) module_map: HashMap<String, Vec<ModModule>>,
     pub(super) unit_map: HashMap<Entity, JsProxy>,
     pub(super) entity_map: HashMap<JsEntity, Entity>,
+    pub(super) selected_signal_map: FxHashMap<JsEntity, JsObject>,
 }
 
 impl JsEngine {
@@ -76,6 +78,7 @@ impl JsEngine {
             module_map: HashMap::new(),
             unit_map: HashMap::new(),
             entity_map: HashMap::new(),
+            selected_signal_map: FxHashMap::new(),
         }
     }
 }
@@ -138,7 +141,6 @@ fn register_global_callable(
 
     ctx.register_global_callable("require".into(), 0, unsafe {
         NativeFunction::from_closure(move |_referrer, args, ctx| {
-            
             let arg = args.get_or_undefined(0);
             let lib_file = arg.to_string(ctx)?.to_std_string_escaped();
 

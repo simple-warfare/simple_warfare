@@ -13,6 +13,7 @@ use crate::{
             graphic::{Graphic, Graphics},
             movement::Movement,
         },
+        turret::Turret,
         unit::CustomUnit,
         way_point::WayPointQueue,
     },
@@ -25,6 +26,9 @@ impl Plugin for UnitSystemPlugin {
     fn build(&self, app: &mut App) {
         app.add_event::<NewSpawnedUnit>()
             .register_type::<Core>()
+            .register_type::<Movement>()
+            .register_type::<Turret>()
+            .register_type::<Section>()
             .register_type::<Graphic>()
             .register_type::<Graphics>()
             .register_type::<Movement>()
@@ -42,23 +46,19 @@ fn check_new_unit(
 ) -> Result {
     for event in reader.read() {
         if let JsEngineResponseEvent::SpawnedUnit(entity, form, spawned_unit_data) = event {
-            let core = &spawned_unit_data.core;
-            let graphics = &spawned_unit_data.graphics;
-            let movement = spawned_unit_data.movement;
-            let colliders = &spawned_unit_data.colliders;
-            let point_lights = &spawned_unit_data.point_lights;
+            let core = &spawned_unit_data.section.core;
+            let graphics = &spawned_unit_data.section.graphics;
+            let colliders = &spawned_unit_data.section.colliders;
+            let point_lights = &spawned_unit_data.section.point_lights;
+            let turrets = &spawned_unit_data.section.turrets;
+
+            info!("{:?}", turrets);
             commands
                 .entity(*entity)
                 .insert((CustomUnit, EnablePhysics))
                 .insert((
                     Name::new(core.name.clone()),
-                    Section::new(
-                        core.clone(),
-                        colliders.clone(),
-                        graphics.clone(),
-                        movement,
-                        point_lights.clone(),
-                    ),
+                    spawned_unit_data.section.clone(),
                     EnablePhysics,
                     Selectable,
                     WayPointQueue::default(),
@@ -79,11 +79,25 @@ fn check_new_unit(
                     },
                 ))
                 .with_children(|parent| {
-                    for collider in colliders.to_avian2d().iter() {
-                        parent.spawn(collider.clone());
+                    for collider in colliders.to_avian2d().drain(..) {
+                        parent.spawn(collider);
                     }
                     for point_light in point_lights.to_point_light2d().drain(..) {
                         parent.spawn(point_light);
+                    }
+                    for turret in turrets.data.iter() {
+                        parent.spawn((
+                            turret.transform.to_transform(),
+                            Sprite {
+                                image: asset_server.load(
+                                    Path::new(form)
+                                        .parent()
+                                        .unwrap()
+                                        .join(turret.image.path.clone()),
+                                ),
+                                ..Default::default()
+                            },
+                        ));
                     }
                 });
             writer.write(NewSpawnedUnit(*entity));

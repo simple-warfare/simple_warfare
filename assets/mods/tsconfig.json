@@ -10,6 +10,9 @@
       "std:*": [
         "./std/*"
       ],
+      "custom:*": [
+        "./custom/*"
+      ],
     },
     "allowJs": true,
     "declaration": true,

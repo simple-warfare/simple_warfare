@@ -5,7 +5,7 @@ pub mod way_point;
 pub mod light2d;
 pub mod graphic;
 pub mod transform;
-pub mod turrent;
+pub mod turret;
 
 use bevy::prelude::*;
 

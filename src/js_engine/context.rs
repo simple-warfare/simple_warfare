@@ -1,16 +1,5 @@
 use crate::{
-    custom_unit::{
-        light2d::point_light2d::JsPointLight2d,
-        physics::collider::JsCollider,
-        section::{
-            collider::JsColliders,
-            core::Core,
-            graphic::{Graphic, Graphics},
-            light2d::JsPointLights2d,
-            movement::Movement,
-        },
-        unit::SpawnedUnitData,
-    },
+    custom_unit::{section::Section, unit::SpawnedUnitData},
     js_engine::{
         engine::JsEngine,
         event::*,
@@ -26,7 +15,7 @@ use boa_engine::{
     js_string,
     object::builtins::{JsArray, JsProxy},
     prelude::*,
-    value::{TryFromJs, TryIntoJs},
+    value::TryIntoJs,
 };
 use std::{
     path::Path,
@@ -50,9 +39,6 @@ pub(super) fn process_js_event(
 ) -> JsResult<()> {
     let context = &mut engine.context;
     let module_map = &mut engine.module_map;
-    let unit_map = &mut engine.unit_map;
-    let entity_map = &mut engine.entity_map;
-
     match event {
         JsEngineRequestEvent::LoadMod(mod_enable, mod_info) => {
             for (js_asset, classes) in mod_enable.enable {
@@ -90,6 +76,10 @@ pub(super) fn process_js_event(
             }
         }
         JsEngineRequestEvent::SpawnUnit(entity, unit_str) => {
+            let unit_map = &mut engine.unit_map;
+            let entity_map = &mut engine.entity_map;
+            let selected_signal_map = &mut engine.selected_signal_map;
+
             let unit_from: Vec<&str> = unit_str.split(':').collect();
             if let Some(modules) = module_map.get(unit_from[0]) {
                 for module in modules {
@@ -120,42 +110,14 @@ pub(super) fn process_js_event(
                                 .clone(),
                         )?;
 
-                        let graphics = Graphics::new(Vec::<Graphic>::try_from_js(
-                            &JsValue::Object(
-                                unit_proxy
-                                    .get(js_string!("graphics"), context)?
-                                    .to_object(context)?,
-                            ),
-                            context,
-                        )?);
+                        let section = Section::try_from_proxy(&unit_proxy, context)?;
 
-                        let core = Core::try_from_js(
-                            &unit_proxy.get(js_string!("core"), context)?,
-                            context,
-                        )?;
-                        let movement = Movement::try_from_js(
-                            &unit_proxy.get(js_string!("movement"), context)?,
-                            context,
-                        )?;
+                        let selected_signal = unit_proxy
+                            .get(js_string!("selected"), context)?
+                            .to_object(context)?
+                            .clone();
 
-                        let colliders = JsColliders::new(Vec::<JsCollider>::try_from_js(
-                            &JsValue::Object(
-                                unit_proxy
-                                    .get(js_string!("colliders"), context)?
-                                    .to_object(context)?,
-                            ),
-                            context,
-                        )?);
-
-                        let point_lights =
-                            JsPointLights2d::new(Vec::<JsPointLight2d>::try_from_js(
-                                &JsValue::Object(
-                                    unit_proxy
-                                        .get(js_string!("pointLights"), context)?
-                                        .to_object(context)?,
-                                ),
-                                context,
-                            )?);
+                        selected_signal_map.insert(js_entity.clone(), selected_signal);
 
                         let created_signal = unit_proxy
                             .get(js_string!("created"), context)?
@@ -179,13 +141,7 @@ pub(super) fn process_js_event(
                             .send(JsEngineResponseEvent::SpawnedUnit(
                                 entity,
                                 module_path,
-                                SpawnedUnitData::new(
-                                    core,
-                                    graphics,
-                                    movement,
-                                    colliders,
-                                    point_lights,
-                                ),
+                                SpawnedUnitData::new(section),
                             ))
                             .unwrap();
                     }
@@ -193,6 +149,7 @@ pub(super) fn process_js_event(
             }
         }
         JsEngineRequestEvent::GetEntityToTeleport(js_entity, vec2) => {
+            let entity_map = &engine.entity_map;
             response_sender
                 .send(JsEngineResponseEvent::GetedEntityToTeleport(
                     js_entity,
@@ -238,6 +195,26 @@ pub(super) fn process_js_event(
             }
         }
         JsEngineRequestEvent::SignalConnect => todo!(),
+        JsEngineRequestEvent::SelectedSignalEmit => {
+            let selected_signal_map = &engine.selected_signal_map;
+            selected_signal_map.iter().for_each(|(_, signal)| {
+                let connect_array = JsArray::from_object(
+                    signal
+                        .get(js_string!("connectArray"), context)
+                        .unwrap()
+                        .to_object(context)
+                        .unwrap(),
+                )
+                .unwrap();
+
+                let func = connect_array
+                    .get(js_string!("0"), context)
+                    .unwrap()
+                    .as_function()
+                    .unwrap();
+                func.call(&JsValue::Undefined, &[], context).unwrap();
+            });
+        }
     }
     Ok(())
 }

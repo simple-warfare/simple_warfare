@@ -21,5 +21,5 @@ export function fromValues(name = "", hp = 0, maxHp = 0, price = 0, mass = 0., b
     buildSpeed = typeof buildSpeed !== "undefined" ? buildSpeed : 0.;
     radius = typeof radius !== "undefined" ? radius : 0.;
     enablePhysics = typeof enablePhysics !== "undefined" ? enablePhysics : true;
-    return new Core(name, hp, maxHp, price, mass, buildSpeed, radius, enablePhysics)
+    return new Core(name, hp, maxHp, price, mass, buildSpeed, radius, enablePhysics);
 };

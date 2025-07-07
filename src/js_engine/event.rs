@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use boa_engine::object::builtins::JsProxy;
 
 use crate::{
     assets::mods::{
@@ -9,7 +10,7 @@ use crate::{
     js_engine::global::class::entity::JsEntity,
 };
 
-#[derive(Debug, Event, Clone)]
+#[derive(Event)]
 pub enum JsEngineRequestEvent {
     LoadMod(ModEnable, ModInfo),
     SpawnUnit(Entity, String),
@@ -18,6 +19,8 @@ pub enum JsEngineRequestEvent {
     //Signal
     SignalEmit,
     SignalConnect,
+    SelectedSignalEmit,
+    //RemoteJsProxy(Box<dyn Fn(JsProxy) -> String + Send + Sync + 'static>),
 }
 
 #[derive(Debug, Event, Clone)]

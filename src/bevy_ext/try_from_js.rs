@@ -23,6 +23,7 @@ pub fn vec3_try_from_js(value: &JsValue, context: &mut Context) -> JsResult<Vec3
 }
 
 pub fn f32_try_from_js(value: &JsValue, context: &mut Context) -> JsResult<f32> {
+    info!("{:?}{:?}",value,value.to_f32(context)?);
     Ok(value.to_f32(context)?)
 }
 

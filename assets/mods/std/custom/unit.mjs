@@ -16,6 +16,7 @@ export class CustomUnit {
         this.movement = undefined
         this.core = undefined
         this.created = new Signal()
+        this.selected = new Signal()
         this._proxy = new Proxy(this, CustomUnitHandle)
     }
 
@@ -31,9 +32,13 @@ export class CustomUnit {
 
 export const CustomUnitHandle = {
     get(target, prop) {
+        //console.log(`访问属性: ${String(prop)}`)
+        //console.log(`属性类型: ${typeof prop}`)
         return Reflect.get(target, prop)
     },
     set(target, prop, value) {
+        //console.log(`设置属性: ${String(prop)} = ${value}`)
+        //console.log(`属性类型: ${typeof prop}`)
         return Reflect.set(target, prop, value)
     }
 };
