@@ -1,5 +1,10 @@
-class Movement {
-    constructor({ movementType = MovementType.LAND,
+export const MovementType = {
+    LAND: "Land",
+};
+
+export class Movement {
+    constructor(
+        movementType,
         maxMoveSpeed,
         moveAcceleration,
         moveDeceleration,
@@ -7,7 +12,7 @@ class Movement {
         maxTurnSpeed,
         turnAcceleration,
         turnDeceleration,
-    }) {
+    ) {
         this.movementType = movementType
         this.maxMoveSpeed = maxMoveSpeed
         this.moveAcceleration = moveAcceleration
@@ -17,38 +22,25 @@ class Movement {
         this.turnAcceleration = turnAcceleration
         this.turnDeceleration = turnDeceleration
     }
-}
-
-const MovementType = {
-    LAND: "Land",
 };
 
-class MovementBuilder {
-    constructor() {
-        this.params = {
-            movementType: MovementType.LAND,
-            maxMoveSpeed: 0.,
-            moveAcceleration: 0.,
-            moveDeceleration: 0.,
-            reversePercentage: 0.,
-            maxTurnSpeed: 0.,
-            turnAcceleration: 0.,
-            turnDeceleration: 0.,
-        }
-
-        Object.keys(this.params).forEach(key => {
-            const methodName = `with${key.charAt(0).toUpperCase() + key.slice(1)}`
-            this[methodName] = (value) => {
-                this.params[key] = value
-                return this
-            };
-        });
-    };
-
-    build() {
-        return new Movement(this.params)
-    }
+export function fromValues(
+    movementType,
+    maxMoveSpeed,
+    moveAcceleration,
+    moveDeceleration,
+    reversePercentage,
+    maxTurnSpeed,
+    turnAcceleration,
+    turnDeceleration
+) {
+    movementType = typeof movementType !== "undefined" ? movementType : MovementType.LAND;
+    maxMoveSpeed = typeof maxMoveSpeed !== "undefined" ? maxMoveSpeed : 0.;
+    moveAcceleration = typeof moveAcceleration !== "undefined" ? moveAcceleration : 0.;
+    moveDeceleration = typeof moveDeceleration !== "undefined" ? moveDeceleration : 0.;
+    reversePercentage = typeof reversePercentage !== "undefined" ? reversePercentage : 0.;
+    maxTurnSpeed = typeof maxTurnSpeed !== "undefined" ? maxTurnSpeed : 0.;
+    turnAcceleration = typeof turnAcceleration !== "undefined" ? turnAcceleration : 0.;
+    turnDeceleration = typeof turnDeceleration !== "undefined" ? turnDeceleration : 0.;
+    return new Movement(movementType, maxMoveSpeed, moveAcceleration, moveDeceleration, reversePercentage, maxTurnSpeed, turnAcceleration, turnDeceleration)
 };
-
-
-export { Movement, MovementBuilder, MovementType };

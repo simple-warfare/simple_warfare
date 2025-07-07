@@ -1,4 +1,4 @@
-class Signal {
+export class Signal {
     constructor() {
         this.connectArray = new Array()
     }
@@ -10,9 +10,4 @@ class Signal {
     emit(args) {
         sw.signal_emit(this, args)
     }
-}
-
-
-
-
-export { Signal };
+};

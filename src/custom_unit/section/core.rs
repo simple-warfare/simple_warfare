@@ -5,10 +5,10 @@ pub struct Core {
     pub name: String,
     pub hp: u32,
     pub price: u32,
+    pub max_hp: u32,
     pub mass: f32,
     pub build_speed: f32,
     pub radius: f32,
-    pub max_hp: u32,
     pub enable_physics: bool,
 }
 

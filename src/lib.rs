@@ -11,20 +11,24 @@ pub mod statistics;
 pub mod system;
 pub mod utils;
 
-use avian2d::prelude::*;
-use bevy::{app::PluginGroupBuilder, prelude::*};
-use bevy_ecs_ldtk::prelude::*;
-use bevy_fly_camera::FlyCameraPlugin;
-use bevy_inspector_egui::quick::StateInspectorPlugin;
-use bevy_light_2d::prelude::*;
-use bevy_panic_handler::PanicHandler;
-use js_engine::JsEnginePlugin;
-
 use crate::{
     app_state::AppState, assets::AssetsPlugin, custom_unit::CustomUnitPlugin,
     lua_engine::LuaEnginePlugin, mod_engine::ModEnginePlugin, scenes::ScenePlugin,
     statistics::StatistcsPlugin, system::SystemPlugin,
 };
+use avian2d::prelude::*;
+use bevy::{
+    app::PluginGroupBuilder,
+    prelude::*,
+    remote::{RemotePlugin, http::RemoteHttpPlugin},
+};
+use bevy_ecs_ldtk::prelude::*;
+use bevy_fly_camera::FlyCameraPlugin;
+use bevy_hui::prelude::*;
+use bevy_inspector_egui::quick::StateInspectorPlugin;
+use bevy_light_2d::prelude::*;
+use bevy_panic_handler::PanicHandler;
+use js_engine::JsEnginePlugin;
 
 pub struct SimpleWarfarePlugins;
 
@@ -50,6 +54,11 @@ impl Plugin for SimpleWarfarePlugin {
     fn build(&self, app: &mut App) {
         app.init_state::<AppState>()
             .register_type::<AppState>()
+            .add_plugins((
+                RemotePlugin::default(),
+                RemoteHttpPlugin::default(),
+                HuiPlugin,
+            ))
             .add_plugins(PhysicsPlugins::default())
             .add_plugins(PhysicsDebugPlugin::default())
             .add_plugins(StateInspectorPlugin::<AppState>::default())

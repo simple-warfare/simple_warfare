@@ -51,11 +51,13 @@ bevy_hanabi = { version = "0.16", default-features = false, features = [
   "2d",
   "serde",
 ] }
-
+bevy_hui = "0.4.0"
 
 [dependencies.bevy]
 version = "0.16.1"
 features = [
+  "bevy_remote",
+  "file_watcher",
   "animation",
   "bevy_asset",
   "bevy_color",
@@ -91,6 +93,8 @@ features = [
 [dev-dependencies.bevy]
 version = "0.16.1"
 features = [
+  "bevy_remote",
+  "file_watcher",
   "animation",
   "bevy_asset",
   "bevy_color",

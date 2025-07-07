@@ -1,36 +1,28 @@
-import { CoreBuilder } from "std:section/core.mjs"
+import { fromValues as CoreFromValues } from "std:section/core.mjs"
 import { CustomUnit } from "std:custom/unit.mjs"
-import { GraphicBuilder } from "std:section/graphic.mjs"
-import { Movement } from "std:section/movement.mjs";
+import { fromValues as GraphicFromValues } from "std:section/graphic.mjs"
+import { fromValues as movementFromValues } from "std:section/movement.mjs";
 import { CircleCollider, ColliderType } from "std:physics/collider.mjs";
 import { Signal } from "std:signal/signal.mjs";
 import { PointLight2d } from "std:section/light2d.mjs";
 import Color from "package:color/index.js";
 import colors from 'package:color-name/index.js';
-import { fromValues } from "std:bevy/transform/transform.mjs";
-import { fromValues as fromValuesVec3 } from "package:gl-matrix/vec3.js"
-import { fromValues as fromValuesVec2 } from "package:gl-matrix/vec2.js"
+import { fromValues as transformFromValues } from "std:bevy/transform/transform.mjs";
+import { fromValues as vec3FromValues } from "package:gl-matrix/vec3.js"
+import { fromValues as vec2FromValues } from "package:gl-matrix/vec2.js"
 
 class Builder extends CustomUnit {
     constructor(entity) {
         super(entity)
-        this.core = new CoreBuilder().withName("建造者").withMass(100.).build()
-        this.graphics.push(new GraphicBuilder().withPath("builder.png").withFrameHeight(100).withFrameWidth(100).build())
-        this.movement = new Movement({
-            maxMoveSpeed: 10.,
-            moveAcceleration: 3.,
-            moveDeceleration: 3.,
-            reversePercentage: 10.,
-            maxTurnSpeed: 10.,
-            turnAcceleration: 10.,
-            turnDeceleration: 10.,
-        })
+        this.core = CoreFromValues("建造者", 100, 100, 100, 100., 10., 50., true)
+        this.graphics.push(GraphicFromValues(undefined, "builder.png", undefined, undefined, undefined))
+        this.movement = movementFromValues(undefined,10., 3., 3., 10., 10., 10., 10.)
         this.colliders.push(new CircleCollider(ColliderType.Circle, 30.))
 
         this.created_func = () => {
-            this.teleportSelfTo(fromValuesVec2(
-                Math.floor(Math.random()*(500+1)),
-                Math.floor(Math.random()*(500+1)),))
+            this.teleportSelfTo(vec2FromValues(
+                Math.floor(Math.random() * (300 + 1)),
+                Math.floor(Math.random() * (300 + 1)),))
             this.print_string_when_created.emit(this.name)
             this.print_string_when_created.emit("print_string_when_created")
         }
@@ -41,11 +33,11 @@ class Builder extends CustomUnit {
         this.print_string_when_created = new Signal()
         this.print_string_when_created.connect(this.print_string)
 
-        this.pointLights.push(new PointLight2d(fromValues(fromValuesVec3(10., 0., 0.), undefined, undefined), 50., Color(colors.red), 0.2, 130., false))
-        this.pointLights.push(new PointLight2d(fromValues(fromValuesVec3(-10., 0., 0.), undefined, undefined), 50., Color(colors.red), 0.2, 130., false))
+        this.pointLights.push(new PointLight2d(transformFromValues(vec3FromValues(10., 0., 0.), undefined, undefined), 50., Color(colors.red), 0.2, 130., false))
+        this.pointLights.push(new PointLight2d(transformFromValues(vec3FromValues(-10., 0., 0.), undefined, undefined), 50., Color(colors.red), 0.2, 130., false))
 
-        this.pointLights.push(new PointLight2d(fromValues(fromValuesVec3(-15., -10., 0.), undefined, undefined), 50., Color(colors.red), 0.2, 130., false))
-        this.pointLights.push(new PointLight2d(fromValues(fromValuesVec3(15., -10., 0.), undefined, undefined), 50., Color(colors.red), 0.2, 130., false))
+        this.pointLights.push(new PointLight2d(transformFromValues(vec3FromValues(-15., -10., 0.), undefined, undefined), 50., Color(colors.red), 0.2, 130., false))
+        this.pointLights.push(new PointLight2d(transformFromValues(vec3FromValues(15., -10., 0.), undefined, undefined), 50., Color(colors.red), 0.2, 130., false))
     }
 }
 

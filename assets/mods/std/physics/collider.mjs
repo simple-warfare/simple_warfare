@@ -1,20 +1,18 @@
-const ColliderType = {
+export const ColliderType = {
     Circle: 'Circle',
     Rectangle: 'Rectangle',
 };
 
-class CircleCollider {
+export class CircleCollider {
     constructor(type, radius) {
         this.type = type
         this.radius = radius
     }
-}
-class RectangleCollider {
+};
+export class RectangleCollider {
     constructor(type, width, height) {
         this.type = type
         this.width = width
         this.height = height
     }
-}
-
-export { ColliderType, CircleCollider, RectangleCollider };
+};

@@ -24,14 +24,9 @@ fn setup(mut commands: Commands, _game_asset: Res<GameAsset>, mod_server: Res<Mo
         FlyCamera2d::default(),
         Projection::Orthographic(OrthographicProjection::default_2d()),
     ));
-    commands.spawn((PointLight2d {
-        radius: 48.0,
-        color: Color::Srgba(YELLOW),
-        intensity: 2.0,
-        falloff: 4.0,
-        ..default()
-    },));
-    //mod_server.spawn_unit(commands.spawn_empty().id(), "example:Tank");
+
+    mod_server.spawn_unit(commands.spawn_empty().id(), "example:Tank");
+    mod_server.spawn_unit(commands.spawn_empty().id(), "example:Tank");
     mod_server.spawn_unit(commands.spawn_empty().id(), "example:Builder");
     mod_server.spawn_unit(commands.spawn_empty().id(), "example:Builder");
     mod_server.spawn_unit(commands.spawn_empty().id(), "example:Builder");

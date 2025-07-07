@@ -1,7 +1,13 @@
-import { create } from "std:bevy/transform/transform.mjs"
+import { create as transformCreate } from "std:bevy/transform/transform.mjs"
 
-class Graphic {
-    constructor({ transform = create(), path, layer, frameWidth, frameHeight }) {
+export class Graphic {
+    constructor(
+        transform,
+        path,
+        layer,
+        frameWidth,
+        frameHeight
+    ) {
         this.transform = transform
         this.path = path
         this.layer = layer
@@ -10,28 +16,13 @@ class Graphic {
     }
 }
 
-class GraphicBuilder {
-    constructor() {
-        this.params = {
-            transform: create(),
-            path: '',
-            layer: 1,
-            frameWidth: 0,
-            frameHeight: 0
-        }
 
-        Object.keys(this.params).forEach(key => {
-            const methodName = `with${key.charAt(0).toUpperCase() + key.slice(1)}`
-            this[methodName] = (value) => {
-                this.params[key] = value
-                return this
-            }
-        })
-    }
+export function fromValues(transform, path, layer, frameWidth, frameHeight) {
+    transform = typeof transform !== "undefined" ? transform : transformCreate();
+    path = typeof path !== "undefined" ? path : "";
+    layer = typeof layer !== "undefined" ? layer : 0;
+    frameWidth = typeof frameWidth !== "undefined" ? frameWidth : 0;
+    frameHeight = typeof frameHeight !== "undefined" ? frameHeight : 0;
+    return new Graphic(transform, path, layer, frameWidth, frameHeight)
+};
 
-    build() {
-        return new Graphic(this.params)
-    }
-}
-
-export { Graphic, GraphicBuilder };

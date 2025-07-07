@@ -1,5 +1,5 @@
-class Core {
-    constructor({ name, hp, maxHp, price, mass, buildSpeed, radius, enablePhysics }) {
+export class Core {
+    constructor(name, hp, maxHp, price, mass, buildSpeed, radius, enablePhysics) {
         this.name = name
         this.hp = hp
         this.maxHp = maxHp
@@ -9,35 +9,17 @@ class Core {
         this.radius = radius
         this.enablePhysics = enablePhysics
     }
-}
-
-
-class CoreBuilder {
-    constructor() {
-        this.params = {
-            name: "",
-            hp: 0,
-            maxHp: 0,
-            price: 0,
-            mass: 0.,
-            buildSpeed: 0.,
-            radius: 0.,
-            enablePhysics: true
-        }
-
-        Object.keys(this.params).forEach(key => {
-            const methodName = `with${key.charAt(0).toUpperCase() + key.slice(1)}`
-            this[methodName] = (value) => {
-                this.params[key] = value
-                return this
-            };
-        });
-    };
-
-    build() {
-        return new Core(this.params)
-    }
 };
 
 
-export { Core, CoreBuilder };
+export function fromValues(name = "", hp = 0, maxHp = 0, price = 0, mass = 0., buildSpeed = 0., radius = 0., enablePhysics = true) {
+    name = typeof name !== "undefined" ? name : "undefinedName";
+    hp = typeof hp !== "undefined" ? hp : 0;
+    maxHp = typeof maxHp !== "undefined" ? maxHp : 0;
+    price = typeof price !== "undefined" ? price : 0;
+    mass = typeof mass !== "undefined" ? mass : 0.;
+    buildSpeed = typeof buildSpeed !== "undefined" ? buildSpeed : 0.;
+    radius = typeof radius !== "undefined" ? radius : 0.;
+    enablePhysics = typeof enablePhysics !== "undefined" ? enablePhysics : true;
+    return new Core(name, hp, maxHp, price, mass, buildSpeed, radius, enablePhysics)
+};

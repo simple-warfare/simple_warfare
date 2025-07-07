@@ -1,5 +1,3 @@
-const TeleportType = {
+export const TeleportType = {
     Position: 'Position',
-}
-
-export { TeleportType };
+};

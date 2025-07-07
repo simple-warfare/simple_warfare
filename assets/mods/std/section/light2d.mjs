@@ -1,9 +1,9 @@
 import Color from "package:color/index.js";
-import { Transform } from "std:bevy/transform/transform.mjs";
+import { create as transformCreate } from "std:bevy/transform/transform.mjs";
 
-class PointLight2d {
+export class PointLight2d {
     constructor(
-        transform = new Transform(),
+        transform = transformCreate(),
         radius = 0.5,
         color = Color({ r: 255, g: 255, b: 255, alpha: 0.5 }),
         intensity = 1.0,
@@ -17,7 +17,15 @@ class PointLight2d {
         this.falloff = falloff
         this.cast_shadows = cast_shadows
     }
-}
+};
 
-
-export { PointLight2d };
+export function fromValues(
+    transform = create(),
+    radius = 0.5,
+    color = Color({ r: 255, g: 255, b: 255, alpha: 0.5 }),
+    intensity = 1.0,
+    falloff = 0.0,
+    cast_shadows = false
+) {
+    return new PointLight2d(transform, radius, color, intensity, falloff, cast_shadows)
+};
