@@ -82,8 +82,8 @@ fn check_new_unit(
                     for collider in colliders.to_avian2d().iter() {
                         parent.spawn(collider.clone());
                     }
-                    for point_light in point_lights.to_point_light2d().iter() {
-                        parent.spawn(point_light.clone());
+                    for point_light in point_lights.to_point_light2d().drain(..) {
+                        parent.spawn(point_light);
                     }
                 });
             writer.write(NewSpawnedUnit(*entity));

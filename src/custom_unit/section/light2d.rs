@@ -1,5 +1,4 @@
 use bevy::prelude::*;
-use bevy_light_2d::prelude::*;
 use boa_engine::value::TryFromJs;
 
 use crate::custom_unit::light2d::point_light2d::JsPointLight2d;
@@ -13,7 +12,7 @@ impl JsPointLights2d {
         Self { data: colliders }
     }
 
-    pub fn to_point_light2d(&self) -> Vec<PointLight2d> {
+    pub fn to_point_light2d(&self) -> Vec<impl Bundle> {
         self.data
             .iter()
             .map(|collider| collider.to_point_light2d())

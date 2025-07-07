@@ -1,7 +1,7 @@
-import { Transform } from "std:bevy/transform/transform.mjs"
+import { create } from "std:bevy/transform/transform.mjs"
 
 class Graphic {
-    constructor({ transform = new Transform(), path, layer, frameWidth, frameHeight }) {
+    constructor({ transform = create(), path, layer, frameWidth, frameHeight }) {
         this.transform = transform
         this.path = path
         this.layer = layer
@@ -13,7 +13,7 @@ class Graphic {
 class GraphicBuilder {
     constructor() {
         this.params = {
-            transform: new Transform(),
+            transform: create(),
             path: '',
             layer: 1,
             frameWidth: 0,

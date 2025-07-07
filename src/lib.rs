@@ -14,6 +14,7 @@ pub mod utils;
 use avian2d::prelude::*;
 use bevy::{app::PluginGroupBuilder, prelude::*};
 use bevy_ecs_ldtk::prelude::*;
+use bevy_enhanced_input::prelude::*;
 use bevy_fly_camera::FlyCameraPlugin;
 use bevy_inspector_egui::quick::StateInspectorPlugin;
 use bevy_light_2d::prelude::*;
@@ -50,6 +51,7 @@ impl Plugin for SimpleWarfarePlugin {
     fn build(&self, app: &mut App) {
         app.init_state::<AppState>()
             .register_type::<AppState>()
+            .add_plugins(EnhancedInputPlugin)
             .add_plugins(PhysicsPlugins::default())
             .add_plugins(PhysicsDebugPlugin::default())
             .add_plugins(StateInspectorPlugin::<AppState>::default())

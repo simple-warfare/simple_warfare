@@ -2,8 +2,11 @@ use bevy::prelude::*;
 use bevy_light_2d::light::PointLight2d;
 use boa_engine::{JsResult, js_string, object::builtins::JsArray, prelude::*, value::TryFromJs};
 
+use crate::custom_unit::transform::transform::JsTransform;
+
 #[derive(Debug, Clone, Component, Reflect)]
 pub struct JsPointLight2d {
+    pub transform: JsTransform,
     /// The light's color tint.
     pub color: Color,
     /// The intensity of the light. The light's attenutation is multiplied by this value.
@@ -21,6 +24,7 @@ pub struct JsPointLight2d {
 impl Default for JsPointLight2d {
     fn default() -> Self {
         Self {
+            transform: JsTransform::default(),
             color: Color::WHITE,
             intensity: 1.0,
             radius: 0.5,
@@ -45,22 +49,18 @@ impl TryFromJs for JsPointLight2d {
         let valpha = color_object
             .get(js_string!("valpha"), context)?
             .to_f32(context)?;
-        info!("{:?}", color.length(context));
-        info!(
-            "r:{}g:{}b:{}a:{}",
-            color.at(0, context)?.to_f32(context)?,
-            color.at(1, context)?.to_f32(context)?,
-            color.at(2, context)?.to_f32(context)?,
-            valpha
-        );
+
         let model = color_object
             .get(js_string!("model"), context)?
             .to_string(context)?
             .to_std_string_lossy();
 
-        info!("{model}");
         match model.as_str() {
             "rgb" => Ok(Self {
+                transform: JsTransform::try_from_js(
+                    &point_light2d_object.get(js_string!("transform"), context)?,
+                    context,
+                )?,
                 color: Color::LinearRgba(LinearRgba::new(
                     color.at(0, context)?.to_f32(context)?,
                     color.at(1, context)?.to_f32(context)?,
@@ -86,13 +86,16 @@ impl TryFromJs for JsPointLight2d {
 }
 
 impl JsPointLight2d {
-    pub fn to_point_light2d(&self) -> PointLight2d {
-        PointLight2d {
-            color: self.color,
-            intensity: self.intensity,
-            radius: self.radius,
-            falloff: self.falloff,
-            cast_shadows: self.cast_shadows,
-        }
+    pub fn to_point_light2d(&self) -> impl Bundle {
+        (
+            self.transform.to_transform(),
+            PointLight2d {
+                color: self.color,
+                intensity: self.intensity,
+                radius: self.radius,
+                falloff: self.falloff,
+                cast_shadows: self.cast_shadows,
+            },
+        )
     }
 }

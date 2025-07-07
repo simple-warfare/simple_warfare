@@ -1,7 +1,7 @@
 use crate::bevy_ext::try_from_js::*;
 use bevy::prelude::*;
 use boa_engine::value::TryFromJs;
-#[derive(Debug, Clone, Component, Reflect, TryFromJs)]
+#[derive(Debug, Default, Clone, Component, Reflect, TryFromJs)]
 pub struct JsTransform {
     /// Position of the entity. In 2d, the last value of the `Vec3` is used for z-ordering.
     ///

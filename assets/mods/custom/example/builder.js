@@ -7,6 +7,9 @@ import { Signal } from "std:signal/signal.mjs";
 import { PointLight2d } from "std:section/light2d.mjs";
 import Color from "package:color/index.js";
 import colors from 'package:color-name/index.js';
+import { fromValues } from "std:bevy/transform/transform.mjs";
+import { fromValues as fromValuesVec3 } from "package:gl-matrix/vec3.js"
+import { fromValues as fromValuesVec2 } from "package:gl-matrix/vec2.js"
 
 class Builder extends CustomUnit {
     constructor(entity) {
@@ -25,19 +28,24 @@ class Builder extends CustomUnit {
         this.colliders.push(new CircleCollider(ColliderType.Circle, 30.))
 
         this.created_func = () => {
-            console.log("created")
+            this.teleportSelfTo(fromValuesVec2(
+                Math.floor(Math.random()*(500+1)),
+                Math.floor(Math.random()*(500+1)),))
             this.print_string_when_created.emit(this.name)
             this.print_string_when_created.emit("print_string_when_created")
         }
         this.created.connect(this.created_func)
 
         this.print_string = (string) => {
-            console.log(JSON.stringify(string))
         }
         this.print_string_when_created = new Signal()
         this.print_string_when_created.connect(this.print_string)
 
-        this.pointLights.push(new PointLight2d(60., Color(colors.red), 0.2, 120., false))
+        this.pointLights.push(new PointLight2d(fromValues(fromValuesVec3(10., 0., 0.), undefined, undefined), 50., Color(colors.red), 0.2, 130., false))
+        this.pointLights.push(new PointLight2d(fromValues(fromValuesVec3(-10., 0., 0.), undefined, undefined), 50., Color(colors.red), 0.2, 130., false))
+
+        this.pointLights.push(new PointLight2d(fromValues(fromValuesVec3(-15., -10., 0.), undefined, undefined), 50., Color(colors.red), 0.2, 130., false))
+        this.pointLights.push(new PointLight2d(fromValues(fromValuesVec3(15., -10., 0.), undefined, undefined), 50., Color(colors.red), 0.2, 130., false))
     }
 }
 
