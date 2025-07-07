@@ -1,5 +1,3 @@
-use bevy::{color::palettes::css::*, input::mouse::MouseButtonInput, prelude::*};
-
 use crate::{
     custom_unit::{
         physics::EnablePhysics,
@@ -9,6 +7,7 @@ use crate::{
     scenes::SceneState,
     statistics::*,
 };
+use bevy::{color::palettes::css::*, input::mouse::MouseButtonInput, prelude::*};
 
 pub struct InputSystemPlugin;
 
@@ -97,23 +96,13 @@ pub fn calculate_world_position_of_selection(
     Ok(())
 }
 
-pub fn draw_selection_box(
-    mut gizmos: Gizmos,
-    selection_state: Res<SelectionState>,
-    camera: Single<(&Camera, &GlobalTransform)>,
-) -> Result {
+pub fn draw_selection_box(mut gizmos: Gizmos, selection_state: Res<SelectionState>) -> Result {
     if selection_state.is_selecting {
-        let (camera, camera_transform) = *camera;
-        let start = selection_state.start;
-        let end = selection_state.end;
+        let start = selection_state.real_start;
+        let end = selection_state.real_end;
         let size = Vec2::new(start.x - end.x, start.y - end.y);
         gizmos.rect_2d(
-            Isometry2d::from_translation(
-                camera.viewport_to_world_2d(
-                    camera_transform,
-                    Rect::from_corners(start, end).center(),
-                )?,
-            ),
+            Isometry2d::from_translation(Rect::from_corners(start, end).center()),
             size,
             GREEN,
         );

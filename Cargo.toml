@@ -52,7 +52,6 @@ bevy_hanabi = { version = "0.16", default-features = false, features = [
   "serde",
 ] }
 
-bevy_enhanced_input = "0.14.1"
 
 [dependencies.bevy]
 version = "0.16.1"
