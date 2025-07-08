@@ -1,7 +1,10 @@
 pub mod plugin;
 use bevy::prelude::*;
 use boa_engine::{
-    JsResult, js_string, object::ObjectInitializer, prelude::*, property::Attribute,
+    JsResult, js_string,
+    object::{ObjectInitializer, builtins::JsArray},
+    prelude::*,
+    property::Attribute,
     value::TryFromJs,
 };
 use std::sync::{
@@ -9,10 +12,7 @@ use std::sync::{
     mpsc::{Receiver, Sender},
 };
 
-use crate::{bevy_ext::try_from_js::vec2_try_from_js, js_engine::{
-    global::class::entity::JsEntity,
-    signal::{EmitSignal, HostDefinedSignalSystem},
-}};
+use crate::{bevy_ext::try_from_js::vec2_try_from_js, js_engine::global::class::entity::JsEntity};
 
 #[derive(Resource)]
 pub struct SwRequestReceiver(pub Arc<Mutex<Receiver<SwRequestEvent>>>);
@@ -26,7 +26,6 @@ pub struct Sw;
 #[derive(Event, Clone)]
 pub enum SwRequestEvent {
     Teleport(TeleportType),
-    EmitSignal,
 }
 
 #[derive(Event, Clone)]
@@ -87,18 +86,21 @@ impl Sw {
             })
         };
         let signal_emit = unsafe {
-            let sw_request_sender = sw_request_sender.clone();
-            NativeFunction::from_closure(move |_referrer, args, ctx| {
+            NativeFunction::from_closure(|_referrer, args, ctx| {
                 let signal = args.first().unwrap().to_object(ctx)?;
 
                 let signal_args = args[1..].to_owned();
-                ctx.realm()
-                    .host_defined_mut()
-                    .get_mut::<HostDefinedSignalSystem>()
-                    .unwrap()
-                    .insert_emit_signal(EmitSignal::new(signal, signal_args));
+                let connect_array = JsArray::from_object(
+                    signal
+                        .get(js_string!("connectArray"), ctx)?
+                        .to_object(ctx)?,
+                )?;
 
-                sw_request_sender.send(SwRequestEvent::EmitSignal).unwrap();
+                let func = connect_array
+                    .get(js_string!("0"), ctx)?
+                    .as_function()
+                    .unwrap();
+                func.call(&JsValue::Undefined, &signal_args, ctx)?;
                 Ok(JsValue::undefined())
             })
         };

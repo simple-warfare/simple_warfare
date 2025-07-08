@@ -17,8 +17,6 @@ pub enum JsEngineRequestEvent {
     GetEntityToTeleport(JsEntity, Vec2),
 
     //Signal
-    SignalEmit,
-    SignalConnect,
     SelectedSignalEmit,
     //RemoteJsProxy(Box<dyn Fn(JsProxy) -> String + Send + Sync + 'static>),
 }

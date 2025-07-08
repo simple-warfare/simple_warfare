@@ -1,12 +1,6 @@
 use crate::{
     custom_unit::{section::Section, unit::SpawnedUnitData},
-    js_engine::{
-        engine::JsEngine,
-        event::*,
-        global::class::entity::JsEntity,
-        module::ModModule,
-        signal::{EmitSignal, HostDefinedSignalSystem},
-    },
+    js_engine::{engine::JsEngine, event::*, global::class::entity::JsEntity, module::ModModule},
 };
 use bevy::prelude::*;
 use boa_engine::{
@@ -124,15 +118,7 @@ pub(super) fn process_js_event(
                             .to_object(context)?
                             .clone();
 
-                        context
-                            .realm()
-                            .host_defined_mut()
-                            .get_mut::<HostDefinedSignalSystem>()
-                            .unwrap()
-                            .insert_emit_signal(EmitSignal::new(created_signal, &[]));
-                        request_sender
-                            .send(JsEngineRequestEvent::SignalEmit)
-                            .unwrap();
+                        emit_signal(&created_signal, &[], context)?;
 
                         unit_map.insert(entity, unit_proxy);
                         entity_map.insert(js_entity, entity);
@@ -158,43 +144,6 @@ pub(super) fn process_js_event(
                 ))
                 .unwrap();
         }
-        JsEngineRequestEvent::SignalEmit => {
-            if context
-                .realm()
-                .host_defined()
-                .get::<HostDefinedSignalSystem>()
-                .unwrap()
-                .signal_emit_queue
-                .is_empty()
-            {
-                return Ok(());
-            }
-            let signal_emit_queue: Vec<EmitSignal> = context
-                .realm()
-                .host_defined_mut()
-                .get_mut::<HostDefinedSignalSystem>()
-                .unwrap()
-                .signal_emit_queue
-                .drain(..)
-                .collect();
-
-            for emit_signal in signal_emit_queue {
-                let signal = &emit_signal.signal;
-
-                let connect_array = JsArray::from_object(
-                    signal
-                        .get(js_string!("connectArray"), context)?
-                        .to_object(context)?,
-                )?;
-
-                let func = connect_array
-                    .get(js_string!("0"), context)?
-                    .as_function()
-                    .unwrap();
-                func.call(&JsValue::Undefined, &emit_signal.args, context)?;
-            }
-        }
-        JsEngineRequestEvent::SignalConnect => todo!(),
         JsEngineRequestEvent::SelectedSignalEmit => {
             let selected_signal_map = &engine.selected_signal_map;
             selected_signal_map.iter().for_each(|(_, signal)| {
@@ -216,5 +165,20 @@ pub(super) fn process_js_event(
             });
         }
     }
+    Ok(())
+}
+
+fn emit_signal(signal: &JsObject, args: &[JsValue], context: &mut Context) -> JsResult<()> {
+    let connect_array = JsArray::from_object(
+        signal
+            .get(js_string!("connectArray"), context)?
+            .to_object(context)?,
+    )?;
+
+    for i in 0..connect_array.length(context)? {
+        let func = connect_array.at(i as i64, context)?.as_function().unwrap();
+        func.call(&JsValue::Undefined, args, context)?;
+    }
+
     Ok(())
 }

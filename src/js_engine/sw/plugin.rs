@@ -40,9 +40,6 @@ fn handle_sw_event(
                     //transform.translation = Vec3::new(vec2.x, vec2.y, transform.translation.z);
                 }
             },
-            SwRequestEvent::EmitSignal => js_engine_event_sender
-                .0
-                .send(JsEngineRequestEvent::SignalEmit)?,
         }
     }
 

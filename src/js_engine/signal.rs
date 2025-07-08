@@ -1,7 +1,7 @@
 use boa_engine::prelude::*;
 
 pub type JsSignal = JsObject;
-
+/*
 #[derive(Default, Trace, Finalize, JsData)]
 pub struct HostDefinedSignalSystem {
     #[unsafe_ignore_trace]
@@ -28,7 +28,7 @@ impl EmitSignal {
         }
     }
 }
-/*
+
 #[derive(Debug, Clone, JsData, Trace, Finalize, TryIntoJs, TryFromJs)]
 pub struct Signal {
     pub name: JsString,

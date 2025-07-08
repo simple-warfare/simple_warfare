@@ -23,7 +23,6 @@ use crate::{
         global::class::entity::JsEntity,
         loader::SimpleWarfareModuleLoader,
         module::ModModule,
-        signal::HostDefinedSignalSystem,
         sw::{Sw, SwRequestEvent, SwResponseEvent},
     },
 };
@@ -202,11 +201,11 @@ fn register_global_callable(
 }
 
 fn insert_host_defined_data(ctx: &mut Context) {
-    let signal_system = HostDefinedSignalSystem::default();
+    //let signal_system = HostDefinedSignalSystem::default();
     //signal_system.signal_map.insert(
     //    js_string!("custom_unit_spwaned"),
     //    Signal::new(js_string!("custom_unit_spwaned")),
     //);
 
-    ctx.realm().host_defined_mut().insert(signal_system);
+    //ctx.realm().host_defined_mut().insert(signal_system);
 }

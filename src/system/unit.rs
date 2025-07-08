@@ -52,7 +52,6 @@ fn check_new_unit(
             let point_lights = &spawned_unit_data.section.point_lights;
             let turrets = &spawned_unit_data.section.turrets;
 
-            info!("{:?}", turrets);
             commands
                 .entity(*entity)
                 .insert((CustomUnit, EnablePhysics))

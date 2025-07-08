@@ -8,9 +8,12 @@ pub mod plugin;
 pub mod signal;
 pub mod sw;
 
-use std::sync::{
-    Arc, Mutex,
-    mpsc::{self, Receiver, Sender},
+use std::{
+    path::PathBuf,
+    sync::{
+        Arc, Mutex,
+        mpsc::{self, Receiver, Sender},
+    },
 };
 
 use crate::{
@@ -103,6 +106,7 @@ fn init_js_context(mut commands: Commands) -> Result {
     std::thread::spawn(move || {
         let engine = &mut JsEngine::new(
             SimpleWarfareModuleLoader::new(
+                "assets/",
                 Arc::new(sw_module_request_sender),
                 Arc::new(Mutex::new(sw_module_response_receiver)),
             )

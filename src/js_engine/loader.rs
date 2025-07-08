@@ -1,9 +1,18 @@
-use std::sync::{
-    Arc, Mutex,
-    mpsc::{Receiver, Sender},
+use std::{
+    path::{Path, PathBuf},
+    sync::{
+        Arc, Mutex,
+        mpsc::{Receiver, Sender},
+    },
 };
 
-use crate::{assets::mods::js::JsAsset, js_engine::event::{SwModuleLoaderRequestEvent, SwModuleLoaderResponseEvent, SwRequireLoaderRequestEvent, SwRequireLoaderResponseEvent}};
+use crate::{
+    assets::mods::js::JsAsset,
+    js_engine::event::{
+        SwModuleLoaderRequestEvent, SwModuleLoaderResponseEvent, SwRequireLoaderRequestEvent,
+        SwRequireLoaderResponseEvent,
+    },
+};
 use bevy::prelude::*;
 use boa_engine::{
     JsResult, js_string,
@@ -31,6 +40,7 @@ pub struct SwRequireLoaderResponseSender(pub Arc<Sender<SwRequireLoaderResponseE
 
 #[derive(Debug)]
 pub struct SimpleWarfareModuleLoader {
+    root: PathBuf,
     module_map: GcRefCell<FxHashMap<String, Module>>,
     path_url: Arc<FxHashMap<&'static str, &'static str>>,
     request_sender: Arc<Sender<SwModuleLoaderRequestEvent>>,
@@ -38,7 +48,8 @@ pub struct SimpleWarfareModuleLoader {
 }
 
 impl SimpleWarfareModuleLoader {
-    pub fn new(
+    pub fn new<P: AsRef<Path>>(
+        root: P,
         request_sender: Arc<Sender<SwModuleLoaderRequestEvent>>,
         response_receiver: Arc<Mutex<Receiver<SwModuleLoaderResponseEvent>>>,
     ) -> JsResult<Self> {
@@ -48,12 +59,18 @@ impl SimpleWarfareModuleLoader {
                 .with_message("cannot resolve a relative path in WASM targets")
                 .into());
         }
-
+        let root = root.as_ref();
+        let absolute = root.canonicalize().map_err(|e| {
+            JsNativeError::typ()
+                .with_message(format!("could not set module root `{}`", root.display()))
+                .with_cause(JsError::from_opaque(js_string!(e.to_string()).into()))
+        })?;
         let mut path_url = FxHashMap::default();
         path_url.insert("std", "mods/std/");
         path_url.insert("package", "mods/package/");
         path_url.insert("custom", "mods/custom/");
         Ok(Self {
+            root: absolute,
             module_map: GcRefCell::default(),
             path_url: Arc::new(path_url),
             request_sender,
@@ -124,15 +141,14 @@ impl SimpleWarfareModuleLoader {
 impl ModuleLoader for SimpleWarfareModuleLoader {
     fn load_imported_module(
         &self,
-        _referrer: Referrer,
+        referrer: Referrer,
         specifier: JsString,
         finish_load: Box<dyn FnOnce(JsResult<Module>, &mut Context)>,
         context: &mut Context,
     ) {
         let result = (|| {
-            
             let specifier = specifier.to_std_string_escaped();
-            
+
             let specifier_url = Url::parse(&specifier).map_err(|err| {
                 JsNativeError::typ()
                     .with_message(format!("could not parse url `{specifier}`"))
