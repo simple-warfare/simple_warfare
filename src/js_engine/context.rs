@@ -106,6 +106,13 @@ pub(super) fn process_js_event(
                                 .to_object(context)?
                                 .clone(),
                         )?;
+                        emit_signal(
+                            &unit_proxy
+                                .get(js_string!("created"), context)?
+                                .to_object(context)?,
+                            &[],
+                            context,
+                        )?;
 
                         let section = Section::try_from_proxy(&unit_proxy, context)?;
 
