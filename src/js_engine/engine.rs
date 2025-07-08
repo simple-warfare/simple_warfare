@@ -205,4 +205,11 @@ fn insert_host_defined_data(ctx: &mut Context) {
     ctx.realm()
         .host_defined_mut()
         .insert(SelectedSignalMap::default());
+    ctx.realm()
+        .host_defined_mut()
+        .insert(UnitEnterSignalMap::default());
+
+    ctx.realm()
+        .host_defined_mut()
+        .insert(UnitExitSignalMap::default());
 }

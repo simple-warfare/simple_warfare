@@ -6,6 +6,8 @@ use boa_engine::{JsResult, value::TryFromJs};
 pub enum JsDefaultSignalType {
     Created,
     Selected,
+    UnitEnter,
+    UnitExit
 }
 
 impl TryFromJs for JsDefaultSignalType {
@@ -13,8 +15,10 @@ impl TryFromJs for JsDefaultSignalType {
         match value.to_string(context)?.to_std_string_lossy().as_str() {
             "Created" => Ok(Self::Created),
             "Selected" => Ok(Self::Selected),
+            "UnitEnter" => Ok(Self::UnitEnter),
+            "UnitExit" => Ok(Self::UnitExit),
             _ => Err(JsNativeError::typ()
-                .with_message("the collider type is undefine")
+                .with_message("the DefaultSignal type is undefine")
                 .into()),
         }
     }

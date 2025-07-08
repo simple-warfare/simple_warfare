@@ -19,14 +19,10 @@ impl ModServer {
     pub fn new(sender: Arc<Sender<JsEngineRequestEvent>>) -> Self {
         Self { sender }
     }
-    pub fn spawn_unit(&self, entity: Entity, unit_str: &str) -> Entity {
+    pub fn spawn_unit(&self, unit_str: &str) {
         self.sender
-            .send(JsEngineRequestEvent::SpawnUnit(
-                entity,
-                unit_str.to_string(),
-            ))
+            .send(JsEngineRequestEvent::SpawnUnit(unit_str.to_string()))
             .unwrap();
-        entity
     }
 
     pub fn load_mod(&self, enables: Vec<(JsAsset, Vec<String>)>, info: ModInfo) -> Result<()> {

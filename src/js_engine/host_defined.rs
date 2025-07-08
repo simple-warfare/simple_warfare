@@ -21,4 +21,14 @@ pub struct SelectedSignalMap {
     #[unsafe_ignore_trace]
     pub map: Rc<RefCell<FxHashMap<JsEntity, JsObject>>>,
 }
+#[derive(Default, Trace, Finalize, JsData)]
+pub struct UnitEnterSignalMap {
+    #[unsafe_ignore_trace]
+    pub map: Rc<RefCell<FxHashMap<JsEntity, JsObject>>>,
+}
+#[derive(Default, Trace, Finalize, JsData)]
+pub struct UnitExitSignalMap {
+    #[unsafe_ignore_trace]
+    pub map: Rc<RefCell<FxHashMap<JsEntity, JsObject>>>,
+}
 

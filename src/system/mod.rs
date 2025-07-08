@@ -1,13 +1,13 @@
 mod input;
 mod physics;
+mod turret;
 mod unit;
 mod way_point;
-mod turret;
 use bevy::prelude::*;
 
 use crate::system::{
-    input::InputSystemPlugin, physics::PhysicsSystemPlugin, unit::UnitSystemPlugin,
-    way_point::WayPointSystemPlugin,
+    input::InputSystemPlugin, physics::PhysicsSystemPlugin, turret::TurretSystemPlugin,
+    unit::UnitSystemPlugin, way_point::WayPointSystemPlugin,
 };
 
 pub struct SystemPlugin;
@@ -19,6 +19,7 @@ impl Plugin for SystemPlugin {
             UnitSystemPlugin,
             PhysicsSystemPlugin,
             WayPointSystemPlugin,
+            TurretSystemPlugin,
         ));
     }
 }

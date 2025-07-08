@@ -1,5 +1,5 @@
 import { create as transformCreate } from "std:bevy/transform/transform.mjs"
-import { CreatedSignal, Signal } from "std:signal/signal.mjs";
+import { CreatedSignal, Signal, UnitEnterSignal, UnitExitSignal } from "std:signal/signal.mjs";
 import { TargetType } from "std:sw/sw.mjs";
 
 export class Turret {
@@ -16,7 +16,11 @@ export class Turret {
         this.turnSpeed = turnSpeed
         this.canShoot = canShoot
         this.attackRadius = attackRadius
-        this.unitEntered = new Signal()
+        this.UnitsInRange = new Array()
+        this.unitEnter = new UnitEnterSignal()
+        this.unitExit = new UnitExitSignal()
+        this.unitEnterSignalEntity = this.unitEnter.entity
+        this.unitExitSignalEntity = this.unitExit.entity
         this.created = new CreatedSignal()
     }
 

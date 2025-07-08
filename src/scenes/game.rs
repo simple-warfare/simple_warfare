@@ -26,6 +26,8 @@ fn setup(mut commands: Commands, _game_asset: Res<GameAsset>, mod_server: Res<Mo
         Projection::Orthographic(projection),
     ));
 
-    mod_server.spawn_unit(commands.spawn_empty().id(), "example:Tank");
+    mod_server.spawn_unit("example:Tank");
+    mod_server.spawn_unit("example:Tank");
+    //mod_server.spawn_unit("example:Tank");
     //mod_server.spawn_unit(commands.spawn_empty().id(), "example:Builder");
 }

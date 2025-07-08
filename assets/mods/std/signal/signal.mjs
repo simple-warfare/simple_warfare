@@ -16,6 +16,8 @@ export class Signal {
 export const DefaultSignalType = {
     Created: 'Created',
     Selected: 'Selected',
+    UnitEnter: "UnitEnter",
+    UnitExit: "UnitExit"
 };
 
 export class CreatedSignal extends Signal {
@@ -31,6 +33,22 @@ export class SelectedSignal extends Signal {
     constructor() {
         super()
         this.type = DefaultSignalType.Selected
+        sw.registerDefaultSignal(this)
+    }
+};
+
+export class UnitEnterSignal extends Signal {
+    constructor() {
+        super()
+        this.type = DefaultSignalType.UnitEnter
+        sw.registerDefaultSignal(this)
+    }
+};
+
+export class UnitExitSignal extends Signal {
+    constructor() {
+        super()
+        this.type = DefaultSignalType.UnitExit
         sw.registerDefaultSignal(this)
     }
 };

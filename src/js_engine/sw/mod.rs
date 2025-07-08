@@ -16,7 +16,7 @@ use crate::{
     bevy_ext::try_from_js::vec2_try_from_js,
     js_engine::{
         context::emit_signal, event::JsEngineRequestEvent, global::class::entity::JsEntity,
-        host_defined::SelectedSignalMap, signal::JsDefaultSignalType,
+        host_defined::*, signal::JsDefaultSignalType,
     },
 };
 
@@ -146,13 +146,34 @@ impl Sw {
 
                 match default_signal_type {
                     JsDefaultSignalType::Created => emit_signal(&signal, &[], ctx)?,
-
                     JsDefaultSignalType::Selected => {
                         let js_entity =
                             JsEntity::try_from_js(&signal.get(js_string!("entity"), ctx)?, ctx)?;
                         ctx.realm()
                             .host_defined_mut()
                             .get_mut::<SelectedSignalMap>()
+                            .unwrap()
+                            .map
+                            .borrow_mut()
+                            .insert(js_entity, signal);
+                    }
+                    JsDefaultSignalType::UnitEnter => {
+                        let js_entity =
+                            JsEntity::try_from_js(&signal.get(js_string!("entity"), ctx)?, ctx)?;
+                        ctx.realm()
+                            .host_defined_mut()
+                            .get_mut::<UnitEnterSignalMap>()
+                            .unwrap()
+                            .map
+                            .borrow_mut()
+                            .insert(js_entity, signal);
+                    }
+                    JsDefaultSignalType::UnitExit => {
+                        let js_entity =
+                            JsEntity::try_from_js(&signal.get(js_string!("entity"), ctx)?, ctx)?;
+                        ctx.realm()
+                            .host_defined_mut()
+                            .get_mut::<UnitExitSignalMap>()
                             .unwrap()
                             .map
                             .borrow_mut()
@@ -174,11 +195,15 @@ impl Sw {
                 if let SwResponseEvent::RegisteredEntity(entity) =
                     sw_response_receiver.lock().unwrap().recv().unwrap()
                 {
-                    Ok(JsValue::Object(
-                        JsEntity::from_entity(&entity)
-                            .try_into_js(ctx)?
-                            .to_object(ctx)?,
-                    ))
+                    let js_entity = JsEntity::from_entity(&entity);
+                    ctx.realm()
+                        .host_defined_mut()
+                        .get_mut::<EntityMap>()
+                        .unwrap()
+                        .map
+                        .borrow_mut()
+                        .insert(js_entity, entity);
+                    Ok(JsValue::Object(js_entity.try_into_js(ctx)?.to_object(ctx)?))
                 } else {
                     Ok(JsValue::undefined())
                 }

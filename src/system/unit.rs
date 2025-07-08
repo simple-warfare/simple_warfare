@@ -13,11 +13,12 @@ use crate::{
             graphic::{Graphic, Graphics},
             movement::Movement,
         },
-        turret::Turret,
+        turret::JsTurret,
         unit::CustomUnit,
         way_point::WayPointQueue,
     },
     js_engine::event::JsEngineResponseEvent,
+    spatial::Spatial,
     statistics::*,
 };
 
@@ -27,7 +28,7 @@ impl Plugin for UnitSystemPlugin {
         app.add_event::<NewSpawnedUnit>()
             .register_type::<Core>()
             .register_type::<Movement>()
-            .register_type::<Turret>()
+            .register_type::<JsTurret>()
             .register_type::<Section>()
             .register_type::<Graphic>()
             .register_type::<Graphics>()
@@ -51,7 +52,29 @@ fn check_new_unit(
             let colliders = &spawned_unit_data.section.colliders;
             let point_lights = &spawned_unit_data.section.point_lights;
             let turrets = &spawned_unit_data.section.turrets;
-
+            let turret_entities: Vec<Entity> = turrets
+                .data
+                .iter()
+                .map(|turret| {
+                    commands
+                        .entity(turret.entity)
+                        .insert((
+                            Spatial,
+                            turret.clone(),
+                            turret.transform.to_transform(),
+                            Sprite {
+                                image: asset_server.load(
+                                    Path::new(form)
+                                        .parent()
+                                        .unwrap()
+                                        .join(turret.image.path.clone()),
+                                ),
+                                ..Default::default()
+                            },
+                        ))
+                        .id()
+                })
+                .collect();
             commands
                 .entity(*entity)
                 .insert((CustomUnit, EnablePhysics))
@@ -60,6 +83,7 @@ fn check_new_unit(
                     spawned_unit_data.section.clone(),
                     EnablePhysics,
                     Selectable,
+                    Spatial,
                     WayPointQueue::default(),
                     RigidBody::Dynamic,
                     MaxLinearSpeed(40.),
@@ -77,6 +101,7 @@ fn check_new_unit(
                         ..Default::default()
                     },
                 ))
+                .add_children(&turret_entities)
                 .with_children(|parent| {
                     for collider in colliders.to_avian2d().drain(..) {
                         parent.spawn(collider);
@@ -84,25 +109,8 @@ fn check_new_unit(
                     for point_light in point_lights.to_point_light2d().drain(..) {
                         parent.spawn(point_light);
                     }
-                    for turret in turrets.data.iter() {
-                        parent.spawn((
-                            Sensor,
-                            Collider::circle(turret.attack_radius),
-                            CollisionEventsEnabled,
-                            CollidingEntities::default(),
-                            turret.transform.to_transform(),
-                            Sprite {
-                                image: asset_server.load(
-                                    Path::new(form)
-                                        .parent()
-                                        .unwrap()
-                                        .join(turret.image.path.clone()),
-                                ),
-                                ..Default::default()
-                            },
-                        ));
-                    }
                 });
+
             writer.write(NewSpawnedUnit(*entity));
         }
     }

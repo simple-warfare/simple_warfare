@@ -1,10 +1,10 @@
-use bevy::ecs::entity::Entity;
+use bevy::{ecs::entity::Entity, reflect::Reflect};
 use boa_engine::{
     JsData,
     value::{TryFromJs, TryIntoJs},
 };
 
-#[derive(Debug, Clone, Copy, TryFromJs, JsData, TryIntoJs, Eq, Hash, PartialEq)]
+#[derive(Debug, Clone, Copy, TryFromJs, JsData, TryIntoJs, Eq, Hash, PartialEq, Reflect)]
 pub struct JsEntity {
     pub index: u32,
     pub generation: u32,

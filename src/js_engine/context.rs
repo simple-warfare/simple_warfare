@@ -16,7 +16,7 @@ use boa_engine::{
     js_string,
     object::builtins::{JsArray, JsProxy},
     prelude::*,
-    value::TryIntoJs,
+    value::{TryFromJs, TryIntoJs},
 };
 use std::{
     path::Path,
@@ -76,7 +76,7 @@ pub(super) fn process_js_event(
                 }
             }
         }
-        JsEngineRequestEvent::SpawnUnit(entity, unit_str) => {
+        JsEngineRequestEvent::SpawnUnit(unit_str) => {
             let unit_from: Vec<&str> = unit_str.split(':').collect();
             if let Some(modules) = module_map.get(unit_from[0]) {
                 for module in modules {
@@ -89,10 +89,9 @@ pub(super) fn process_js_event(
                             .namespace(context)
                             .get(js_string!(unit_from[1]), context)?;
 
-                        let js_entity = JsEntity::from_entity(&entity);
                         let class_obj = class
                             .to_object(context)?
-                            .construct(&[js_entity.try_into_js(context)?], None, context)
+                            .construct(&[], None, context)
                             .expect("construct error");
 
                         let unit_proxy = JsProxy::from_object(
@@ -106,6 +105,11 @@ pub(super) fn process_js_event(
                                 .to_object(context)?
                                 .clone(),
                         )?;
+                        let js_entity = JsEntity::try_from_js(
+                            &unit_proxy.get(js_string!("entity"), context)?,
+                            context,
+                        )?;
+
                         emit_signal(
                             &unit_proxy
                                 .get(js_string!("created"), context)?
@@ -124,14 +128,16 @@ pub(super) fn process_js_event(
                             .map
                             .borrow_mut()
                             .insert(js_entity, unit_proxy);
-                        context
+                        let entity = context
                             .realm()
                             .host_defined_mut()
-                            .get_mut::<EntityMap>()
+                            .get::<EntityMap>()
                             .unwrap()
                             .map
-                            .borrow_mut()
-                            .insert(js_entity, entity);
+                            .borrow()
+                            .get(&js_entity)
+                            .unwrap()
+                            .clone();
 
                         response_sender
                             .send(JsEngineResponseEvent::SpawnedUnit(
@@ -168,21 +174,7 @@ pub(super) fn process_js_event(
                 .map
                 .clone();
             selected_signal_map.borrow().iter().for_each(|(_, signal)| {
-                let connect_array = JsArray::from_object(
-                    signal
-                        .get(js_string!("connectArray"), context)
-                        .unwrap()
-                        .to_object(context)
-                        .unwrap(),
-                )
-                .unwrap();
-
-                let func = connect_array
-                    .get(js_string!("0"), context)
-                    .unwrap()
-                    .as_function()
-                    .unwrap();
-                func.call(&JsValue::Undefined, &[], context).unwrap();
+                emit_signal(&signal, &[], context).unwrap();
             });
         }
         JsEngineRequestEvent::ToLook(look_type) => match look_type {
@@ -208,6 +200,40 @@ pub(super) fn process_js_event(
                 .map
                 .borrow_mut()
                 .insert(js_entity, entity);
+        }
+        JsEngineRequestEvent::UnitEnterSignal(items, entity) => {
+            let unit_enter_signal = context
+                .realm()
+                .host_defined()
+                .get::<UnitEnterSignalMap>()
+                .unwrap()
+                .map
+                .borrow()
+                .get(&JsEntity::from_entity(&entity))
+                .unwrap()
+                .clone();
+            let args: Vec<JsValue> = items
+                .iter()
+                .map(|js_entity| js_entity.try_into_js(context).unwrap())
+                .collect();
+            emit_signal(&unit_enter_signal, &args, context)?;
+        }
+        JsEngineRequestEvent::UnitExitSignal(items, entity) => {
+            let unit_exit_signal = context
+                .realm()
+                .host_defined()
+                .get::<UnitExitSignalMap>()
+                .unwrap()
+                .map
+                .borrow()
+                .get(&JsEntity::from_entity(&entity))
+                .unwrap()
+                .clone();
+            let args: Vec<JsValue> = items
+                .iter()
+                .map(|js_entity| js_entity.try_into_js(context).unwrap())
+                .collect();
+            emit_signal(&unit_exit_signal, &args, context)?;
         }
     }
     Ok(())

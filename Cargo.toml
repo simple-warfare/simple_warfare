@@ -52,6 +52,7 @@ bevy_hanabi = { version = "0.16", default-features = false, features = [
   "serde",
 ] }
 bevy_hui = "0.4.0"
+bevy_spatial = "0.11.0"
 
 [dependencies.bevy]
 version = "0.16.1"

@@ -15,12 +15,15 @@ use crate::{
 #[derive(Event)]
 pub enum JsEngineRequestEvent {
     LoadMod(ModEnable, ModInfo),
-    SpawnUnit(Entity, String),
+    SpawnUnit(String),
     InsertEntity(JsEntity, Entity),
     ToTeleport(TeleportType),
     ToLook(LookType),
     //Signal
     SelectedSignalEmit,
+
+    UnitEnterSignal(Vec<JsEntity>, Entity),
+    UnitExitSignal(Vec<JsEntity>, Entity),
     //RemoteJsProxy(Box<dyn Fn(JsProxy) -> String + Send + Sync + 'static>),
 }
 

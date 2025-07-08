@@ -11,7 +11,7 @@ use crate::custom_unit::{
         light2d::JsPointLights2d,
         movement::Movement,
     },
-    turret::{Turret, Turrets},
+    turret::{JsTurret, Turrets},
 };
 
 pub mod collider;
@@ -77,7 +77,7 @@ impl Section {
                 ),
                 context,
             )?),
-            turrets: Turrets::new(Vec::<Turret>::try_from_js(
+            turrets: Turrets::new(Vec::<JsTurret>::try_from_js(
                 &JsValue::Object(
                     proxy
                         .get(js_string!("turrets"), context)?

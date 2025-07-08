@@ -7,8 +7,8 @@ export const UnitType = {
 };
 
 export class CustomUnit {
-    constructor(entity) {
-        this.entity = entity
+    constructor() {
+        this.entity = sw.register_entity()
         this.graphics = new Array()
         this.colliders = new Array()
         this.pointLights = new Array()

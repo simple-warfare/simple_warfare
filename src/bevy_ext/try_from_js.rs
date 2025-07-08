@@ -3,7 +3,10 @@ use boa_engine::{
     JsResult, js_string,
     object::builtins::{JsArray, JsTypedArray},
     prelude::*,
+    value::TryFromJs,
 };
+
+use crate::js_engine::{global::class::entity::JsEntity, host_defined::*};
 
 pub fn vec2_try_from_js(value: &JsValue, context: &mut Context) -> JsResult<Vec2> {
     let vec2_array = JsTypedArray::from_object(value.to_object(context)?)?;
@@ -24,6 +27,20 @@ pub fn vec3_try_from_js(value: &JsValue, context: &mut Context) -> JsResult<Vec3
 
 pub fn f32_try_from_js(value: &JsValue, context: &mut Context) -> JsResult<f32> {
     Ok(value.to_f32(context)?)
+}
+
+pub fn entity_try_from_js(value: &JsValue, context: &mut Context) -> JsResult<Entity> {
+    let js_entity = JsEntity::try_from_js(value, context)?;
+    Ok(context
+        .realm()
+        .host_defined()
+        .get::<EntityMap>()
+        .unwrap()
+        .map
+        .borrow()
+        .get(&js_entity)
+        .unwrap()
+        .clone())
 }
 
 pub fn quat_try_from_js(value: &JsValue, context: &mut Context) -> JsResult<Quat> {

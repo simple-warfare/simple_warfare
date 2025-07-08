@@ -1554,6 +1554,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "bevy_spatial"
+version = "0.11.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "97c520d6901718c2fdeddce2c60218a803714dfe1f346a5ab8cdbd7568094768"
+dependencies = [
+ "bevy",
+ "kd-tree",
+ "num-traits",
+ "typenum",
+]
+
+[[package]]
 name = "bevy_sprite"
 version = "0.16.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4309,6 +4321,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "kd-tree"
+version = "0.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "10cba89e4275e55bed515724fd6d7888861c1afb9e3a1ef2c4b001b1894b41c7"
+dependencies = [
+ "num-traits",
+ "ordered-float 5.0.0",
+ "paste",
+ "rayon",
+ "typenum",
+]
+
+[[package]]
 name = "khronos-egl"
 version = "6.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5536,6 +5561,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "ordered-float"
+version = "5.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e2c1f9f56e534ac6a9b8a4600bdf0f530fb393b5f393e7b4d03489c3cf0c3f01"
+dependencies = [
+ "num-traits",
+]
+
+[[package]]
 name = "overload"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6679,6 +6713,7 @@ dependencies = [
  "bevy_prng",
  "bevy_rand",
  "bevy_seedling",
+ "bevy_spatial",
  "bevy_spritesheet_animation",
  "bevy_tween",
  "boa_engine",

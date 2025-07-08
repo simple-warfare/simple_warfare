@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use crate::{
-    custom_unit::{turret::Turret, unit::CustomUnit},
+    custom_unit::{turret::JsTurret, unit::CustomUnit},
     js_engine::{
         JsEngineEventRequestSender,
         event::{EntityLookType, EntityTeleportType, JsEngineRequestEvent, JsEngineResponseEvent},
@@ -71,7 +71,7 @@ fn finish_teleport(
 
 fn finish_look(
     mut js_response_reader: EventReader<JsEngineResponseEvent>,
-    mut turrets: Query<&mut Transform, With<Turret>>,
+    mut turrets: Query<&mut Transform, With<JsTurret>>,
 ) -> Result {
     for js_response in js_response_reader.read() {
         if let JsEngineResponseEvent::EntityToLook(telepoty_type) = *js_response {

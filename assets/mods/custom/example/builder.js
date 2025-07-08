@@ -12,9 +12,8 @@ import { fromValues as vec3FromValues } from "package:gl-matrix/vec3.js"
 import { fromValues as vec2FromValues } from "package:gl-matrix/vec2.js"
 
 class Builder extends CustomUnit {
-    constructor(entity) {
-        super(entity)
-        console.log(typeof entity)
+    constructor() {
+        super()
         this.core = coreFromValues("建造者", 100, 100, 100, 100., 100., 100., true)
         this.graphics.push(graphicFromValues(undefined, "builder.png", undefined, undefined, undefined))
         this.movement = movementFromValues(MovementType.LAND,10., 3., 3., 10., 10., 10., 10.)

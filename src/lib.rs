@@ -2,19 +2,19 @@ pub mod app_state;
 pub mod assets;
 pub mod bevy_ext;
 pub mod custom_unit;
+pub mod debug;
 pub mod js_engine;
 pub mod lua_engine;
 pub mod mod_engine;
 pub mod panel;
 pub mod scenes;
+pub mod spatial;
 pub mod statistics;
 pub mod system;
 pub mod utils;
 
 use crate::{
-    app_state::AppState, assets::AssetsPlugin, custom_unit::CustomUnitPlugin,
-    lua_engine::LuaEnginePlugin, mod_engine::ModEnginePlugin, scenes::ScenePlugin,
-    statistics::StatistcsPlugin, system::SystemPlugin,
+    app_state::AppState, assets::AssetsPlugin, custom_unit::CustomUnitPlugin, debug::DebugPlugin, lua_engine::LuaEnginePlugin, mod_engine::ModEnginePlugin, scenes::ScenePlugin, spatial::SpatialPlugin, statistics::StatistcsPlugin, system::SystemPlugin
 };
 use avian2d::prelude::*;
 use bevy::{
@@ -43,7 +43,9 @@ impl PluginGroup for SimpleWarfarePlugins {
             .add(ModEnginePlugin)
             .add(SystemPlugin)
             .add(StatistcsPlugin)
-            .add(CustomUnitPlugin);
+            .add(CustomUnitPlugin)
+            .add(SpatialPlugin)
+            .add(DebugPlugin);
         group
     }
 }
