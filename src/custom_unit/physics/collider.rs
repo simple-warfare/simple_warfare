@@ -1,11 +1,11 @@
-use avian2d::prelude::Collider;
+use avian2d::{math::Scalar, prelude::Collider};
 use bevy::prelude::*;
 use boa_engine::{JsResult, js_string, prelude::*, value::TryFromJs};
 
 #[derive(Debug, Clone, Component, Reflect)]
 pub enum JsCollider {
-    Circle(f32),
-    Rectangle(f32, f32),
+    Circle(Scalar),
+    Rectangle(Scalar, Scalar),
 }
 
 impl TryFromJs for JsCollider {

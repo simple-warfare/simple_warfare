@@ -182,7 +182,7 @@ fn setup(
                                     index: ChromeAtlasKind::GrayBrickRect as usize
                                 }
                             )
-                            .with_mode(NodeImageMode::Sliced((gray_brick_rect.clone()))),
+                            .with_mode(NodeImageMode::Sliced(gray_brick_rect.clone())),
                             children![(Text::new("Ok"), TextColor(Color::Srgba(WHITE),))]
                         )
                     ]

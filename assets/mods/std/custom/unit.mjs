@@ -1,5 +1,5 @@
-import { Signal } from "std:signal/signal.mjs";
-import { TeleportType } from "std:sw/sw.mjs";
+import { CreatedSignal, SelectedSignal } from "std:signal/signal.mjs";
+import { TargetType } from "std:sw/sw.mjs";
 
 export const UnitType = {
     Unit: 'Unit',
@@ -15,8 +15,8 @@ export class CustomUnit {
         this.turrets = new Array()
         this.movement = undefined
         this.core = undefined
-        this.created = new Signal()
-        this.selected = new Signal()
+        this.created = new CreatedSignal()
+        this.selected = new SelectedSignal()
         this._proxy = new Proxy(this, CustomUnitHandle)
     }
 
@@ -25,7 +25,7 @@ export class CustomUnit {
     }
 
     teleportSelfTo(target) {
-        sw.teleport(TeleportType.Position, this.entity, target)
+        sw.teleport(TargetType.Position, this.entity, target)
     }
 
 };

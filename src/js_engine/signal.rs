@@ -1,6 +1,26 @@
+use bevy::prelude::*;
 use boa_engine::prelude::*;
+use boa_engine::{JsResult, value::TryFromJs};
 
-pub type JsSignal = JsObject;
+#[derive(Debug, Clone, Component, Reflect)]
+pub enum JsDefaultSignalType {
+    Created,
+    Selected,
+}
+
+impl TryFromJs for JsDefaultSignalType {
+    fn try_from_js(value: &JsValue, context: &mut Context) -> JsResult<Self> {
+        match value.to_string(context)?.to_std_string_lossy().as_str() {
+            "Created" => Ok(Self::Created),
+            "Selected" => Ok(Self::Selected),
+            _ => Err(JsNativeError::typ()
+                .with_message("the collider type is undefine")
+                .into()),
+        }
+    }
+}
+
+//pub type JsSignal = JsObject;
 /*
 #[derive(Default, Trace, Finalize, JsData)]
 pub struct HostDefinedSignalSystem {

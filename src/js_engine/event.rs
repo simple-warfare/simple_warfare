@@ -1,5 +1,4 @@
 use bevy::prelude::*;
-use boa_engine::object::builtins::JsProxy;
 
 use crate::{
     assets::mods::{
@@ -7,15 +6,19 @@ use crate::{
         js::JsAsset,
     },
     custom_unit::unit::SpawnedUnitData,
-    js_engine::global::class::entity::JsEntity,
+    js_engine::{
+        global::class::entity::JsEntity,
+        sw::{LookType, TeleportType},
+    },
 };
 
 #[derive(Event)]
 pub enum JsEngineRequestEvent {
     LoadMod(ModEnable, ModInfo),
     SpawnUnit(Entity, String),
-    GetEntityToTeleport(JsEntity, Vec2),
-
+    InsertEntity(JsEntity, Entity),
+    ToTeleport(TeleportType),
+    ToLook(LookType),
     //Signal
     SelectedSignalEmit,
     //RemoteJsProxy(Box<dyn Fn(JsProxy) -> String + Send + Sync + 'static>),
@@ -26,7 +29,18 @@ pub enum JsEngineResponseEvent {
     EngineInited,
     //Mod
     SpawnedUnit(Entity, String, SpawnedUnitData),
-    GetedEntityToTeleport(JsEntity, Entity, Vec2),
+    EntityToTeleport(EntityTeleportType),
+    EntityToLook(EntityLookType),
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum EntityTeleportType {
+    Position(Entity, Vec2),
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum EntityLookType {
+    Position(Entity, Vec2),
 }
 #[derive(Debug, Clone)]
 pub enum SwModuleLoaderRequestEvent {

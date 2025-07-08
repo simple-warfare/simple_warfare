@@ -1,3 +1,3 @@
-export const TeleportType = {
+export const TargetType = {
     Position: 'Position',
 };

@@ -7,13 +7,11 @@ pub mod module;
 pub mod plugin;
 pub mod signal;
 pub mod sw;
+pub mod host_defined;
 
-use std::{
-    path::PathBuf,
-    sync::{
-        Arc, Mutex,
-        mpsc::{self, Receiver, Sender},
-    },
+use std::sync::{
+    Arc, Mutex,
+    mpsc::{self, Receiver, Sender},
 };
 
 use crate::{
@@ -111,6 +109,7 @@ fn init_js_context(mut commands: Commands) -> Result {
                 Arc::new(Mutex::new(sw_module_response_receiver)),
             )
             .unwrap(),
+            js_request_sender.clone(),
             Arc::new(sw_require_request_sender),
             Arc::new(Mutex::new(sw_require_response_receiver)),
             Arc::new(sw_request_sender),

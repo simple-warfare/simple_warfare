@@ -40,7 +40,7 @@ pub struct SwRequireLoaderResponseSender(pub Arc<Sender<SwRequireLoaderResponseE
 
 #[derive(Debug)]
 pub struct SimpleWarfareModuleLoader {
-    root: PathBuf,
+    _root: PathBuf,
     module_map: GcRefCell<FxHashMap<String, Module>>,
     path_url: Arc<FxHashMap<&'static str, &'static str>>,
     request_sender: Arc<Sender<SwModuleLoaderRequestEvent>>,
@@ -70,7 +70,7 @@ impl SimpleWarfareModuleLoader {
         path_url.insert("package", "mods/package/");
         path_url.insert("custom", "mods/custom/");
         Ok(Self {
-            root: absolute,
+            _root: absolute,
             module_map: GcRefCell::default(),
             path_url: Arc::new(path_url),
             request_sender,
@@ -141,7 +141,7 @@ impl SimpleWarfareModuleLoader {
 impl ModuleLoader for SimpleWarfareModuleLoader {
     fn load_imported_module(
         &self,
-        referrer: Referrer,
+        _referrer: Referrer,
         specifier: JsString,
         finish_load: Box<dyn FnOnce(JsResult<Module>, &mut Context)>,
         context: &mut Context,

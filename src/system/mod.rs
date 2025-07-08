@@ -2,6 +2,7 @@ mod input;
 mod physics;
 mod unit;
 mod way_point;
+mod turret;
 use bevy::prelude::*;
 
 use crate::system::{

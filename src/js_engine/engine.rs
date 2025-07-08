@@ -8,10 +8,7 @@ use std::{
 };
 
 use bevy::{platform::collections::HashMap, prelude::*};
-use bevy_inspector_egui::egui::ahash::HashMapExt;
-use boa_engine::{
-    JsArgs, JsResult, js_string, object::builtins::JsProxy, prelude::*, property::Attribute,
-};
+use boa_engine::{JsArgs, JsResult, js_string, prelude::*, property::Attribute};
 use boa_runtime::Console;
 use rustc_hash::FxHashMap;
 use url::Url;
@@ -19,8 +16,8 @@ use url::Url;
 use crate::{
     assets::mods::js::JsAsset,
     js_engine::{
-        event::{SwRequireLoaderRequestEvent, SwRequireLoaderResponseEvent},
-        global::class::entity::JsEntity,
+        event::{JsEngineRequestEvent, SwRequireLoaderRequestEvent, SwRequireLoaderResponseEvent},
+        host_defined::*,
         loader::SimpleWarfareModuleLoader,
         module::ModModule,
         sw::{Sw, SwRequestEvent, SwResponseEvent},
@@ -30,14 +27,12 @@ use crate::{
 pub struct JsEngine {
     pub(super) context: Context,
     pub(super) module_map: HashMap<String, Vec<ModModule>>,
-    pub(super) unit_map: HashMap<Entity, JsProxy>,
-    pub(super) entity_map: HashMap<JsEntity, Entity>,
-    pub(super) selected_signal_map: FxHashMap<JsEntity, JsObject>,
 }
 
 impl JsEngine {
     pub fn new(
         loader: SimpleWarfareModuleLoader,
+        js_engine_request_sender: Arc<Sender<JsEngineRequestEvent>>,
         require_request_sender: Arc<Sender<SwRequireLoaderRequestEvent>>,
         require_response_receiver: Arc<Mutex<Receiver<SwRequireLoaderResponseEvent>>>,
         sw_request_sender: Arc<Sender<SwRequestEvent>>,
@@ -56,6 +51,7 @@ impl JsEngine {
         insert_host_defined_data(&mut ctx.borrow_mut());
         egister_global_property(
             &mut ctx.borrow_mut(),
+            js_engine_request_sender,
             sw_request_sender,
             sw_response_receiver,
         );
@@ -75,15 +71,13 @@ impl JsEngine {
         Self {
             context,
             module_map: HashMap::new(),
-            unit_map: HashMap::new(),
-            entity_map: HashMap::new(),
-            selected_signal_map: FxHashMap::new(),
         }
     }
 }
 
 fn egister_global_property(
     ctx: &mut Context,
+    js_engine_request_sender: Arc<Sender<JsEngineRequestEvent>>,
     sw_request_sender: Arc<Sender<SwRequestEvent>>,
     sw_response_receiver: Arc<Mutex<Receiver<SwResponseEvent>>>,
 ) {
@@ -91,7 +85,12 @@ fn egister_global_property(
     ctx.register_global_property(Console::NAME, console, Attribute::all())
         .expect("the console builtin shouldn't exist");
 
-    let sw = Sw::init(ctx, sw_request_sender, sw_response_receiver);
+    let sw = Sw::init(
+        ctx,
+        js_engine_request_sender,
+        sw_request_sender,
+        sw_response_receiver,
+    );
 
     ctx.register_global_property(Sw::NAME, sw, Attribute::all())
         .expect("the sw builtin shouldn't exist");
@@ -201,11 +200,9 @@ fn register_global_callable(
 }
 
 fn insert_host_defined_data(ctx: &mut Context) {
-    //let signal_system = HostDefinedSignalSystem::default();
-    //signal_system.signal_map.insert(
-    //    js_string!("custom_unit_spwaned"),
-    //    Signal::new(js_string!("custom_unit_spwaned")),
-    //);
-
-    //ctx.realm().host_defined_mut().insert(signal_system);
+    ctx.realm().host_defined_mut().insert(UnitMap::default());
+    ctx.realm().host_defined_mut().insert(EntityMap::default());
+    ctx.realm()
+        .host_defined_mut()
+        .insert(SelectedSignalMap::default());
 }

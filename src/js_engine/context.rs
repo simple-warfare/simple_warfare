@@ -1,6 +1,13 @@
 use crate::{
     custom_unit::{section::Section, unit::SpawnedUnitData},
-    js_engine::{engine::JsEngine, event::*, global::class::entity::JsEntity, module::ModModule},
+    js_engine::{
+        engine::JsEngine,
+        event::*,
+        global::class::entity::JsEntity,
+        host_defined::*,
+        module::ModModule,
+        sw::{LookType, TeleportType},
+    },
 };
 use bevy::prelude::*;
 use boa_engine::{
@@ -28,7 +35,7 @@ pub enum JsEngineError {
 pub(super) fn process_js_event(
     engine: &mut JsEngine,
     event: JsEngineRequestEvent,
-    request_sender: Arc<Sender<JsEngineRequestEvent>>,
+    _request_sender: Arc<Sender<JsEngineRequestEvent>>,
     response_sender: Arc<Sender<JsEngineResponseEvent>>,
 ) -> JsResult<()> {
     let context = &mut engine.context;
@@ -70,10 +77,6 @@ pub(super) fn process_js_event(
             }
         }
         JsEngineRequestEvent::SpawnUnit(entity, unit_str) => {
-            let unit_map = &mut engine.unit_map;
-            let entity_map = &mut engine.entity_map;
-            let selected_signal_map = &mut engine.selected_signal_map;
-
             let unit_from: Vec<&str> = unit_str.split(':').collect();
             if let Some(modules) = module_map.get(unit_from[0]) {
                 for module in modules {
@@ -106,22 +109,22 @@ pub(super) fn process_js_event(
 
                         let section = Section::try_from_proxy(&unit_proxy, context)?;
 
-                        let selected_signal = unit_proxy
-                            .get(js_string!("selected"), context)?
-                            .to_object(context)?
-                            .clone();
-
-                        selected_signal_map.insert(js_entity.clone(), selected_signal);
-
-                        let created_signal = unit_proxy
-                            .get(js_string!("created"), context)?
-                            .to_object(context)?
-                            .clone();
-
-                        emit_signal(&created_signal, &[], context)?;
-
-                        unit_map.insert(entity, unit_proxy);
-                        entity_map.insert(js_entity, entity);
+                        context
+                            .realm()
+                            .host_defined_mut()
+                            .get_mut::<UnitMap>()
+                            .unwrap()
+                            .map
+                            .borrow_mut()
+                            .insert(js_entity, unit_proxy);
+                        context
+                            .realm()
+                            .host_defined_mut()
+                            .get_mut::<EntityMap>()
+                            .unwrap()
+                            .map
+                            .borrow_mut()
+                            .insert(js_entity, entity);
 
                         response_sender
                             .send(JsEngineResponseEvent::SpawnedUnit(
@@ -134,19 +137,30 @@ pub(super) fn process_js_event(
                 }
             }
         }
-        JsEngineRequestEvent::GetEntityToTeleport(js_entity, vec2) => {
-            let entity_map = &engine.entity_map;
-            response_sender
-                .send(JsEngineResponseEvent::GetedEntityToTeleport(
-                    js_entity,
-                    *entity_map.get(&js_entity).unwrap(),
-                    vec2,
-                ))
-                .unwrap();
-        }
+        JsEngineRequestEvent::ToTeleport(teleport_type) => match teleport_type {
+            TeleportType::Position(js_entity, vec2) => {
+                let host_defined = context.realm().host_defined();
+                let entity_map = &host_defined.get::<EntityMap>().unwrap().map;
+
+                response_sender
+                    .send(JsEngineResponseEvent::EntityToTeleport(
+                        EntityTeleportType::Position(
+                            *entity_map.borrow().get(&js_entity).unwrap(),
+                            vec2,
+                        ),
+                    ))
+                    .unwrap();
+            }
+        },
         JsEngineRequestEvent::SelectedSignalEmit => {
-            let selected_signal_map = &engine.selected_signal_map;
-            selected_signal_map.iter().for_each(|(_, signal)| {
+            let selected_signal_map = context
+                .realm()
+                .host_defined()
+                .get::<SelectedSignalMap>()
+                .unwrap()
+                .map
+                .clone();
+            selected_signal_map.borrow().iter().for_each(|(_, signal)| {
                 let connect_array = JsArray::from_object(
                     signal
                         .get(js_string!("connectArray"), context)
@@ -164,11 +178,35 @@ pub(super) fn process_js_event(
                 func.call(&JsValue::Undefined, &[], context).unwrap();
             });
         }
+        JsEngineRequestEvent::ToLook(look_type) => match look_type {
+            LookType::Position(js_entity, vec2) => {
+                let host_defined = context.realm().host_defined();
+                let entity_map = &host_defined.get::<EntityMap>().unwrap().map;
+                response_sender
+                    .send(JsEngineResponseEvent::EntityToLook(
+                        EntityLookType::Position(
+                            *entity_map.borrow().get(&js_entity).unwrap(),
+                            vec2,
+                        ),
+                    ))
+                    .unwrap();
+            }
+        },
+        JsEngineRequestEvent::InsertEntity(js_entity, entity) => {
+            context
+                .realm()
+                .host_defined_mut()
+                .get_mut::<EntityMap>()
+                .unwrap()
+                .map
+                .borrow_mut()
+                .insert(js_entity, entity);
+        }
     }
     Ok(())
 }
 
-fn emit_signal(signal: &JsObject, args: &[JsValue], context: &mut Context) -> JsResult<()> {
+pub fn emit_signal(signal: &JsObject, args: &[JsValue], context: &mut Context) -> JsResult<()> {
     let connect_array = JsArray::from_object(
         signal
             .get(js_string!("connectArray"), context)?

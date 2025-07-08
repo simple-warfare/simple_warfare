@@ -86,6 +86,10 @@ fn check_new_unit(
                     }
                     for turret in turrets.data.iter() {
                         parent.spawn((
+                            Sensor,
+                            Collider::circle(turret.attack_radius),
+                            CollisionEventsEnabled,
+                            CollidingEntities::default(),
                             turret.transform.to_transform(),
                             Sprite {
                                 image: asset_server.load(

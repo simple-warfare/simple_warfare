@@ -5,7 +5,7 @@ import { fromValues as graphicFromValues } from "std:section/graphic.mjs"
 
 export class SingleTurret extends Turret {
     constructor() {
-        super(transFormFromValues(vec3FromValues(0., 5., 1.), undefined, undefined),
-            graphicFromValues (undefined, "single_turret.png", undefined, undefined, undefined),666., true)
+        super(transFormFromValues(vec3FromValues(0., 5., 20.), undefined, undefined),
+            graphicFromValues (undefined, "single_turret.png", undefined, undefined, undefined),666., true,200.)
     }
 };
