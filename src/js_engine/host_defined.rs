@@ -22,12 +22,12 @@ pub struct SelectedSignalMap {
     pub map: Rc<RefCell<FxHashMap<JsEntity, JsObject>>>,
 }
 #[derive(Default, Trace, Finalize, JsData)]
-pub struct UnitEnterSignalMap {
+pub struct OnUnitEnterSignalMap {
     #[unsafe_ignore_trace]
     pub map: Rc<RefCell<FxHashMap<JsEntity, JsObject>>>,
 }
 #[derive(Default, Trace, Finalize, JsData)]
-pub struct UnitExitSignalMap {
+pub struct OnUnitExitSignalMap {
     #[unsafe_ignore_trace]
     pub map: Rc<RefCell<FxHashMap<JsEntity, JsObject>>>,
 }

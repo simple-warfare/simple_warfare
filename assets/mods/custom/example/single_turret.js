@@ -14,14 +14,15 @@ export class SingleTurret extends Turret {
                 Math.floor(Math.random() * (300 + 1)),
                 Math.floor(Math.random() * (300 + 1)),))
         }
-        this.unitEnterFunc = (units) => {
-            console.log(`Enter: ${JSON.stringify(units)}`)
+        this.onUnitEnterFunc = (units) => {
+            //console.log(typeof units)
+            sw.lookAt(TargetType.Entity, this.entity, units)
         }
-        this.unitExitFunc = (units) => {
-            console.log(`Exit: ${JSON.stringify(units)}`)
+        this.onUnitExitFunc = (units) => {
+            //console.log(`Exit: ${JSON.stringify(units)}`)
         }
-        this.unitEnter.connect(this.unitEnterFunc)
-        this.unitExit.connect(this.unitExitFunc)
+        this.onUnitEnter.connect(this.onUnitEnterFunc)
+        this.onUnitExit.connect(this.onUnitExitFunc)
         this.created.connect(this.created_func)
         this.created.emit()
     }

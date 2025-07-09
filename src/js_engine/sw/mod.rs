@@ -43,16 +43,19 @@ pub enum SwResponseEvent {
 #[derive(Debug, Clone, Copy)]
 pub enum TeleportType {
     Position(JsEntity, Vec2),
+    Entity(JsEntity, JsEntity),
 }
 
 #[derive(Debug, Clone, Copy)]
 pub enum LookType {
     Position(JsEntity, Vec2),
+    Entity(JsEntity, JsEntity),
 }
 
 #[derive(Debug, Clone, Copy)]
 pub enum JsTargetType {
     Position,
+    Entity,
 }
 
 impl TryFromJs for JsTargetType {
@@ -60,9 +63,11 @@ impl TryFromJs for JsTargetType {
         match value {
             JsValue::String(target_type) => match target_type.to_std_string_lossy().as_str() {
                 "Position" => Ok(JsTargetType::Position),
+                "Entity" => Ok(JsTargetType::Entity),
                 _ => Err(JsNativeError::typ()
                     .with_message("cannot convert value to a JsTeleportType")
                     .into()),
+
             },
             _ => Err(JsNativeError::typ()
                 .with_message("cannot convert value to a JsTeleportType")
@@ -84,15 +89,19 @@ impl Sw {
             NativeFunction::from_closure(move |_referrer, args, ctx| {
                 let js_teleport_type = JsTargetType::try_from_js(args.first().unwrap(), ctx)?;
                 match js_teleport_type {
-                    JsTargetType::Position => {
-                        let target = vec2_try_from_js(args.get(2).unwrap(), ctx)?;
-                        js_engine_request_sender
-                            .send(JsEngineRequestEvent::ToTeleport(TeleportType::Position(
-                                JsEntity::try_from_js(args.get(1).unwrap(), ctx)?,
-                                target,
-                            )))
-                            .unwrap();
-                    }
+                    JsTargetType::Position => js_engine_request_sender
+                        .send(JsEngineRequestEvent::ToTeleport(TeleportType::Position(
+                            JsEntity::try_from_js(args.get(1).unwrap(), ctx)?,
+                            vec2_try_from_js(args.get(2).unwrap(), ctx)?,
+                        )))
+                        .unwrap(),
+
+                    JsTargetType::Entity => js_engine_request_sender
+                        .send(JsEngineRequestEvent::ToLook(LookType::Entity(
+                            JsEntity::try_from_js(args.get(1).unwrap(), ctx)?,
+                            JsEntity::try_from_js(args.get(2).unwrap(), ctx)?,
+                        )))
+                        .unwrap(),
                 }
                 Ok(JsValue::undefined())
             })
@@ -103,15 +112,19 @@ impl Sw {
             NativeFunction::from_closure(move |_referrer, args, ctx| {
                 let js_look_type = JsTargetType::try_from_js(args.first().unwrap(), ctx)?;
                 match js_look_type {
-                    JsTargetType::Position => {
-                        let target = vec2_try_from_js(args.get(2).unwrap(), ctx)?;
-                        js_engine_request_sender
-                            .send(JsEngineRequestEvent::ToLook(LookType::Position(
-                                JsEntity::try_from_js(args.get(1).unwrap(), ctx)?,
-                                target,
-                            )))
-                            .unwrap();
-                    }
+                    JsTargetType::Position => js_engine_request_sender
+                        .send(JsEngineRequestEvent::ToLook(LookType::Position(
+                            JsEntity::try_from_js(args.get(1).unwrap(), ctx)?,
+                            vec2_try_from_js(args.get(2).unwrap(), ctx)?,
+                        )))
+                        .unwrap(),
+
+                    JsTargetType::Entity => js_engine_request_sender
+                        .send(JsEngineRequestEvent::ToLook(LookType::Entity(
+                            JsEntity::try_from_js(args.get(1).unwrap(), ctx)?,
+                            JsEntity::try_from_js(args.get(2).unwrap(), ctx)?,
+                        )))
+                        .unwrap(),
                 }
                 Ok(JsValue::undefined())
             })
@@ -157,23 +170,23 @@ impl Sw {
                             .borrow_mut()
                             .insert(js_entity, signal);
                     }
-                    JsDefaultSignalType::UnitEnter => {
+                    JsDefaultSignalType::OnUnitEnter => {
                         let js_entity =
                             JsEntity::try_from_js(&signal.get(js_string!("entity"), ctx)?, ctx)?;
                         ctx.realm()
                             .host_defined_mut()
-                            .get_mut::<UnitEnterSignalMap>()
+                            .get_mut::<OnUnitEnterSignalMap>()
                             .unwrap()
                             .map
                             .borrow_mut()
                             .insert(js_entity, signal);
                     }
-                    JsDefaultSignalType::UnitExit => {
+                    JsDefaultSignalType::OnUnitExit => {
                         let js_entity =
                             JsEntity::try_from_js(&signal.get(js_string!("entity"), ctx)?, ctx)?;
                         ctx.realm()
                             .host_defined_mut()
-                            .get_mut::<UnitExitSignalMap>()
+                            .get_mut::<OnUnitExitSignalMap>()
                             .unwrap()
                             .map
                             .borrow_mut()

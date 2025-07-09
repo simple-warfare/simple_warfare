@@ -19,7 +19,7 @@ fn main() {
                 }),
                 ..default()
             })
-            .set(ImagePlugin::default_nearest()),
+              .set(ImagePlugin::default_nearest()),
     )
     .add_plugins(EguiPlugin {
         enable_multipass_for_primary_context: true,

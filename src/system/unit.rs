@@ -14,7 +14,7 @@ use crate::{
             movement::Movement,
         },
         turret::JsTurret,
-        unit::CustomUnit,
+        unit::{Custom, CustomUnit},
         way_point::WayPointQueue,
     },
     js_engine::event::JsEngineResponseEvent,
@@ -60,6 +60,7 @@ fn check_new_unit(
                         .entity(turret.entity)
                         .insert((
                             Spatial,
+                            Custom,
                             turret.clone(),
                             turret.transform.to_transform(),
                             Sprite {
@@ -77,9 +78,13 @@ fn check_new_unit(
                 .collect();
             commands
                 .entity(*entity)
-                .insert((CustomUnit, EnablePhysics))
                 .insert((
                     Name::new(core.name.clone()),
+                    CustomUnit,
+                    Custom,
+                    EnablePhysics,
+                ))
+                .insert((
                     spawned_unit_data.section.clone(),
                     EnablePhysics,
                     Selectable,

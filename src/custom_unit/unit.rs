@@ -1,6 +1,8 @@
 use bevy::prelude::*;
 
 use crate::custom_unit::section::Section;
+#[derive(Debug, Component)]
+pub struct Custom;
 
 #[derive(Debug, Component)]
 pub struct CustomUnit;

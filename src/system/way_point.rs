@@ -53,14 +53,14 @@ fn handle_move_way_point(
     ) in way_point_queue
     {
         if let Some(WayPoint::Move(target)) = queue.data.front() {
-            let diff = target - transform.translation.xy();
-            let distance = diff.length();
+            let direction = target - transform.translation.xy();
+            let distance = direction.length();
             if distance <= ARRIVAL_THRESHOLD {
                 queue.data.pop_front();
                 continue;
             }
 
-            let target_angle = diff.to_angle();
+            let target_angle = direction.to_angle();
             let current_angle = transform.rotation.to_euler(EulerRot::ZYX).0 + FRAC_PI_2;
 
             let mut angle_diff = target_angle - current_angle;
@@ -74,7 +74,7 @@ fn handle_move_way_point(
             } else {
                 angular_velocity.0 = 0.;
             }
-            external_force.apply_force(diff.normalize().xy() * 80000.);
+            external_force.apply_force(direction.normalize().xy() * 80000.);
         }
     }
 }

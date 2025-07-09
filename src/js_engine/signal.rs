@@ -6,8 +6,8 @@ use boa_engine::{JsResult, value::TryFromJs};
 pub enum JsDefaultSignalType {
     Created,
     Selected,
-    UnitEnter,
-    UnitExit
+    OnUnitEnter,
+    OnUnitExit
 }
 
 impl TryFromJs for JsDefaultSignalType {
@@ -15,8 +15,8 @@ impl TryFromJs for JsDefaultSignalType {
         match value.to_string(context)?.to_std_string_lossy().as_str() {
             "Created" => Ok(Self::Created),
             "Selected" => Ok(Self::Selected),
-            "UnitEnter" => Ok(Self::UnitEnter),
-            "UnitExit" => Ok(Self::UnitExit),
+            "OnUnitEnter" => Ok(Self::OnUnitEnter),
+            "OnUnitExit" => Ok(Self::OnUnitExit),
             _ => Err(JsNativeError::typ()
                 .with_message("the DefaultSignal type is undefine")
                 .into()),

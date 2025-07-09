@@ -20,10 +20,10 @@ pub struct JsTurret {
     pub attack_radius: Scalar,
     #[boa(rename = "UnitsInRange")]
     pub units_in_range: Vec<JsEntity>,
-    #[boa(from_js_with = "entity_try_from_js", rename = "unitEnterSignalEntity")]
-    pub unit_enter_signal_entity: Entity,
-    #[boa(from_js_with = "entity_try_from_js", rename = "unitExitSignalEntity")]
-    pub unit_exit_signal_entity: Entity,
+    #[boa(from_js_with = "entity_try_from_js", rename = "OnUnitEnterSignalEntity")]
+    pub on_unit_enter_signal_entity: Entity,
+    #[boa(from_js_with = "entity_try_from_js", rename = "OnUnitExitSignalEntity")]
+    pub on_unit_exit_signal_entity: Entity,
 }
 
 #[derive(Debug, Default, Clone, Component, Reflect, TryFromJs)]

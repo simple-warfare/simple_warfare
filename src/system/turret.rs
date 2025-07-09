@@ -60,18 +60,27 @@ fn unit_enter(
         if !new_units_in_range.is_empty() {
             js_engine_request_sender
                 .0
-                .send(JsEngineRequestEvent::UnitEnterSignal(
+                .send(JsEngineRequestEvent::OnUnitEnterSignal(
                     new_units_in_range,
-                    turret.unit_enter_signal_entity,
+                    turret.on_unit_enter_signal_entity,
                 ))?;
         }
 
         if !exited_units.is_empty() {
             js_engine_request_sender
                 .0
-                .send(JsEngineRequestEvent::UnitExitSignal(
+                .send(JsEngineRequestEvent::OnUnitExitSignal(
                     exited_units,
-                    turret.unit_exit_signal_entity,
+                    turret.on_unit_exit_signal_entity,
+                ))?;
+        }
+
+        if !turret.units_in_range.is_empty() {
+            js_engine_request_sender
+                .0
+                .send(JsEngineRequestEvent::OnUnitEnterSignal(
+                    turret.units_in_range.clone(),
+                    turret.on_unit_enter_signal_entity,
                 ))?;
         }
     }

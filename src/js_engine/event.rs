@@ -22,8 +22,8 @@ pub enum JsEngineRequestEvent {
     //Signal
     SelectedSignalEmit,
 
-    UnitEnterSignal(Vec<JsEntity>, Entity),
-    UnitExitSignal(Vec<JsEntity>, Entity),
+    OnUnitEnterSignal(Vec<JsEntity>, Entity),
+    OnUnitExitSignal(Vec<JsEntity>, Entity),
     //RemoteJsProxy(Box<dyn Fn(JsProxy) -> String + Send + Sync + 'static>),
 }
 
@@ -39,11 +39,13 @@ pub enum JsEngineResponseEvent {
 #[derive(Debug, Clone, Copy)]
 pub enum EntityTeleportType {
     Position(Entity, Vec2),
+    Entity(Entity, Entity),
 }
 
 #[derive(Debug, Clone, Copy)]
 pub enum EntityLookType {
     Position(Entity, Vec2),
+    Entity(Entity, Entity),
 }
 #[derive(Debug, Clone)]
 pub enum SwModuleLoaderRequestEvent {

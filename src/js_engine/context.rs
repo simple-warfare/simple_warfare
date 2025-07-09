@@ -164,6 +164,19 @@ pub(super) fn process_js_event(
                     ))
                     .unwrap();
             }
+            TeleportType::Entity(this_entity, target_entity) => {
+                let host_defined = context.realm().host_defined();
+                let entity_map = &host_defined.get::<EntityMap>().unwrap().map;
+
+                response_sender
+                    .send(JsEngineResponseEvent::EntityToTeleport(
+                        EntityTeleportType::Entity(
+                            *entity_map.borrow().get(&this_entity).unwrap(),
+                            *entity_map.borrow().get(&target_entity).unwrap(),
+                        ),
+                    ))
+                    .unwrap();
+            }
         },
         JsEngineRequestEvent::SelectedSignalEmit => {
             let selected_signal_map = context
@@ -190,6 +203,19 @@ pub(super) fn process_js_event(
                     ))
                     .unwrap();
             }
+            LookType::Entity(this_entity, target_entity) => {
+                let host_defined = context.realm().host_defined();
+                let entity_map = &host_defined.get::<EntityMap>().unwrap().map;
+
+                response_sender
+                    .send(JsEngineResponseEvent::EntityToLook(
+                        EntityLookType::Entity(
+                            *entity_map.borrow().get(&this_entity).unwrap(),
+                            *entity_map.borrow().get(&target_entity).unwrap(),
+                        ),
+                    ))
+                    .unwrap();
+            }
         },
         JsEngineRequestEvent::InsertEntity(js_entity, entity) => {
             context
@@ -201,11 +227,11 @@ pub(super) fn process_js_event(
                 .borrow_mut()
                 .insert(js_entity, entity);
         }
-        JsEngineRequestEvent::UnitEnterSignal(items, entity) => {
+        JsEngineRequestEvent::OnUnitEnterSignal(items, entity) => {
             let unit_enter_signal = context
                 .realm()
                 .host_defined()
-                .get::<UnitEnterSignalMap>()
+                .get::<OnUnitEnterSignalMap>()
                 .unwrap()
                 .map
                 .borrow()
@@ -218,11 +244,11 @@ pub(super) fn process_js_event(
                 .collect();
             emit_signal(&unit_enter_signal, &args, context)?;
         }
-        JsEngineRequestEvent::UnitExitSignal(items, entity) => {
+        JsEngineRequestEvent::OnUnitExitSignal(items, entity) => {
             let unit_exit_signal = context
                 .realm()
                 .host_defined()
-                .get::<UnitExitSignalMap>()
+                .get::<OnUnitExitSignalMap>()
                 .unwrap()
                 .map
                 .borrow()
