@@ -52,13 +52,15 @@ fn handle_sw_event(
             }
             SwRequestEvent::CreateQuickUi(quick_ui) => match quick_ui {
                 QuickUi::Dialog(quick_dialog) => match quick_dialog {
-                    QuickDialogData::Comfirm(on_press_cancel_signal, on_press_comfirm_signal) => {
-                        commands.spawn((
+                    QuickDialogData::Comfirm(data) => {
+                        let node_entity = commands.spawn(data.clone()).id();
+
+                        commands.entity(node_entity).insert((
                             HtmlNode(asset_server.load("mods/std/ui/html/dialog/comfirm.html")),
-                            QuickComfirmDialog::new(
-                                on_press_cancel_signal,
-                                on_press_comfirm_signal,
-                            ),
+                            TemplateProperties::default()
+                                .with("node_entity", &serde_json::ser::to_string(&node_entity)?)
+                                .with("title", &data.title)
+                                .with("context", &data.context),
                         ));
                     }
                 },

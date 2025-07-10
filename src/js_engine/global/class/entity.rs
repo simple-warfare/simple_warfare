@@ -3,8 +3,21 @@ use boa_engine::{
     JsData,
     value::{TryFromJs, TryIntoJs},
 };
-
-#[derive(Debug, Clone, Copy, TryFromJs, JsData, TryIntoJs, Eq, Hash, PartialEq, Reflect)]
+use serde::{Deserialize, Serialize};
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    TryFromJs,
+    JsData,
+    TryIntoJs,
+    Eq,
+    Hash,
+    PartialEq,
+    Reflect,
+    Deserialize,
+    Serialize,
+)]
 pub struct JsEntity {
     pub index: u32,
     pub generation: u32,

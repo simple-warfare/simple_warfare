@@ -15,16 +15,23 @@ class Tank extends CustomUnit {
         this.graphics.push(graphicFromValues(undefined, "tank.png", undefined, undefined, undefined))
         this.movement = movementFromValues(undefined, 10., 3., 3., 10., 10., 10., 10.)
         this.colliders.push(new CircleCollider(ColliderType.Circle, 25.))
-        this.turrets.push(new SingleTurret())
-        this.quick_dialog = new ComfirmDialog("abab", "abab")
+
+        this.onUnitEnterFunc = () => {
+            this.quick_dialog = new ComfirmDialog("abab", "abab")
+            this.quick_dialog.onPressComfirm.connect(this.onPressComfirmFunc)
+            this.quick_dialog.onPressCancel.connect(this.onPressCancelFunc)
+        }
+        let turret = new SingleTurret()
+        turret.onUnitEnter.connect(this.onUnitEnterFunc)
+        this.turrets.push(turret)
+
         this.onPressComfirmFunc = () => {
             console.log("Comfirm")
         }
         this.onPressCancelFunc = () => {
             console.log("Cancel")
         }
-        this.quick_dialog.onPressComfirm.connect()
-        this.quick_dialog.onPressCancel.connect()
+
 
         this.created_func = () => {
             this.print_string_when_created.emit("print_string_when_created")

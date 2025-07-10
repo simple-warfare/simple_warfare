@@ -1,6 +1,7 @@
 <template>
     <property name="title">Default Title</property>
     <property name="context">Default Context</property>
+    <property name="node_entity"></property>
     <node display="grid" grid_template_rows="(1,1fr)(1,auto)(1,1fr)" max_width="40%" justify_self="center"
         align_self="center" background="#ADD8E6" padding="10px" border_radius="20px">
         <text display="grid" justify_self="center" font_color="#055" max_width="100%" max_height="100%" delay="0.2"
@@ -15,13 +16,15 @@
         <node display="grid" grid_template_columns="(1,1fr)(1,3fr)(1,1fr)" height="100%" width="100%" border="2px"
             border_radius="5px">
             <button display="grid" justify_content="center" padding="5px" align_content="center" background="#008B8B"
-                pressed:background="#0aa" border_radius="10px" on_press="quick_ui_comfirm_dialog_cancel">
+                pressed:background="#0aa" border_radius="10px" on_press="quick_ui_comfirm_dialog_cancel"
+                tag:node_entity="{node_entity}">
                 <text font_size="25">Cancel</text>
             </button>
             <node display="grid" width="auto" height="auto">
             </node>
             <button display="grid" justify_content="center" padding="5px" align_content="center" background="#008B8B"
-                pressed:background="#0aa" border_radius="10px" on_press="quick_ui_comfirm_dialog_comfirm">
+                pressed:background="#0aa" border_radius="10px" on_press="quick_ui_comfirm_dialog_comfirm"
+                tag:node_entity="{node_entity}">
                 <text font_size="25">Comfirm</text>
             </button>
         </node>
