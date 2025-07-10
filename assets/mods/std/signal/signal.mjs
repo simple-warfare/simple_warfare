@@ -2,6 +2,7 @@ export class Signal {
     constructor() {
         this.entity = sw.register_entity()
         this.connectArray = new Array()
+        sw.register_signal(this)
     }
 
     connect(func) {

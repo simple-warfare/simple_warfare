@@ -1,7 +1,7 @@
 use bevy::{ecs::bundle::Bundle, reflect::Reflect};
 use boa_engine::{JsResult, js_string, object::builtins::JsProxy, prelude::*, value::TryFromJs};
 
-use crate::custom_unit::{
+use crate::custom::unit::{
     light2d::point_light2d::JsPointLight2d,
     physics::collider::JsCollider,
     section::{

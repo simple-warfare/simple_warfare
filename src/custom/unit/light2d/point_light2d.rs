@@ -3,7 +3,7 @@ use bevy_light_2d::light::PointLight2d;
 use boa_engine::value::TryFromJs;
 
 use crate::bevy_ext::try_from_js::*;
-use crate::custom_unit::transform::transform::JsTransform;
+use crate::custom::unit::transform::transform::JsTransform;
 #[derive(Debug, Clone, Component, Reflect, TryFromJs)]
 pub struct JsPointLight2d {
     pub transform: JsTransform,

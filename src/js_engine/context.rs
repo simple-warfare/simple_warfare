@@ -1,5 +1,5 @@
 use crate::{
-    custom_unit::{section::Section, unit::SpawnedUnitData},
+    custom::unit::{section::Section, unit::SpawnedUnitData},
     js_engine::{
         engine::JsEngine,
         event::*,
@@ -208,12 +208,10 @@ pub(super) fn process_js_event(
                 let entity_map = &host_defined.get::<EntityMap>().unwrap().map;
 
                 response_sender
-                    .send(JsEngineResponseEvent::EntityToLook(
-                        EntityLookType::Entity(
-                            *entity_map.borrow().get(&this_entity).unwrap(),
-                            *entity_map.borrow().get(&target_entity).unwrap(),
-                        ),
-                    ))
+                    .send(JsEngineResponseEvent::EntityToLook(EntityLookType::Entity(
+                        *entity_map.borrow().get(&this_entity).unwrap(),
+                        *entity_map.borrow().get(&target_entity).unwrap(),
+                    )))
                     .unwrap();
             }
         },
@@ -260,6 +258,19 @@ pub(super) fn process_js_event(
                 .map(|js_entity| js_entity.try_into_js(context).unwrap())
                 .collect();
             emit_signal(&unit_exit_signal, &args, context)?;
+        }
+        JsEngineRequestEvent::EmitEmptySignal(js_entity) => {
+            let signal = context
+                .realm()
+                .host_defined()
+                .get::<SignalEntityMap>()
+                .unwrap()
+                .map
+                .borrow()
+                .get(&js_entity)
+                .unwrap()
+                .clone();
+            emit_signal(&signal, &[], context)?;
         }
     }
     Ok(())

@@ -2,7 +2,7 @@ use bevy::{platform::collections::HashSet, prelude::*};
 use bevy_spatial::SpatialAccess;
 
 use crate::{
-    custom_unit::{turret::JsTurret, unit::CustomUnit},
+    custom::unit::{turret::JsTurret, unit::CustomUnit},
     js_engine::{
         JsEngineEventRequestSender, event::JsEngineRequestEvent, global::class::entity::JsEntity,
     },
@@ -72,15 +72,6 @@ fn unit_enter(
                 .send(JsEngineRequestEvent::OnUnitExitSignal(
                     exited_units,
                     turret.on_unit_exit_signal_entity,
-                ))?;
-        }
-
-        if !turret.units_in_range.is_empty() {
-            js_engine_request_sender
-                .0
-                .send(JsEngineRequestEvent::OnUnitEnterSignal(
-                    turret.units_in_range.clone(),
-                    turret.on_unit_enter_signal_entity,
                 ))?;
         }
     }

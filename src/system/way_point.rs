@@ -4,7 +4,7 @@ use avian2d::
 use bevy::prelude::*;
 
 use crate::{
-    custom_unit::{
+    custom::unit::{
         section::movement::Movement,
         way_point::{WayPoint, WayPointQueue},
     },

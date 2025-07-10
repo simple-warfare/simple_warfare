@@ -5,7 +5,7 @@ use crate::{
         info::{ModEnable, ModInfo},
         js::JsAsset,
     },
-    custom_unit::unit::SpawnedUnitData,
+    custom::unit::unit::SpawnedUnitData,
     js_engine::{
         global::class::entity::JsEntity,
         sw::{LookType, TeleportType},
@@ -24,6 +24,7 @@ pub enum JsEngineRequestEvent {
 
     OnUnitEnterSignal(Vec<JsEntity>, Entity),
     OnUnitExitSignal(Vec<JsEntity>, Entity),
+    EmitEmptySignal(JsEntity),
     //RemoteJsProxy(Box<dyn Fn(JsProxy) -> String + Send + Sync + 'static>),
 }
 

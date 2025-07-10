@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::custom_unit::turret::JsTurret;
+use crate::custom::unit::turret::JsTurret;
 
 pub struct DebugPlugin;
 

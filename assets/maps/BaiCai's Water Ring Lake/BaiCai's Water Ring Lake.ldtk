@@ -144,7 +144,7 @@
 			"intGridValuesGroups": [],
 			"autoRuleGroups": [],
 			"autoSourceLayerDefUid": null,
-			"tilesetDefUid": 30,
+			"tilesetDefUid": null,
 			"tilePivotX": 0,
 			"tilePivotY": 0,
 			"biomeFieldUid": null
@@ -1114,11 +1114,7 @@
 				{ "value": 5, "identifier": "Water", "color": "#0066FF", "tile": null, "groupUid": 0 },
 				{ "value": 6, "identifier": "Water2", "color": "#0066FF", "tile": null, "groupUid": 0 },
 				{ "value": 7, "identifier": "Water3", "color": "#0066FF", "tile": null, "groupUid": 0 },
-				{ "value": 9, "identifier": "WaterFlow", "color": "#0066FF", "tile": null, "groupUid": 0 },
-				{ "value": 10, "identifier": "_", "color": "#0066FF", "tile": null, "groupUid": 0 },
-				{ "value": 11, "identifier": null, "color": "#3E8948", "tile": null, "groupUid": 0 },
-				{ "value": 12, "identifier": null, "color": "#124E89", "tile": null, "groupUid": 0 },
-				{ "value": 13, "identifier": null, "color": "#0099DB", "tile": null, "groupUid": 0 }
+				{ "value": 9, "identifier": "WaterFlow", "color": "#0066FF", "tile": null, "groupUid": 0 }
 			],
 			"intGridValuesGroups": [],
 			"autoRuleGroups": [],

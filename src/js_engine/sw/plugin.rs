@@ -1,11 +1,7 @@
-use std::f32::consts::{FRAC_PI_2, PI};
-
-use bevy::prelude::*;
-
 use crate::{
-    custom_unit::{
-        turret::JsTurret,
-        unit::{Custom, CustomUnit},
+    custom::{
+        ui::quick::{QuickComfirmDialog, QuickDialogData, QuickUi},
+        unit::unit::Custom,
     },
     js_engine::{
         JsEngineEventRequestSender,
@@ -14,6 +10,8 @@ use crate::{
         sw::{SwRequestEvent, SwRequestReceiver, SwResponseEvent, SwResponseSender},
     },
 };
+use bevy::prelude::*;
+use bevy_hui::prelude::*;
 pub struct SwPlugin;
 
 impl Plugin for SwPlugin {
@@ -28,6 +26,7 @@ impl Plugin for SwPlugin {
 
 fn handle_sw_event(
     mut commands: Commands,
+    asset_server: Res<AssetServer>,
     sw_request_receiver: ResMut<SwRequestReceiver>,
     sw_response_sender: ResMut<SwResponseSender>,
     js_engine_event_sender: Res<JsEngineEventRequestSender>,
@@ -51,6 +50,19 @@ fn handle_sw_event(
                         entity,
                     ))?;
             }
+            SwRequestEvent::CreateQuickUi(quick_ui) => match quick_ui {
+                QuickUi::Dialog(quick_dialog) => match quick_dialog {
+                    QuickDialogData::Comfirm(on_press_cancel_signal, on_press_comfirm_signal) => {
+                        commands.spawn((
+                            HtmlNode(asset_server.load("mods/std/ui/html/dialog/comfirm.html")),
+                            QuickComfirmDialog::new(
+                                on_press_cancel_signal,
+                                on_press_comfirm_signal,
+                            ),
+                        ));
+                    }
+                },
+            },
         }
     }
 
@@ -81,9 +93,8 @@ fn finish_teleport(
 
 fn finish_look(
     mut js_response_reader: EventReader<JsEngineResponseEvent>,
-    mut customs: Query<(&mut Transform, &GlobalTransform), With<Custom>>,
+    mut customs: Query<(&mut Transform, &GlobalTransform, Option<&ChildOf>), With<Custom>>,
 ) -> Result {
-    const TWO_PI: f32 = 2.0 * PI;
     for js_response in js_response_reader.read() {
         if let JsEngineResponseEvent::EntityToLook(telepoty_type) = *js_response {
             match telepoty_type {
@@ -96,13 +107,30 @@ fn finish_look(
                     transform.rotation = Quat::from_rotation_z(angle);
                 }
                 EntityLookType::Entity(this_entity, target_entity) => {
-                    let this_global = customs.get(this_entity)?.1;
-                    let target_global = customs.get(target_entity)?.1;
-                    let direction =
-                        target_global.translation().xy() - this_global.translation().xy();
+                    let (target_transform, target_global, _) = customs.get(target_entity)?;
+                    let (this_transform, this_global, child_of_option) =
+                        customs.get(this_entity)?;
 
-                    customs.get_mut(this_entity)?.0.rotation =
-                        Quat::from_rotation_z(direction.to_angle());
+                    fn calculate_target_rotation(origin: Vec2, target: Vec2) -> Quat {
+                        let direction = target - origin;
+                        let angle = direction.to_angle();
+                        Quat::from_rotation_z(angle)
+                    }
+
+                    customs.get_mut(this_entity)?.0.rotation = match child_of_option {
+                        Some(child_of) => {
+                            customs.get(child_of.0)?.1.rotation().inverse()
+                                * calculate_target_rotation(
+                                    this_global.translation().truncate(),
+                                    target_global.translation().truncate(),
+                                )
+                        }
+
+                        None => calculate_target_rotation(
+                            this_transform.translation.truncate(),
+                            target_transform.translation.truncate(),
+                        ),
+                    }
                 }
             }
         }

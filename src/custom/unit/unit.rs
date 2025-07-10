@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::custom_unit::section::Section;
+use crate::custom::unit::section::Section;
 #[derive(Debug, Component)]
 pub struct Custom;
 

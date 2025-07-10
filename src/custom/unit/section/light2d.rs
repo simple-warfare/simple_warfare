@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use boa_engine::value::TryFromJs;
 
-use crate::custom_unit::light2d::point_light2d::JsPointLight2d;
+use crate::custom::unit::light2d::point_light2d::JsPointLight2d;
 #[derive(Debug, Default, Clone, Component, Reflect, TryFromJs)]
 pub struct JsPointLights2d {
     pub data: Vec<JsPointLight2d>,

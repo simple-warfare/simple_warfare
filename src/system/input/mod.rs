@@ -1,5 +1,5 @@
 use crate::{
-    custom_unit::{
+    custom::unit::{
         physics::EnablePhysics,
         unit::CustomUnit,
         way_point::{WayPoint, WayPointQueue},

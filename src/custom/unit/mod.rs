@@ -9,7 +9,7 @@ pub mod turret;
 
 use bevy::prelude::*;
 
-use crate::custom_unit::way_point::WayPointQueue;
+use crate::custom::unit::way_point::WayPointQueue;
 
 #[derive(Event)]
 pub struct NewSpawnedUnit(pub Entity);

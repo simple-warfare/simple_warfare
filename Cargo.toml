@@ -46,13 +46,16 @@ bevy_polyline = "0.12.0"
 tokio = { version = "1.46.1", features = ["rt", "rt-multi-thread", "time"] }
 
 vleue_navigator = "0.12.0"
-bevy_seedling = "0.4.3" #audio
+bevy_seedling = { version = "0.4.3", features = ["mp3"] } #audio
 bevy_hanabi = { version = "0.16", default-features = false, features = [
   "2d",
   "serde",
 ] }
-bevy_hui = "0.4.0"
+bevy_hui = { git = "https://github.com/shishanyue/bevy_hui.git" }
+bevy_hui_widgets = "0.3.0"
 bevy_spatial = "0.11.0"
+bevy_aseprite_ultra = "0.6.1"
+fluent = "0.17.0"
 
 [dependencies.bevy]
 version = "0.16.1"

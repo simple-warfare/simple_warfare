@@ -1,4 +1,4 @@
-use crate::custom_unit::physics::collider::JsCollider;
+use crate::custom::unit::physics::collider::JsCollider;
 use avian2d::prelude::Collider;
 use bevy::prelude::*;
 use boa_engine::value::TryFromJs;

@@ -1,0 +1,119 @@
+use crate::js_engine::{
+    JsEngineEventRequestSender, event::JsEngineRequestEvent, global::class::entity::JsEntity,
+};
+use bevy::prelude::*;
+use bevy_hui::prelude::*;
+use boa_engine::{JsResult, js_string, prelude::*, value::TryFromJs};
+
+pub mod html_path {}
+
+#[derive(Clone, Copy, PartialEq, Eq, Hash, Component, Reflect)]
+pub enum QuickUi {
+    Dialog(QuickDialogData),
+}
+
+#[derive(Clone, Copy, PartialEq, Eq, Hash, Component, Reflect)]
+pub enum QuickDialogData {
+    Comfirm(JsEntity, JsEntity),
+}
+
+#[derive(Clone, Copy, PartialEq, Eq, Hash, Component, Reflect)]
+pub struct QuickComfirmDialog {
+    pub on_press_cancel_signal: JsEntity,
+    pub on_press_comfirm_signal: JsEntity,
+}
+
+impl QuickComfirmDialog {
+    pub fn new(on_press_cancel_signal: JsEntity, on_press_comfirm_signal: JsEntity) -> Self {
+        Self {
+            on_press_cancel_signal,
+            on_press_comfirm_signal,
+        }
+    }
+}
+
+impl TryFromJs for QuickUi {
+    fn try_from_js(value: &JsValue, context: &mut Context) -> JsResult<Self> {
+        let quick_ui_object = value.to_object(context)?;
+        match quick_ui_object
+            .get(js_string!("type"), context)?
+            .to_string(context)?
+            .to_std_string_lossy()
+            .as_str()
+        {
+            "Comfirm" => Ok(Self::Dialog(QuickDialogData::Comfirm(
+                JsEntity::try_from_js(
+                    &quick_ui_object
+                        .get(js_string!("onPressCancel"), context)?
+                        .to_object(context)?
+                        .get(js_string!("entity"), context)?,
+                    context,
+                )?,
+                JsEntity::try_from_js(
+                    &quick_ui_object
+                        .get(js_string!("onPressComfirm"), context)?
+                        .to_object(context)?
+                        .get(js_string!("entity"), context)?,
+                    context,
+                )?,
+            ))),
+            _ => Err(JsNativeError::typ()
+                .with_message("the quick ui type is undefine")
+                .into()),
+        }
+    }
+}
+
+pub struct CustomQuickUiPlugin;
+
+impl Plugin for CustomQuickUiPlugin {
+    fn build(&self, app: &mut App) {
+        app.add_systems(PreStartup, setup_quick_ui);
+    }
+}
+
+fn setup_quick_ui(mut html_funcs: HtmlFunctions) {
+    html_funcs.register(
+        "quick_ui_comfirm_dialog_comfirm",
+        quick_ui_comfirm_dialog_comfirm,
+    );
+
+    html_funcs.register(
+        "quick_ui_comfirm_dialog_cancel",
+        quick_ui_comfirm_dialog_cancel,
+    );
+}
+
+fn quick_ui_comfirm_dialog_comfirm(
+    In(entity): In<Entity>,
+    dialog_query: Query<&QuickComfirmDialog>,
+    js_engine_request_sender: Res<JsEngineEventRequestSender>,
+) {
+    info!("Comfirm");
+    let Ok(dialog) = query.get(entity) else {
+        return;
+    };
+    js_engine_request_sender
+        .0
+        .send(JsEngineRequestEvent::EmitEmptySignal(
+            dialog.on_press_comfirm_signal.clone(),
+        ))
+        .unwrap();
+}
+
+fn quick_ui_comfirm_dialog_cancel(
+    In(entity): In<Entity>,
+    query: Query<&QuickComfirmDialog>,
+    js_engine_request_sender: Res<JsEngineEventRequestSender>,
+) {
+    info!("Cancel");
+    let Ok(dialog) = query.get(entity) else {
+        return;
+    };
+    js_engine_request_sender
+        .0
+        .send(JsEngineRequestEvent::EmitEmptySignal(
+            dialog.on_press_cancel_signal.clone(),
+        ))
+        .unwrap();
+}

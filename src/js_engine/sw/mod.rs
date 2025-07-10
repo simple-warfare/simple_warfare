@@ -1,7 +1,7 @@
 pub mod plugin;
 use bevy::prelude::*;
 use boa_engine::{
-    JsResult, js_string,
+    JsArgs, JsResult, js_string,
     object::{ObjectInitializer, builtins::JsArray},
     prelude::*,
     property::Attribute,
@@ -14,6 +14,7 @@ use std::sync::{
 
 use crate::{
     bevy_ext::try_from_js::vec2_try_from_js,
+    custom::ui::quick::QuickUi,
     js_engine::{
         context::emit_signal, event::JsEngineRequestEvent, global::class::entity::JsEntity,
         host_defined::*, signal::JsDefaultSignalType,
@@ -32,6 +33,7 @@ pub struct Sw;
 #[derive(Event, Clone)]
 pub enum SwRequestEvent {
     RegisterEntity,
+    CreateQuickUi(QuickUi),
 }
 
 #[derive(Event, Clone)]
@@ -67,7 +69,6 @@ impl TryFromJs for JsTargetType {
                 _ => Err(JsNativeError::typ()
                     .with_message("cannot convert value to a JsTeleportType")
                     .into()),
-
             },
             _ => Err(JsNativeError::typ()
                 .with_message("cannot convert value to a JsTeleportType")
@@ -223,6 +224,36 @@ impl Sw {
             })
         };
 
+        let create_quick_ui = unsafe {
+            let sw_request_sender = sw_request_sender.clone();
+            NativeFunction::from_closure(move |_referrer, args, ctx| {
+                let quick_ui = args.first().unwrap();
+                sw_request_sender
+                    .send(SwRequestEvent::CreateQuickUi(QuickUi::try_from_js(
+                        quick_ui,
+                        ctx,
+                    )?))
+                    .unwrap();
+                Ok(JsValue::Undefined)
+            })
+        };
+
+        let register_signal = unsafe {
+            NativeFunction::from_closure(move |_referrer, args, ctx| {
+                let signal_object = args.get_or_undefined(0).to_object(ctx)?;
+                let js_entity =
+                    JsEntity::try_from_js(&signal_object.get(js_string!("entity"), ctx)?, ctx)?;
+                ctx.realm()
+                    .host_defined_mut()
+                    .get_mut::<SignalEntityMap>()
+                    .unwrap()
+                    .map
+                    .borrow_mut()
+                    .insert(js_entity, signal_object);
+                Ok(JsValue::Undefined)
+            })
+        };
+
         ObjectInitializer::with_native_data_and_proto(
             Self::default(),
             JsObject::with_object_proto(context.realm().intrinsics()),
@@ -243,6 +274,8 @@ impl Sw {
             js_string!("registerDefaultSignal"),
             1,
         )
+        .function(create_quick_ui, js_string!("create_quick_ui"), 1)
+        .function(register_signal, js_string!("register_signal"), 1)
         .build()
     }
 }

@@ -1,7 +1,7 @@
 pub mod app_state;
 pub mod assets;
 pub mod bevy_ext;
-pub mod custom_unit;
+pub mod custom;
 pub mod debug;
 pub mod js_engine;
 pub mod lua_engine;
@@ -14,7 +14,16 @@ pub mod system;
 pub mod utils;
 
 use crate::{
-    app_state::AppState, assets::AssetsPlugin, custom_unit::CustomUnitPlugin, debug::DebugPlugin, lua_engine::LuaEnginePlugin, mod_engine::ModEnginePlugin, scenes::ScenePlugin, spatial::SpatialPlugin, statistics::StatistcsPlugin, system::SystemPlugin
+    app_state::AppState,
+    assets::AssetsPlugin,
+    custom::{ui::CustomUiPlugin, unit::CustomUnitPlugin},
+    debug::DebugPlugin,
+    lua_engine::LuaEnginePlugin,
+    mod_engine::ModEnginePlugin,
+    scenes::ScenePlugin,
+    spatial::SpatialPlugin,
+    statistics::StatistcsPlugin,
+    system::SystemPlugin,
 };
 use avian2d::prelude::*;
 use bevy::{
@@ -22,12 +31,17 @@ use bevy::{
     prelude::*,
     remote::{RemotePlugin, http::RemoteHttpPlugin},
 };
+use bevy_aseprite_ultra::AsepriteUltraPlugin;
 use bevy_ecs_ldtk::prelude::*;
 use bevy_fly_camera::FlyCameraPlugin;
 use bevy_hui::prelude::*;
-use bevy_inspector_egui::quick::StateInspectorPlugin;
+use bevy_inspector_egui::{
+    bevy_egui::EguiPlugin,
+    quick::{StateInspectorPlugin, WorldInspectorPlugin},
+};
 use bevy_light_2d::prelude::*;
 use bevy_panic_handler::PanicHandler;
+use bevy_seedling::SeedlingPlugin;
 use js_engine::JsEnginePlugin;
 
 pub struct SimpleWarfarePlugins;
@@ -45,7 +59,8 @@ impl PluginGroup for SimpleWarfarePlugins {
             .add(StatistcsPlugin)
             .add(CustomUnitPlugin)
             .add(SpatialPlugin)
-            .add(DebugPlugin);
+            .add(DebugPlugin)
+            .add(CustomUiPlugin);
         group
     }
 }
@@ -63,10 +78,15 @@ impl Plugin for SimpleWarfarePlugin {
             ))
             .add_plugins(PhysicsPlugins::default())
             .add_plugins(PhysicsDebugPlugin::default())
+            .add_plugins(EguiPlugin {
+                enable_multipass_for_primary_context: true,
+            })
+            .add_plugins(WorldInspectorPlugin::new())
             .add_plugins(StateInspectorPlugin::<AppState>::default())
             .add_plugins(FlyCameraPlugin)
             .add_plugins(PanicHandler::new().build())
             .add_plugins(LdtkPlugin)
+            .add_plugins(AsepriteUltraPlugin)
             .insert_resource(LevelSelection::default())
             .insert_resource(LdtkSettings {
                 level_spawn_behavior: LevelSpawnBehavior::UseWorldTranslation {
@@ -75,6 +95,7 @@ impl Plugin for SimpleWarfarePlugin {
                 ..Default::default()
             })
             .add_plugins(Light2dPlugin)
+            .add_plugins(SeedlingPlugin::default())
             .add_plugins(SimpleWarfarePlugins)
             .insert_resource(Gravity(Vec2::ZERO));
     }

@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use crate::{app_state::AppState, assets::GameAsset, bevy_ext::app::AppExt};
-
+use bevy_seedling::prelude::*;
 use super::{Scene, SceneState};
 
 #[derive(Default)]
@@ -23,7 +23,10 @@ impl Scene for LoadingScene {
     }
 }
 
-fn setup(mut commands: Commands, game_asset: Res<GameAsset>) {
+fn setup(mut commands: Commands,asset_server:Res<AssetServer>, game_asset: Res<GameAsset>) {
+    let mut background_music = SamplePlayer::new(asset_server.load("music/background/war.mp3"));
+    background_music.repeat_mode = RepeatMode::RepeatEndlessly;
+    commands.spawn(background_music);
     commands.spawn((
         LoadingSceneMark,
         Node {

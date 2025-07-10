@@ -1,5 +1,5 @@
 use crate::bevy_ext::try_from_js::*;
-use crate::custom_unit::{section::graphic::Graphic, transform::transform::JsTransform};
+use crate::custom::unit::{section::graphic::Graphic, transform::transform::JsTransform};
 use crate::js_engine::global::class::entity::JsEntity;
 use avian2d::math::Scalar;
 use bevy::prelude::*;
