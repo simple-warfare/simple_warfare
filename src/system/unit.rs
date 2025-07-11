@@ -56,22 +56,25 @@ fn check_new_unit(
                 .data
                 .iter()
                 .map(|turret| {
+                    let image_path = Path::new(form)
+                        .parent()
+                        .unwrap()
+                        .join(turret.image.path.clone());
+
+                    let anchor = turret.image.anchor();
+                    let sprite = Sprite {
+                        image: asset_server.load(image_path),
+                        anchor: anchor,
+                        ..Default::default()
+                    };
                     commands
                         .entity(turret.entity)
                         .insert((
                             Spatial,
                             Custom,
+                            sprite,
                             turret.clone(),
                             turret.transform.to_transform(),
-                            Sprite {
-                                image: asset_server.load(
-                                    Path::new(form)
-                                        .parent()
-                                        .unwrap()
-                                        .join(turret.image.path.clone()),
-                                ),
-                                ..Default::default()
-                            },
                         ))
                         .id()
                 })

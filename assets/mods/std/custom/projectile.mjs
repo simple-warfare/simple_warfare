@@ -1,0 +1,5 @@
+export class Projectile{
+    constructor(){
+        
+    }
+}

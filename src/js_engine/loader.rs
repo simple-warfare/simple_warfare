@@ -156,6 +156,7 @@ impl ModuleLoader for SimpleWarfareModuleLoader {
             })?;
 
             if let Some(module) = self.get(&specifier) {
+                info!("get:{}", specifier);
                 return Ok(module);
             }
 
@@ -164,6 +165,7 @@ impl ModuleLoader for SimpleWarfareModuleLoader {
 
             let source = Source::from_bytes(&js_asset.context);
             let module = Module::parse(source, None, context)?;
+            self.insert(&specifier, module.clone());
             Ok(module)
         })();
 

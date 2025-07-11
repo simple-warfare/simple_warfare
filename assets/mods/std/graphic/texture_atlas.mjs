@@ -1,8 +1,12 @@
-import { create } from "package:gl-matrix/vec2.js";
+import { Rectangle } from "package:math/rectangle.js";
 
-class TextureAtlasLayout {
+export class TextureAtlasLayout {
     constructor({ size }) {
         this.size = size
+        this.textures = new Array()
+    }
+    addTexture(rectangle) {
+        this.textures.push(rectangle)
     }
 }
 

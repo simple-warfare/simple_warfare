@@ -4,7 +4,11 @@ use mlua::{Lua, ObjectLike, Table};
 
 use crate::{
     app_state::AppState,
-    assets::mods::{info::*, js::JsAsset, lua::*},
+    assets::mods::{
+        info::{self, *},
+        js::JsAsset,
+        lua::*,
+    },
     mod_engine::server::ModServer,
 };
 
@@ -69,7 +73,10 @@ fn load_main_lua(
     next_state.set(AppState::MainLuaExecuting);
     let global = &lua_runtime.global;
     let engine = &lua_runtime.engine;
-    for (mod_info_id, mod_info) in mod_infos.iter() {
+    for (mod_info_id, mod_info) in mod_infos
+        .iter()
+        .filter(|(_, info)| !info.game_version.is_empty())
+    {
         let lua_handle = asset_server
             .get_handle(
                 asset_server

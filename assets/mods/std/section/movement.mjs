@@ -12,6 +12,8 @@ export class Movement {
         maxTurnSpeed,
         turnAcceleration,
         turnDeceleration,
+        angularDamping,
+        linearDamping
     ) {
         this.movementType = movementType
         this.maxMoveSpeed = maxMoveSpeed
@@ -21,6 +23,8 @@ export class Movement {
         this.maxTurnSpeed = maxTurnSpeed
         this.turnAcceleration = turnAcceleration
         this.turnDeceleration = turnDeceleration
+        this.angularDamping = angularDamping
+        this.linearDamping = linearDamping
     }
 };
 
@@ -32,7 +36,9 @@ export function fromValues(
     reversePercentage,
     maxTurnSpeed,
     turnAcceleration,
-    turnDeceleration
+    turnDeceleration,
+    angularDamping,
+    linearDamping
 ) {
     movementType = typeof movementType !== "undefined" ? movementType : MovementType.LAND;
     maxMoveSpeed = typeof maxMoveSpeed !== "undefined" ? maxMoveSpeed : 0.;

@@ -60,4 +60,4 @@ export class TomlError extends Error {
         this.column = column;
         this.codeblock = codeblock;
     }
-}
+};

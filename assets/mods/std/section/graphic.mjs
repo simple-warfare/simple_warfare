@@ -1,28 +1,31 @@
-import { create as transformCreate } from "std:bevy/transform/transform.mjs"
-
+import * as create from "std:create.mjs"
 export class Graphic {
     constructor(
-        transform,
+        width,
+        height,
         path,
         layer,
         frameWidth,
-        frameHeight
+        frameHeight,
+        textureAtlasLayout,
+        offset,
     ) {
-        this.transform = transform
+        this.width = width
+        this.height = height
         this.path = path
         this.layer = layer
         this.frameWidth = frameWidth
         this.frameHeight = frameHeight
+        this.textureAtlasLayout = textureAtlasLayout
+        this.offset = offset
     }
 }
 
 
-export function fromValues(transform, path, layer, frameWidth, frameHeight) {
-    transform = typeof transform !== "undefined" ? transform : transformCreate();
+export function fromValues(width, height, path, layer, frameWidth, frameHeight, textureAtlasLayout, offset) {
     path = typeof path !== "undefined" ? path : "";
     layer = typeof layer !== "undefined" ? layer : 0;
-    frameWidth = typeof frameWidth !== "undefined" ? frameWidth : 0;
-    frameHeight = typeof frameHeight !== "undefined" ? frameHeight : 0;
-    return new Graphic(transform, path, layer, frameWidth, frameHeight)
+    offset = typeof offset !== "undefined" ? offset : create.vec2();
+    return new Graphic(width, height, path, layer, frameWidth, frameHeight, textureAtlasLayout, offset)
 };
 

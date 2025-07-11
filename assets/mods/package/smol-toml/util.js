@@ -31,7 +31,7 @@ export function indexOfNewline(str, start = 0, end = str.length) {
     if (str[idx - 1] === '\r')
         idx--;
     return idx <= end ? idx : -1;
-}
+};
 export function skipComment(str, ptr) {
     for (let i = ptr; i < str.length; i++) {
         let c = str[i];
@@ -47,7 +47,7 @@ export function skipComment(str, ptr) {
         }
     }
     return str.length;
-}
+};
 export function skipVoid(str, ptr, banNewLines, banComments) {
     let c;
     while ((c = str[ptr]) === ' ' || c === '\t' || (!banNewLines && (c === '\n' || c === '\r' && str[ptr + 1] === '\n')))
@@ -55,7 +55,7 @@ export function skipVoid(str, ptr, banNewLines, banComments) {
     return banComments || c !== '#'
         ? ptr
         : skipVoid(str, skipComment(str, ptr), banNewLines);
-}
+};
 export function skipUntil(str, ptr, sep, end, banNewLines = false) {
     if (!end) {
         ptr = indexOfNewline(str, ptr);
@@ -77,7 +77,7 @@ export function skipUntil(str, ptr, sep, end, banNewLines = false) {
         toml: str,
         ptr: ptr
     });
-}
+};
 export function getStringEnd(str, seek) {
     let first = str[seek];
     let target = first === str[seek + 1] && str[seek + 1] === str[seek + 2]
@@ -97,4 +97,4 @@ export function getStringEnd(str, seek) {
         }
     }
     return seek;
-}
+};

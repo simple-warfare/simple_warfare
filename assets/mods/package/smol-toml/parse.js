@@ -145,4 +145,4 @@ export function parse(toml, { maxDepth = 1000, integersAsBigInt } = {}) {
         ptr = skipVoid(toml, ptr);
     }
     return res;
-}
+};

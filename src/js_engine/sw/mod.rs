@@ -1,3 +1,4 @@
+pub mod fs;
 pub mod plugin;
 use bevy::prelude::*;
 use boa_engine::{
@@ -17,7 +18,7 @@ use crate::{
     custom::ui::quick::QuickUi,
     js_engine::{
         context::emit_signal, event::JsEngineRequestEvent, global::class::entity::JsEntity,
-        host_defined::*, signal::JsDefaultSignalType,
+        host_defined::*, signal::JsDefaultSignalType, sw::fs::Fs,
     },
 };
 
@@ -30,9 +31,10 @@ pub struct SwResponseSender(pub Arc<Sender<SwResponseEvent>>);
 #[derive(Debug, Default, Trace, Finalize, JsData)]
 pub struct Sw;
 
-#[derive(Event, Clone)]
+#[derive(Event)]
 pub enum SwRequestEvent {
     RegisterEntity,
+    ReadFile(Box<oneshot::Sender<String>>, String),
     CreateQuickUi(QuickUi),
 }
 
@@ -230,8 +232,7 @@ impl Sw {
                 let quick_ui = args.first().unwrap();
                 sw_request_sender
                     .send(SwRequestEvent::CreateQuickUi(QuickUi::try_from_js(
-                        quick_ui,
-                        ctx,
+                        quick_ui, ctx,
                     )?))
                     .unwrap();
                 Ok(JsValue::Undefined)
@@ -253,6 +254,13 @@ impl Sw {
                 Ok(JsValue::Undefined)
             })
         };
+
+        let fs = Fs::init(
+            context,
+            js_engine_request_sender.clone(),
+            sw_request_sender.clone(),
+            sw_response_receiver.clone(),
+        );
 
         ObjectInitializer::with_native_data_and_proto(
             Self::default(),
@@ -276,6 +284,7 @@ impl Sw {
         )
         .function(create_quick_ui, js_string!("create_quick_ui"), 1)
         .function(register_signal, js_string!("register_signal"), 1)
+        .property(js_string!("fs"), fs, Attribute::CONFIGURABLE)
         .build()
     }
 }

@@ -127,7 +127,7 @@ impl AssetLoader for ModInfoLoader {
         if !context.contains("enable") {
             context.push_str("\nenable = []");
         }
-        Ok(toml::from_str(&context)?)
+        Ok(toml::from_str(&context).unwrap_or_default())
     }
 
     fn extensions(&self) -> &[&str] {

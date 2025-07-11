@@ -101,7 +101,7 @@ export function parseKey(str, ptr, end = '=') {
         // Until there's no more dot
     } while (dot + 1 && dot < endPtr);
     return [parsed, skipVoid(str, endPtr + 1, true, true)];
-}
+};
 export function parseInlineTable(str, ptr, depth, integersAsBigInt) {
     let res = {};
     let seen = new Set();
@@ -164,7 +164,7 @@ export function parseInlineTable(str, ptr, depth, integersAsBigInt) {
         });
     }
     return [res, ptr];
-}
+};
 export function parseArray(str, ptr, depth, integersAsBigInt) {
     let res = [];
     let c;
@@ -191,4 +191,4 @@ export function parseArray(str, ptr, depth, integersAsBigInt) {
         });
     }
     return [res, ptr];
-}
+};

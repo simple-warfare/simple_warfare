@@ -15,6 +15,23 @@ pub fn vec2_try_from_js(value: &JsValue, context: &mut Context) -> JsResult<Vec2
         vec2_array.at(1, context)?.to_f32(context)?,
     ))
 }
+pub fn uvec2_try_from_js(value: &JsValue, context: &mut Context) -> JsResult<UVec2> {
+    let uvec2_array = JsTypedArray::from_object(value.to_object(context)?)?;
+    Ok(UVec2::new(
+        uvec2_array.at(0, context)?.to_u32(context)?,
+        uvec2_array.at(1, context)?.to_u32(context)?,
+    ))
+}
+
+pub fn urect2_try_from_js(value: &JsValue, context: &mut Context) -> JsResult<URect> {
+    let rectangle_object = value.to_object(context)?;
+    let min = rectangle_object.get(js_string!("min"), context)?;
+    let max = rectangle_object.get(js_string!("max"), context)?;
+    Ok(URect {
+        min: uvec2_try_from_js(&min, context)?,
+        max: uvec2_try_from_js(&max, context)?,
+    })
+}
 
 pub fn vec3_try_from_js(value: &JsValue, context: &mut Context) -> JsResult<Vec3> {
     let vec3_array = JsTypedArray::from_object(value.to_object(context)?)?;
@@ -79,4 +96,39 @@ pub fn color_try_from_js(value: &JsValue, context: &mut Context) -> JsResult<Col
         ))),
         _ => Ok(Color::default()),
     }
+}
+
+pub fn texture_atlas_layout_try_from_js(
+    value: &JsValue,
+    context: &mut Context,
+) -> JsResult<Option<TextureAtlasLayout>> {
+    if value.is_undefined() {
+        return Ok(None);
+    }
+    let texture_atlas_layout_object = value.to_object(context)?;
+
+    let size = uvec2_try_from_js(
+        &texture_atlas_layout_object.get(js_string!("size"), context)?,
+        context,
+    )?;
+
+    let textures_arrary = JsArray::from_object(
+        texture_atlas_layout_object
+            .get(js_string!("textures"), context)?
+            .to_object(context)?,
+    )?;
+
+    let textures = array_collect_to_vec(&textures_arrary, context, urect2_try_from_js)?;
+    Ok(textures.map(|textures| TextureAtlasLayout { size, textures }))
+}
+
+pub fn array_collect_to_vec<T>(
+    array: &JsArray,
+    context: &mut Context,
+    f: fn(&JsValue, &mut Context) -> JsResult<T>,
+) -> JsResult<Option<Vec<T>>> {
+    (0..array.length(context)?)
+        .map(|i| f(&array.at(i as i64, context)?, context))
+        .collect::<Result<Vec<_>, _>>()
+        .map(|v| if v.is_empty() { None } else { Some(v) })
 }

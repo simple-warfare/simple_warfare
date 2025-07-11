@@ -1,6 +1,4 @@
-use avian2d::
-    prelude::{AngularVelocity, ExternalForce, LinearVelocity}
-;
+use avian2d::prelude::{AngularVelocity, ExternalForce, LinearVelocity};
 use bevy::prelude::*;
 
 use crate::{
@@ -29,7 +27,6 @@ fn handle_move_way_point(
             &mut WayPointQueue,
             &mut Transform,
             &Movement,
-            &mut ExternalForce,
             &mut AngularVelocity,
             &mut LinearVelocity,
         ),
@@ -47,7 +44,7 @@ fn handle_move_way_point(
         mut queue,
         mut transform,
         movement,
-        mut external_force,
+        //mut external_force,
         mut angular_velocity,
         mut linear_velocity,
     ) in way_point_queue
@@ -67,14 +64,14 @@ fn handle_move_way_point(
             angle_diff = (angle_diff + PI).rem_euclid(TWO_PI) - PI;
 
             if angle_diff.abs() > ANGLE_THRESHOLD_MAX {
-                angular_velocity.0 += angle_diff.signum() * movement.move_acceleration * delta_time;
+                angular_velocity.0 += angle_diff.signum() * movement.turn_acceleration * delta_time;
                 continue;
             } else if angle_diff.abs() > ANGLE_THRESHOLD_MIN {
-                angular_velocity.0 += angle_diff.signum() * movement.move_acceleration * delta_time;
+                angular_velocity.0 += angle_diff.signum() * movement.turn_deceleration * delta_time;
             } else {
                 angular_velocity.0 = 0.;
             }
-            external_force.apply_force(direction.normalize().xy() * 80000.);
+            linear_velocity.0 += direction.normalize() * movement.move_acceleration * delta_time;
         }
     }
 }

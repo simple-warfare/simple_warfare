@@ -124,4 +124,4 @@ export class TomlDate extends Date {
         date.#offset = null;
         return date;
     }
-}
+};

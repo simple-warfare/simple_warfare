@@ -1,16 +1,18 @@
+pub mod js_file;
 pub mod map;
 pub mod mods;
 pub mod texture;
+
 use bevy::prelude::*;
 
 use crate::{
     app_state::AppState,
     assets::{
+        js_file::{JsTomlFile, JsTomlFileLoader},
         map::ldtk::{LdtkMap, LdtkMapLoader},
         mods::{info::*, js::*, lua::*},
         texture::{
-            TextureAtlasLayoutHandles, chrome::ChromeTextureSlicer, dialog::DialogTextureSlicer,
-            process_textures,
+            chrome::ChromeTextureSlicer, dialog::DialogTextureSlicer, process_textures, TextureAtlasLayoutHandles
         },
     },
 };
@@ -58,7 +60,9 @@ pub struct AssetsPlugin;
 
 impl Plugin for AssetsPlugin {
     fn build(&self, app: &mut App) {
-        app.init_asset::<ModInfo>()
+        app.init_asset::<JsTomlFile>()
+            .init_asset_loader::<JsTomlFileLoader>()
+            .init_asset::<ModInfo>()
             .init_asset_loader::<ModInfoLoader>()
             .init_asset::<LuaAsset>()
             .init_asset_loader::<LuaAssetLoader>()

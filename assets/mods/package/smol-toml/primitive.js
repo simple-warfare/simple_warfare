@@ -175,4 +175,4 @@ export function parseValue(value, toml, ptr, integersAsBigInt) {
         });
     }
     return date;
-}
+};

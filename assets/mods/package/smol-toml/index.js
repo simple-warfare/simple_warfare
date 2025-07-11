@@ -29,5 +29,4 @@ import { parse } from 'package:smol-toml/parse.js';
 import { stringify } from 'package:smol-toml/stringify.js';
 import { TomlDate } from 'package:smol-toml/date.js';
 import { TomlError } from 'package:smol-toml/error.js';
-export default { parse, stringify, TomlDate, TomlError };
 export { parse, stringify, TomlDate, TomlError };

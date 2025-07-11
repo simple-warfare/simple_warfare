@@ -106,4 +106,4 @@ export function extractValue(str, ptr, end, depth, integersAsBigInt) {
         parseValue(slice[0], str, ptr, integersAsBigInt),
         endPtr,
     ];
-}
+};

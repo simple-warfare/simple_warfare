@@ -160,4 +160,4 @@ export function stringify(obj, { maxDepth = 1000, numbersAsFloat = false } = {})
         throw new TypeError('stringify can only be called with an object');
     }
     return stringifyTable(obj, '', maxDepth, numbersAsFloat);
-}
+};

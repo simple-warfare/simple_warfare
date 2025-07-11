@@ -41,6 +41,8 @@ impl QuickComfirmDialog {
     }
 }
 
+
+
 impl TryFromJs for QuickUi {
     fn try_from_js(value: &JsValue, context: &mut Context) -> JsResult<Self> {
         let quick_ui_object = value.to_object(context)?;
