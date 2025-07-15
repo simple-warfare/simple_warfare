@@ -18,6 +18,7 @@ use crate::{
     assets::AssetsPlugin,
     custom::{ui::CustomUiPlugin, unit::CustomUnitPlugin},
     debug::DebugPlugin,
+    js_engine::synchronize::SynchronizePlugin,
     lua_engine::LuaEnginePlugin,
     mod_engine::ModEnginePlugin,
     scenes::ScenePlugin,
@@ -33,6 +34,7 @@ use bevy::{
 };
 use bevy_aseprite_ultra::AsepriteUltraPlugin;
 use bevy_ecs_ldtk::prelude::*;
+use bevy_ecs_tiled::TiledMapPlugin;
 use bevy_fly_camera::FlyCameraPlugin;
 use bevy_hui::prelude::*;
 use bevy_inspector_egui::{
@@ -60,7 +62,8 @@ impl PluginGroup for SimpleWarfarePlugins {
             .add(CustomUnitPlugin)
             .add(SpatialPlugin)
             .add(DebugPlugin)
-            .add(CustomUiPlugin);
+            .add(CustomUiPlugin)
+            .add(SynchronizePlugin);
         group
     }
 }
@@ -78,9 +81,7 @@ impl Plugin for SimpleWarfarePlugin {
             ))
             .add_plugins(PhysicsPlugins::default())
             .add_plugins(PhysicsDebugPlugin::default())
-            .add_plugins(EguiPlugin {
-                enable_multipass_for_primary_context: true,
-            })
+            .add_plugins(EguiPlugin::default())
             .add_plugins(WorldInspectorPlugin::new())
             .add_plugins(StateInspectorPlugin::<AppState>::default())
             .add_plugins(FlyCameraPlugin)
@@ -94,6 +95,7 @@ impl Plugin for SimpleWarfarePlugin {
                 },
                 ..Default::default()
             })
+            .add_plugins(TiledMapPlugin::default())
             .add_plugins(Light2dPlugin)
             .add_plugins(SeedlingPlugin::default())
             .add_plugins(SimpleWarfarePlugins)

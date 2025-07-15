@@ -3,8 +3,7 @@ use bevy::prelude::*;
 
 use crate::{
     custom::unit::{
-        section::movement::Movement,
-        way_point::{WayPoint, WayPointQueue},
+        section::movement::Movement, turret::JsTurret, way_point::{WayPoint, WayPointQueue}
     },
     scenes::SceneState,
 };
@@ -25,7 +24,7 @@ fn handle_move_way_point(
     way_point_queue: Query<
         (
             &mut WayPointQueue,
-            &mut Transform,
+            &Transform,
             &Movement,
             &mut AngularVelocity,
             &mut LinearVelocity,
@@ -42,7 +41,7 @@ fn handle_move_way_point(
     let delta_time = time.delta_secs();
     for (
         mut queue,
-        mut transform,
+        transform,
         movement,
         //mut external_force,
         mut angular_velocity,
@@ -74,4 +73,15 @@ fn handle_move_way_point(
             linear_velocity.0 += direction.normalize() * movement.move_acceleration * delta_time;
         }
     }
+}
+
+fn handle_turret_attack_way_point(
+    way_point_queue: Query<(
+        &mut WayPointQueue,
+        &Transform,
+        &JsTurret,
+        &mut AngularVelocity,
+        &mut LinearVelocity,
+    )>,
+) {
 }

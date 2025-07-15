@@ -1,5 +1,5 @@
 use crate::js_engine::{
-    JsEngineEventRequestSender, event::JsEngineRequestEvent, global::class::entity::JsEntity,
+    JsEngineRequestSender, event::JsEngineRequestEvent, global::class::entity::JsEntity,
 };
 use bevy::prelude::*;
 use bevy_hui::prelude::*;
@@ -109,7 +109,7 @@ fn quick_ui_comfirm_dialog_comfirm(
     In(entity): In<Entity>,
     button_tags: Query<&Tags>,
     dialog_query: Query<&QuickComfirmDialog>,
-    js_engine_request_sender: Res<JsEngineEventRequestSender>,
+    js_engine_request_sender: Res<JsEngineRequestSender>,
 ) {
     let Some(node_entity) = button_tags.get(entity).ok().and_then(|tags| {
         tags.get("node_entity").and_then(|node_entity_str| {
@@ -139,7 +139,7 @@ fn quick_ui_comfirm_dialog_cancel(
     mut commands:Commands,
     button_tags: Query<&Tags>,
     dialog_query: Query<&QuickComfirmDialog>,
-    js_engine_request_sender: Res<JsEngineEventRequestSender>,
+    js_engine_request_sender: Res<JsEngineRequestSender>,
 ) {
     let Some(node_entity) = button_tags.get(entity).ok().and_then(|tags| {
         tags.get("node_entity").and_then(|node_entity_str| {

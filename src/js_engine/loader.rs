@@ -156,7 +156,6 @@ impl ModuleLoader for SimpleWarfareModuleLoader {
             })?;
 
             if let Some(module) = self.get(&specifier) {
-                info!("get:{}", specifier);
                 return Ok(module);
             }
 

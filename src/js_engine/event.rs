@@ -8,7 +8,7 @@ use crate::{
     custom::unit::unit::SpawnedUnitData,
     js_engine::{
         global::class::entity::JsEntity,
-        sw::{LookType, TeleportType},
+        sw::{LookType, TeleportType}, synchronize::SynchronizeData,
     },
 };
 
@@ -25,6 +25,7 @@ pub enum JsEngineRequestEvent {
     OnUnitEnterSignal(Vec<JsEntity>, Entity),
     OnUnitExitSignal(Vec<JsEntity>, Entity),
     EmitEmptySignal(JsEntity),
+    SynchronizeData(SynchronizeData)
     //RemoteJsProxy(Box<dyn Fn(JsProxy) -> String + Send + Sync + 'static>),
 }
 

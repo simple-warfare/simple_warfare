@@ -1,6 +1,7 @@
 import { Turret } from "std:custom/turret.mjs"
 import * as manyFromValues from "std:from-values.mjs"
 import { TargetType } from "std:sw/sw.mjs";
+import { ComfirmDialog } from "std:ui/quick/dialog/comfirm.mjs";
 export class SingleTurret extends Turret {
     constructor() {
 
@@ -13,8 +14,21 @@ export class SingleTurret extends Turret {
                 Math.floor(Math.random() * (300 + 1)),))
         }
         this.onUnitEnterFunc = (units) => {
-            sw.lookAt(TargetType.Entity, this.entity, units)
+            sw.lookAt(TargetType.Entity, this.entity, units[0])
+            this.quick_dialog = new ComfirmDialog("Damage", "Damage Hp 10")
+            this.target_entity = units[0]
+            this.quick_dialog.onPressComfirm.connect(this.onPressComfirmFunc)
         }
+
+
+        this.onPressComfirmFunc = () => {
+            let target_object = sw.getObject(this.target_entity)
+            if (target_object.shield == 0){
+                //sw.alterTargetState(this.target_entity, "hp", -100)
+            }
+            console.log(JSON.stringify(target_object.core))
+        }
+
         this.onUnitExitFunc = (units) => {
         }
         this.onUnitEnter.connect(this.onUnitEnterFunc)

@@ -8,6 +8,7 @@ pub mod plugin;
 pub mod signal;
 pub mod sw;
 pub mod host_defined;
+pub mod synchronize;
 
 use std::sync::{
     Arc, Mutex,
@@ -52,30 +53,30 @@ impl Plugin for JsEnginePlugin {
             .add_systems(
                 Update,
                 broadcast_js_engine_response_event
-                    .run_if(resource_exists::<JsEngineEventResponseReciver>),
+                    .run_if(resource_exists::<JsEngineResponseReciver>),
             )
             .add_systems(
                 Update,
                 inited_js_engine.run_if(
                     in_state(AppState::InitJsContext)
-                        .and(resource_exists::<JsEngineEventResponseReciver>),
+                        .and(resource_exists::<JsEngineResponseReciver>),
                 ),
             );
     }
 }
 
 #[derive(Resource)]
-pub struct JsEngineEventRequestSender(pub Arc<Sender<JsEngineRequestEvent>>);
+pub struct JsEngineRequestSender(pub Arc<Sender<JsEngineRequestEvent>>);
 #[derive(Resource)]
-pub struct JsEngineEventResponseReciver(pub Arc<Mutex<Receiver<JsEngineResponseEvent>>>);
+pub struct JsEngineResponseReciver(pub Arc<Mutex<Receiver<JsEngineResponseEvent>>>);
 
 fn init_js_context(mut commands: Commands) -> Result {
     //与js线程的双向通道
     let (js_request_sender, js_request_receiver) = mpsc::channel();
     let (js_response_sender, js_response_receiver) = mpsc::channel();
     let js_request_sender = Arc::new(js_request_sender);
-    commands.insert_resource(JsEngineEventRequestSender(js_request_sender.clone()));
-    commands.insert_resource(JsEngineEventResponseReciver(Arc::new(Mutex::new(
+    commands.insert_resource(JsEngineRequestSender(js_request_sender.clone()));
+    commands.insert_resource(JsEngineResponseReciver(Arc::new(Mutex::new(
         js_response_receiver,
     ))));
 
@@ -121,7 +122,7 @@ fn init_js_context(mut commands: Commands) -> Result {
         js_response_sender
             .send(JsEngineResponseEvent::EngineInited)
             .expect("Faied to send EngineInited event");
-
+        
         while let Ok(event) = js_request_receiver.recv() {
             process_js_event(
                 engine,
@@ -137,7 +138,7 @@ fn init_js_context(mut commands: Commands) -> Result {
 
 fn broadcast_js_engine_response_event(
     mut event_writer: EventWriter<JsEngineResponseEvent>,
-    event_receiver: Res<JsEngineEventResponseReciver>,
+    event_receiver: Res<JsEngineResponseReciver>,
 ) -> Result<()> {
     if let Ok(event) = event_receiver
         .0

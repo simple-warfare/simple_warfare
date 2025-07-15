@@ -16,14 +16,13 @@ class Tank extends CustomUnit {
 
         let core_sting = sw.fs.readFile("mods/custom/example/tank/core.toml")
 
-        console.log(JSON.stringify(parse(core_sting)))
         this.onUnitEnterFunc = () => {
-            this.quick_dialog = new ComfirmDialog("abab", "abab")
+            this.quick_dialog = new ComfirmDialog("New", "new tank")
             this.quick_dialog.onPressComfirm.connect(this.onPressComfirmFunc)
             this.quick_dialog.onPressCancel.connect(this.onPressCancelFunc)
         }
         let turret = new SingleTurret()
-        turret.onUnitEnter.connect(this.onUnitEnterFunc)
+        //turret.onUnitEnter.connect(this.onUnitEnterFunc)
         this.turrets.push(turret)
 
         this.onPressComfirmFunc = () => {
@@ -32,19 +31,6 @@ class Tank extends CustomUnit {
         this.onPressCancelFunc = () => {
             console.log("Cancel")
         }
-
-
-        this.created_func = () => {
-            this.print_string_when_created.emit("print_string_when_created")
-
-        }
-        this.created.connect(this.created_func)
-
-        this.print_string = (string) => {
-            console.log(string)
-        }
-        this.print_string_when_created = new Signal()
-        this.print_string_when_created.connect(this.print_string)
     }
 }
 

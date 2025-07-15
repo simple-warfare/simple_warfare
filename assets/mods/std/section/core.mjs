@@ -1,5 +1,6 @@
 export class Core {
     constructor(name, hp, maxHp, price, mass, buildSpeed, radius, enablePhysics) {
+        this.entity = sw.register_entity(this)
         this.name = name
         this.hp = hp
         this.maxHp = maxHp
@@ -8,6 +9,16 @@ export class Core {
         this.buildSpeed = buildSpeed
         this.radius = radius
         this.enablePhysics = enablePhysics
+    }
+    synchronize(core){
+        this.name = core.name
+        this.hp = core.hp
+        this.maxHp = core.maxHp
+        this.price = core.price
+        this.mass = core.mass
+        this.buildSpeed = core.buildSpeed
+        this.radius = core.radius
+        this.enablePhysics = core.enablePhysics
     }
 };
 

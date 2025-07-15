@@ -28,6 +28,7 @@ fn setup(mut commands: Commands, _game_asset: Res<GameAsset>, mod_server: Res<Mo
 
     mod_server.spawn_unit("example:Tank");
     mod_server.spawn_unit("example:Tank");
+    mod_server.spawn_unit("example:Tank");
     //mod_server.spawn_unit("example:Tank");
     //mod_server.spawn_unit(commands.spawn_empty().id(), "example:Builder");
 }

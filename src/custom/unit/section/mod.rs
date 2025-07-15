@@ -20,7 +20,7 @@ pub mod graphic;
 pub mod light2d;
 pub mod movement;
 
-#[derive(Debug, Default, Clone, Bundle, Reflect)]
+#[derive(Debug, Clone, Bundle, Reflect)]
 pub struct Section {
     pub core: Core,
     pub colliders: JsColliders,

@@ -1,18 +1,28 @@
-use crate::bevy_ext::try_from_js::*;
+use crate::bevy_ext::{try_from_js::*, try_into_js::*};
 use bevy::prelude::*;
-use boa_engine::value::TryFromJs;
-#[derive(Debug, Default, Clone, Component, Reflect, TryFromJs)]
+use simple_warfare_macros::TryFromAndIntoJs;
+#[derive(Debug, Clone, Component, Reflect, TryFromAndIntoJs)]
+#[boa(rename_all = "camelCase")]
 pub struct Core {
+    #[boa(
+        from_js_with = "entity_try_from_js",
+        into_js_with = "entity_try_into_js"
+    )]
+    pub entity: Entity,
     pub name: String,
     pub hp: u32,
     pub price: u32,
     #[boa(rename = "maxHp")]
     pub max_hp: u32,
-    #[boa(from_js_with = "f32_try_from_js")]
+    #[boa(from_js_with = "f32_try_from_js", into_js_with = "f32_try_into_js")]
     pub mass: f32,
-    #[boa(from_js_with = "f32_try_from_js", rename = "buildSpeed")]
+    #[boa(
+        from_js_with = "f32_try_from_js",
+        into_js_with = "f32_try_into_js",
+        rename = "buildSpeed"
+    )]
     pub build_speed: f32,
-    #[boa(from_js_with = "f32_try_from_js")]
+    #[boa(from_js_with = "f32_try_from_js", into_js_with = "f32_try_into_js")]
     pub radius: f32,
     #[boa(rename = "enablePhysics")]
     pub enable_physics: bool,
@@ -20,6 +30,7 @@ pub struct Core {
 
 impl Core {
     pub fn new(
+        entity: Entity,
         name: String,
         hp: u32,
         price: u32,
@@ -30,6 +41,7 @@ impl Core {
         enable_physics: bool,
     ) -> Self {
         Self {
+            entity,
             name,
             hp,
             price,

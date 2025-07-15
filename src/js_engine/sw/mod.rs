@@ -204,7 +204,7 @@ impl Sw {
         let register_entity = unsafe {
             let sw_request_sender = sw_request_sender.clone();
             let sw_response_receiver = sw_response_receiver.clone();
-            NativeFunction::from_closure(move |_referrer, _args, ctx| {
+            NativeFunction::from_closure(move |_referrer, args, ctx| {
                 sw_request_sender
                     .send(SwRequestEvent::RegisterEntity)
                     .unwrap();
@@ -212,6 +212,7 @@ impl Sw {
                     sw_response_receiver.lock().unwrap().recv().unwrap()
                 {
                     let js_entity = JsEntity::from_entity(&entity);
+                    let js_object = args.get_or_undefined(0).to_object(ctx)?;
                     ctx.realm()
                         .host_defined_mut()
                         .get_mut::<EntityMap>()
@@ -219,6 +220,13 @@ impl Sw {
                         .map
                         .borrow_mut()
                         .insert(js_entity, entity);
+                    ctx.realm()
+                        .host_defined_mut()
+                        .get_mut::<JsObjectMap>()
+                        .unwrap()
+                        .map
+                        .borrow_mut()
+                        .insert(js_entity, js_object);
                     Ok(JsValue::Object(js_entity.try_into_js(ctx)?.to_object(ctx)?))
                 } else {
                     Ok(JsValue::undefined())
@@ -255,6 +263,25 @@ impl Sw {
             })
         };
 
+        let get_object = unsafe {
+            NativeFunction::from_closure(move |_referrer, args, ctx| {
+                let target_entity = JsEntity::try_from_js(args.get_or_undefined(0), ctx)?;
+                let target_object = match ctx
+                    .realm()
+                    .host_defined_mut()
+                    .get::<JsObjectMap>()
+                    .unwrap()
+                    .map
+                    .borrow()
+                    .get(&target_entity)
+                {
+                    Some(object) => JsValue::Object(object.clone()),
+                    None => JsValue::Undefined,
+                };
+                Ok(target_object)
+            })
+        };
+
         let fs = Fs::init(
             context,
             js_engine_request_sender.clone(),
@@ -284,6 +311,7 @@ impl Sw {
         )
         .function(create_quick_ui, js_string!("create_quick_ui"), 1)
         .function(register_signal, js_string!("register_signal"), 1)
+        .function(get_object, js_string!("getObject"), 1)
         .property(js_string!("fs"), fs, Attribute::CONFIGURABLE)
         .build()
     }

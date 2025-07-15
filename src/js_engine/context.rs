@@ -7,6 +7,7 @@ use crate::{
         host_defined::*,
         module::ModModule,
         sw::{LookType, TeleportType},
+        synchronize::SynchronizeData,
     },
 };
 use bevy::prelude::*;
@@ -225,7 +226,7 @@ pub(super) fn process_js_event(
                 .borrow_mut()
                 .insert(js_entity, entity);
         }
-        JsEngineRequestEvent::OnUnitEnterSignal(items, entity) => {
+        JsEngineRequestEvent::OnUnitEnterSignal(unit_entitys, entity) => {
             let unit_enter_signal = context
                 .realm()
                 .host_defined()
@@ -236,11 +237,12 @@ pub(super) fn process_js_event(
                 .get(&JsEntity::from_entity(&entity))
                 .unwrap()
                 .clone();
-            let args: Vec<JsValue> = items
-                .iter()
-                .map(|js_entity| js_entity.try_into_js(context).unwrap())
-                .collect();
-            emit_signal(&unit_enter_signal, &args, context)?;
+            
+            emit_signal(
+                &unit_enter_signal,
+                &[unit_entitys.try_into_js(context)?],
+                context,
+            )?;
         }
         JsEngineRequestEvent::OnUnitExitSignal(items, entity) => {
             let unit_exit_signal = context
@@ -272,6 +274,31 @@ pub(super) fn process_js_event(
                 .clone();
             emit_signal(&signal, &[], context)?;
         }
+        JsEngineRequestEvent::SynchronizeData(synchronize_data) => match synchronize_data {
+            SynchronizeData::Core(core) => {
+                let core_object = context
+                    .realm()
+                    .host_defined()
+                    .get::<JsObjectMap>()
+                    .unwrap()
+                    .map
+                    .borrow()
+                    .get(&JsEntity::from_entity(&core.entity))
+                    .unwrap()
+                    .clone();
+
+                core_object
+                    .get(js_string!("synchronize"), context)?
+                    .as_function()
+                    .unwrap()
+                    .call(
+                        &JsValue::Object(core_object),
+                        &[core.try_into_js(context)?],
+                        context,
+                    )?;
+            }
+            SynchronizeData::Movement(movement) => {}
+        },
     }
     Ok(())
 }

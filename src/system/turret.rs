@@ -4,7 +4,7 @@ use bevy_spatial::SpatialAccess;
 use crate::{
     custom::unit::{turret::JsTurret, unit::CustomUnit},
     js_engine::{
-        JsEngineEventRequestSender, event::JsEngineRequestEvent, global::class::entity::JsEntity,
+        JsEngineRequestSender, event::JsEngineRequestEvent, global::class::entity::JsEntity,
     },
     spatial::{Spatial, SpatialTree},
 };
@@ -14,7 +14,7 @@ impl Plugin for TurretSystemPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
             Update,
-            unit_enter.run_if(resource_exists::<JsEngineEventRequestSender>),
+            unit_enter.run_if(resource_exists::<JsEngineRequestSender>),
         );
     }
 }
@@ -23,7 +23,7 @@ fn unit_enter(
     treeaccess: Res<SpatialTree>,
     unit_query: Query<Entity, (With<Spatial>, With<CustomUnit>)>,
     turret_query: Query<(&ChildOf, &mut JsTurret, &GlobalTransform), With<Spatial>>,
-    js_engine_request_sender: Res<JsEngineEventRequestSender>,
+    js_engine_request_sender: Res<JsEngineRequestSender>,
 ) -> Result {
     for (child_of, mut turret, turret_pos) in turret_query {
         let units_in_range: Vec<Entity> = treeaccess

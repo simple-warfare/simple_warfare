@@ -10,7 +10,7 @@ export class Turret {
         canShoot,
         attackRadius
     ) {
-        this.entity = sw.register_entity()
+        this.entity = sw.register_entity(this)
         this.transform = transform
         this.image = image
         this.turnSpeed = turnSpeed

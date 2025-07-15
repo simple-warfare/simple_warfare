@@ -49,7 +49,6 @@ pub(super) fn module_receiver_request(
     if let Ok(SwModuleLoaderRequestEvent::LoadJsAsset(path)) =
         event_receiver.0.lock().unwrap().try_recv()
     {
-        info!("try load:{}", path);
         let asset = asset_server.load(path);
         if asset_server.is_loaded_with_dependencies(asset.id()) {
             sender
@@ -80,10 +79,6 @@ fn module_check_js_asset_ready(
                     .0
                     .contains(&asset_server.get_id_handle(*id).unwrap())
                 {
-                    info!(
-                        "loaded:{:?}",
-                        asset_server.get_id_handle(*id).unwrap().path()
-                    );
                     sender.0.send(SwModuleLoaderResponseEvent::LoadedJsAsset(
                         js_assets.get(*id).unwrap().clone(),
                     ))?;

@@ -4,7 +4,7 @@ use crate::{
         unit::CustomUnit,
         way_point::{WayPoint, WayPointQueue},
     },
-    js_engine::{JsEngineEventRequestSender, event::JsEngineRequestEvent},
+    js_engine::{JsEngineRequestSender, event::JsEngineRequestEvent},
     scenes::SceneState,
     statistics::*,
 };
@@ -115,7 +115,7 @@ pub fn update_selected_unit(
     mut commands: Commands,
     selection_state: Res<SelectionState>,
     units: Query<(Entity, &Transform), With<CustomUnit>>,
-    js_engine_request_sender: Res<JsEngineEventRequestSender>,
+    js_engine_request_sender: Res<JsEngineRequestSender>,
 ) -> Result {
     if selection_state.is_selecting {
         let selection_rect =
