@@ -1,6 +1,8 @@
-export class Core {
+import { Synchronize } from "std:synchronize.mjs"
+
+export class Core extends Synchronize{
     constructor(name, hp, maxHp, price, mass, buildSpeed, radius, enablePhysics) {
-        this.entity = sw.register_entity(this)
+        super()
         this.name = name
         this.hp = hp
         this.maxHp = maxHp
@@ -9,16 +11,6 @@ export class Core {
         this.buildSpeed = buildSpeed
         this.radius = radius
         this.enablePhysics = enablePhysics
-    }
-    synchronize(core){
-        this.name = core.name
-        this.hp = core.hp
-        this.maxHp = core.maxHp
-        this.price = core.price
-        this.mass = core.mass
-        this.buildSpeed = core.buildSpeed
-        this.radius = core.radius
-        this.enablePhysics = core.enablePhysics
     }
 };
 
@@ -33,4 +25,9 @@ export function fromValues(name = "", hp = 0, maxHp = 0, price = 0, mass = 0., b
     radius = typeof radius !== "undefined" ? radius : 0.;
     enablePhysics = typeof enablePhysics !== "undefined" ? enablePhysics : true;
     return new Core(name, hp, maxHp, price, mass, buildSpeed, radius, enablePhysics);
+};
+
+
+export function create() {
+    return new Core("None", 0, 0, 0, 0., 0., 0., true);
 };

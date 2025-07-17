@@ -81,7 +81,9 @@ impl Plugin for SimpleWarfarePlugin {
             ))
             .add_plugins(PhysicsPlugins::default())
             .add_plugins(PhysicsDebugPlugin::default())
-            .add_plugins(EguiPlugin::default())
+            .add_plugins(EguiPlugin {
+                enable_multipass_for_primary_context: true,
+            })
             .add_plugins(WorldInspectorPlugin::new())
             .add_plugins(StateInspectorPlugin::<AppState>::default())
             .add_plugins(FlyCameraPlugin)

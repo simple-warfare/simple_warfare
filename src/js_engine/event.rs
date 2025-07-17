@@ -2,19 +2,19 @@ use bevy::prelude::*;
 
 use crate::{
     assets::mods::{
-        info::{ModEnable, ModInfo},
+        info::ModInfo,
         js::JsAsset,
     },
-    custom::unit::unit::SpawnedUnitData,
+    custom::unit::{section::core::Core, unit::SpawnedUnitData},
     js_engine::{
         global::class::entity::JsEntity,
         sw::{LookType, TeleportType}, synchronize::SynchronizeData,
-    },
+    }, lua_engine::user_data::ModEnableClasses
 };
 
 #[derive(Event)]
 pub enum JsEngineRequestEvent {
-    LoadMod(ModEnable, ModInfo),
+    LoadMod(ModEnableClasses, ModInfo),
     SpawnUnit(String),
     InsertEntity(JsEntity, Entity),
     ToTeleport(TeleportType),
@@ -36,6 +36,8 @@ pub enum JsEngineResponseEvent {
     SpawnedUnit(Entity, String, SpawnedUnitData),
     EntityToTeleport(EntityTeleportType),
     EntityToLook(EntityLookType),
+
+    SynchronizeCore(Core)
 }
 
 #[derive(Debug, Clone, Copy)]

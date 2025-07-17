@@ -3,11 +3,9 @@ use std::sync::{Arc, mpsc::Sender};
 use bevy::prelude::*;
 
 use crate::{
-    assets::mods::{
-        info::{ModEnable, ModInfo},
-        js::JsAsset,
-    },
+    assets::mods::{info::ModInfo, js::JsAsset},
     js_engine::event::JsEngineRequestEvent,
+    lua_engine::user_data::ModEnableClasses,
 };
 
 #[derive(Resource)]
@@ -27,7 +25,7 @@ impl ModServer {
 
     pub fn load_mod(&self, enables: Vec<(JsAsset, Vec<String>)>, info: ModInfo) -> Result<()> {
         self.sender.send(JsEngineRequestEvent::LoadMod(
-            ModEnable::new(enables),
+            ModEnableClasses::new(enables),
             info.clone(),
         ))?;
         Ok(())

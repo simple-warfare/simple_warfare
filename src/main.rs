@@ -1,7 +1,4 @@
-use bevy::{
-    prelude::*,
-    window::WindowMode,
-};
+use bevy::{prelude::*, window::WindowMode};
 
 use simple_warfare::SimpleWarfarePlugin;
 fn main() {
@@ -16,8 +13,9 @@ fn main() {
                 }),
                 ..default()
             })
-              .set(ImagePlugin::default_nearest()),
-    ) 
+            .set(ImagePlugin::default_nearest()),
+    )
     .add_plugins(SimpleWarfarePlugin)
     .run();
 }
+

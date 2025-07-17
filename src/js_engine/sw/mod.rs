@@ -3,7 +3,10 @@ pub mod plugin;
 use bevy::prelude::*;
 use boa_engine::{
     JsArgs, JsResult, js_string,
-    object::{ObjectInitializer, builtins::JsArray},
+    object::{
+        ObjectInitializer,
+        builtins::{JsArray, JsFunction, JsProxy},
+    },
     prelude::*,
     property::Attribute,
     value::{TryFromJs, TryIntoJs},
@@ -15,10 +18,15 @@ use std::sync::{
 
 use crate::{
     bevy_ext::try_from_js::vec2_try_from_js,
-    custom::ui::quick::QuickUi,
+    custom::{ui::quick::QuickUi, unit::section::core::Core},
     js_engine::{
-        context::emit_signal, event::JsEngineRequestEvent, global::class::entity::JsEntity,
-        host_defined::*, signal::JsDefaultSignalType, sw::fs::Fs,
+        context::emit_signal,
+        event::{JsEngineRequestEvent, JsEngineResponseEvent},
+        global::class::entity::JsEntity,
+        host_defined::*,
+        signal::JsDefaultSignalType,
+        sw::fs::Fs,
+        synchronize::SynchronizeType,
     },
 };
 
@@ -84,6 +92,7 @@ impl Sw {
     pub fn init(
         context: &mut Context,
         js_engine_request_sender: Arc<Sender<JsEngineRequestEvent>>,
+        js_engine_response_sender: Arc<Sender<JsEngineResponseEvent>>,
         sw_request_sender: Arc<Sender<SwRequestEvent>>,
         sw_response_receiver: Arc<Mutex<Receiver<SwResponseEvent>>>,
     ) -> JsObject {
@@ -226,7 +235,26 @@ impl Sw {
                         .unwrap()
                         .map
                         .borrow_mut()
-                        .insert(js_entity, js_object);
+                        .insert(js_entity, js_object.clone());
+
+                    if let Ok(js_proxy_func) = js_object.get(js_string!("getSynchronizeProxy"), ctx)
+                    {
+                        let js_proxy = JsProxy::from_object(
+                            js_proxy_func
+                                .as_function()
+                                .unwrap()
+                                .call(&JsValue::Object(js_object), &[], ctx)?
+                                .to_object(ctx)?
+                                .clone(),
+                        )?;
+                        ctx.realm()
+                            .host_defined_mut()
+                            .get_mut::<JsProxyMap>()
+                            .unwrap()
+                            .map
+                            .borrow_mut()
+                            .insert(js_entity, js_proxy);
+                    };
                     Ok(JsValue::Object(js_entity.try_into_js(ctx)?.to_object(ctx)?))
                 } else {
                     Ok(JsValue::undefined())
@@ -266,7 +294,7 @@ impl Sw {
         let get_object = unsafe {
             NativeFunction::from_closure(move |_referrer, args, ctx| {
                 let target_entity = JsEntity::try_from_js(args.get_or_undefined(0), ctx)?;
-                let target_object = match ctx
+                match ctx
                     .realm()
                     .host_defined_mut()
                     .get::<JsObjectMap>()
@@ -275,10 +303,59 @@ impl Sw {
                     .borrow()
                     .get(&target_entity)
                 {
-                    Some(object) => JsValue::Object(object.clone()),
-                    None => JsValue::Undefined,
+                    Some(object) => Ok(JsValue::Object(object.clone())),
+                    None => Ok(JsValue::Undefined),
+                }
+            })
+        };
+
+        let get_proxy = unsafe {
+            NativeFunction::from_closure(move |_referrer, args, ctx| {
+                let target_entity = JsEntity::try_from_js(args.get_or_undefined(0), ctx)?;
+                match ctx
+                    .realm()
+                    .host_defined_mut()
+                    .get::<JsProxyMap>()
+                    .unwrap()
+                    .map
+                    .borrow()
+                    .get(&target_entity)
+                {
+                    Some(object) => Ok(JsValue::Object(object.clone().into())),
+                    None => Ok(JsValue::Undefined),
+                }
+            })
+        };
+
+        let alter_target_state = unsafe {
+            NativeFunction::from_closure(move |_referrer, args, ctx| Ok(JsValue::Undefined))
+        };
+
+        let synchronize = unsafe {
+            let js_engine_response_sender = js_engine_response_sender.clone();
+            NativeFunction::from_closure(move |_referrer, args, ctx| {
+                let js_entity = JsEntity::try_from_js(args.first().unwrap(), ctx)?;
+                let object = ctx
+                    .realm()
+                    .host_defined()
+                    .get::<JsObjectMap>()
+                    .unwrap()
+                    .map
+                    .borrow()
+                    .get(&js_entity)
+                    .unwrap()
+                    .clone();
+
+                match SynchronizeType::try_from_js(args.get(1).unwrap(), ctx)? {
+                    SynchronizeType::Core => js_engine_response_sender
+                        .send(JsEngineResponseEvent::SynchronizeCore(Core::try_from_js(
+                            &JsValue::Object(object),
+                            ctx,
+                        )?))
+                        .unwrap(),
                 };
-                Ok(target_object)
+
+                Ok(JsValue::Undefined)
             })
         };
 
@@ -302,16 +379,19 @@ impl Sw {
         .function(teleport, js_string!("teleport"), 3)
         .function(look_at, js_string!("lookAt"), 3)
         //.function(register_signal, js_string!("register_signal"), 1)
-        .function(signal_emit, js_string!("signal_emit"), 2)
-        .function(register_entity, js_string!("register_entity"), 0)
+        .function(signal_emit, js_string!("signalEmit"), 2)
+        .function(register_entity, js_string!("registerEntity"), 0)
         .function(
             register_default_signal,
             js_string!("registerDefaultSignal"),
             1,
         )
-        .function(create_quick_ui, js_string!("create_quick_ui"), 1)
-        .function(register_signal, js_string!("register_signal"), 1)
+        .function(create_quick_ui, js_string!("createQuickUi"), 1)
+        .function(register_signal, js_string!("registerSignal"), 1)
         .function(get_object, js_string!("getObject"), 1)
+        .function(get_proxy, js_string!("getProxy"), 1)
+        .function(alter_target_state, js_string!("alterTargetState"), 3)
+        .function(synchronize, js_string!("synchronize"), 2)
         .property(js_string!("fs"), fs, Attribute::CONFIGURABLE)
         .build()
     }

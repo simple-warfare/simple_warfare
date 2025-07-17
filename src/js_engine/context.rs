@@ -42,8 +42,8 @@ pub(super) fn process_js_event(
     let context = &mut engine.context;
     let module_map = &mut engine.module_map;
     match event {
-        JsEngineRequestEvent::LoadMod(mod_enable, mod_info) => {
-            for (js_asset, classes) in mod_enable.enable {
+        JsEngineRequestEvent::LoadMod(mod_enable_classes, mod_info) => {
+            for (js_asset, classes) in mod_enable_classes.enables {
                 let module = Module::parse(
                     Source::from_reader(
                         js_asset.context.as_bytes(),
@@ -97,11 +97,9 @@ pub(super) fn process_js_event(
 
                         let unit_proxy = JsProxy::from_object(
                             class_obj
-                                .get(js_string!("get_proxy"), context)?
-                                .as_callable()
-                                .ok_or(JsError::from_opaque(
-                                    js_string!(format!("the vaule is not callable",)).into(),
-                                ))?
+                                .get(js_string!("getSynchronizeProxy"), context)?
+                                .as_function()
+                                .unwrap()
                                 .call(&JsValue::Object(class_obj), &[], context)?
                                 .to_object(context)?
                                 .clone(),
@@ -237,7 +235,7 @@ pub(super) fn process_js_event(
                 .get(&JsEntity::from_entity(&entity))
                 .unwrap()
                 .clone();
-            
+
             emit_signal(
                 &unit_enter_signal,
                 &[unit_entitys.try_into_js(context)?],

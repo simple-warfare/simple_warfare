@@ -22,6 +22,11 @@ pub struct JsObjectMap {
     pub map: Rc<RefCell<HashMap<JsEntity, JsObject>>>,
 }
 #[derive(Default, Trace, Finalize, JsData)]
+pub struct JsProxyMap {
+    #[unsafe_ignore_trace]
+    pub map: Rc<RefCell<HashMap<JsEntity, JsProxy>>>,
+}
+#[derive(Default, Trace, Finalize, JsData)]
 pub struct SelectedSignalMap {
     #[unsafe_ignore_trace]
     pub map: Rc<RefCell<FxHashMap<JsEntity, JsObject>>>,

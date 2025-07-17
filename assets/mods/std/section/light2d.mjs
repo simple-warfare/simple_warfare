@@ -1,7 +1,8 @@
 import Color from "package:color/index.js";
 import { create as transformCreate } from "std:bevy/transform/transform.mjs";
+import { Synchronize } from "std:synchronize.mjs";
 
-export class PointLight2d {
+export class PointLight2d extends Synchronize {
     constructor(
         transform = transformCreate(),
         radius = 0.5,
@@ -10,6 +11,7 @@ export class PointLight2d {
         falloff = 0.0,
         cast_shadows = false
     ) {
+        super()
         this.transform = transform
         this.color = color
         this.radius = radius

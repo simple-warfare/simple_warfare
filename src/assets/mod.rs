@@ -9,10 +9,14 @@ use crate::{
     app_state::AppState,
     assets::{
         js_file::{JsTomlFile, JsTomlFileLoader},
-        map::ldtk::{LdtkMap, LdtkMapLoader},
+        map::{
+            ldtk::{LdtkMap, LdtkMapLoader},
+            tiled::{TiledMap, TiledMapLoader},
+        },
         mods::{info::*, js::*, lua::*},
         texture::{
-            chrome::ChromeTextureSlicer, dialog::DialogTextureSlicer, process_textures, TextureAtlasLayoutHandles
+            TextureAtlasLayoutHandles, chrome::ChromeTextureSlicer, dialog::DialogTextureSlicer,
+            process_textures,
         },
     },
 };
@@ -70,6 +74,8 @@ impl Plugin for AssetsPlugin {
             .init_asset_loader::<JsAssetLoader>()
             .init_asset::<LdtkMap>()
             .init_asset_loader::<LdtkMapLoader>()
+            .init_asset::<TiledMap>()
+            .init_asset_loader::<TiledMapLoader>()
             .init_resource::<GameAsset>()
             .init_resource::<DialogTextureSlicer>()
             .init_resource::<ChromeTextureSlicer>()
@@ -85,10 +91,6 @@ impl Plugin for AssetsPlugin {
 
 fn load_assets(mut game_assets: ResMut<GameAsset>, asset_server: Res<AssetServer>) {
     game_assets.interface.load(&asset_server);
-
-    game_assets
-        .maps
-        .push(asset_server.load("maps/BaiCai's Water Ring Lake/BaiCai's Water Ring Lake.ldtk"));
 
     // 收集所有资源句柄
     game_assets.all_untyped_handle = game_assets

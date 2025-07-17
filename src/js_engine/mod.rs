@@ -2,12 +2,12 @@ mod context;
 mod engine;
 pub mod event;
 pub mod global;
+pub mod host_defined;
 pub mod loader;
 pub mod module;
 pub mod plugin;
 pub mod signal;
 pub mod sw;
-pub mod host_defined;
 pub mod synchronize;
 
 use std::sync::{
@@ -102,6 +102,9 @@ fn init_js_context(mut commands: Commands) -> Result {
     let (sw_response_sender, sw_response_receiver) = mpsc::channel();
     commands.insert_resource(SwResponseSender(Arc::new(sw_response_sender.clone())));
     commands.insert_resource(SwRequestReceiver(Arc::new(Mutex::new(sw_request_receiver))));
+
+    let js_response_sender = Arc::new(js_response_sender.clone());
+
     std::thread::spawn(move || {
         let engine = &mut JsEngine::new(
             SimpleWarfareModuleLoader::new(
@@ -111,18 +114,18 @@ fn init_js_context(mut commands: Commands) -> Result {
             )
             .unwrap(),
             js_request_sender.clone(),
+            js_response_sender.clone(),
             Arc::new(sw_require_request_sender),
             Arc::new(Mutex::new(sw_require_response_receiver)),
             Arc::new(sw_request_sender),
             Arc::new(Mutex::new(sw_response_receiver)),
         );
-        let js_response_sender = Arc::new(js_response_sender.clone());
         // 开始监听
         // 由bevy的EventWriter写入事件并经js_event_bridge中转到此
         js_response_sender
             .send(JsEngineResponseEvent::EngineInited)
             .expect("Faied to send EngineInited event");
-        
+
         while let Ok(event) = js_request_receiver.recv() {
             process_js_event(
                 engine,

@@ -1,5 +1,6 @@
 import * as create from "std:create.mjs"
-export class Graphic {
+import { Synchronize } from "std:synchronize.mjs"
+export class Graphic extends Synchronize {
     constructor(
         width,
         height,
@@ -10,6 +11,7 @@ export class Graphic {
         textureAtlasLayout,
         offset,
     ) {
+        super()
         this.width = width
         this.height = height
         this.path = path

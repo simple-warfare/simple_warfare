@@ -16,7 +16,7 @@ use url::Url;
 use crate::{
     assets::mods::js::JsAsset,
     js_engine::{
-        event::{JsEngineRequestEvent, SwRequireLoaderRequestEvent, SwRequireLoaderResponseEvent},
+        event::{JsEngineRequestEvent, JsEngineResponseEvent, SwRequireLoaderRequestEvent, SwRequireLoaderResponseEvent},
         host_defined::*,
         loader::SimpleWarfareModuleLoader,
         module::ModModule,
@@ -33,6 +33,7 @@ impl JsEngine {
     pub fn new(
         loader: SimpleWarfareModuleLoader,
         js_engine_request_sender: Arc<Sender<JsEngineRequestEvent>>,
+        js_engine_response_sender: Arc<Sender<JsEngineResponseEvent>>,
         require_request_sender: Arc<Sender<SwRequireLoaderRequestEvent>>,
         require_response_receiver: Arc<Mutex<Receiver<SwRequireLoaderResponseEvent>>>,
         sw_request_sender: Arc<Sender<SwRequestEvent>>,
@@ -52,6 +53,7 @@ impl JsEngine {
         egister_global_property(
             &mut ctx.borrow_mut(),
             js_engine_request_sender,
+            js_engine_response_sender,
             sw_request_sender,
             sw_response_receiver,
         );
@@ -78,6 +80,7 @@ impl JsEngine {
 fn egister_global_property(
     ctx: &mut Context,
     js_engine_request_sender: Arc<Sender<JsEngineRequestEvent>>,
+    js_engine_response_sender: Arc<Sender<JsEngineResponseEvent>>,
     sw_request_sender: Arc<Sender<SwRequestEvent>>,
     sw_response_receiver: Arc<Mutex<Receiver<SwResponseEvent>>>,
 ) {
@@ -88,6 +91,7 @@ fn egister_global_property(
     let sw = Sw::init(
         ctx,
         js_engine_request_sender,
+        js_engine_response_sender,
         sw_request_sender,
         sw_response_receiver,
     );
@@ -217,4 +221,5 @@ fn insert_host_defined_data(ctx: &mut Context) {
     ctx.realm()
         .host_defined_mut()
         .insert(JsObjectMap::default());
+    ctx.realm().host_defined_mut().insert(JsProxyMap::default());
 }

@@ -38,17 +38,7 @@ impl Scene for MainScene {
     }
 }
 fn background_map(mut commands: Commands, asset_server: Res<AssetServer>) {
-    let ldtk_handle = asset_server
-        .load("maps/BaiCai's Water Ring Lake/BaiCai's Water Ring Lake.ldtk")
-        .into();
-
-    commands.spawn((
-        MainSceneMark,
-        LdtkWorldBundle {
-            ldtk_handle,
-            ..Default::default()
-        },
-    ));
+    
 }
 fn setup(
     mut commands: Commands,

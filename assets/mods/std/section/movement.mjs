@@ -1,8 +1,10 @@
+import { Synchronize } from "std:synchronize.mjs";
+
 export const MovementType = {
     LAND: "Land",
 };
 
-export class Movement {
+export class Movement extends Synchronize {
     constructor(
         movementType,
         maxMoveSpeed,
@@ -15,6 +17,7 @@ export class Movement {
         angularDamping,
         linearDamping
     ) {
+        super()
         this.movementType = movementType
         this.maxMoveSpeed = maxMoveSpeed
         this.moveAcceleration = moveAcceleration

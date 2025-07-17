@@ -22,11 +22,11 @@ export class SingleTurret extends Turret {
 
 
         this.onPressComfirmFunc = () => {
-            let target_object = sw.getObject(this.target_entity)
-            if (target_object.shield == 0){
-                //sw.alterTargetState(this.target_entity, "hp", -100)
-            }
-            console.log(JSON.stringify(target_object.core))
+            let target_proxy = sw.getProxy(this.target_entity)
+
+            console.log(`before:${target_proxy.core.hp}`)
+            target_proxy.getCore().hp -= 100
+            console.log(`after:${target_proxy.core.hp}`)
         }
 
         this.onUnitExitFunc = (units) => {

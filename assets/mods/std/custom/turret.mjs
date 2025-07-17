@@ -1,8 +1,9 @@
 import { create as transformCreate } from "std:bevy/transform/transform.mjs"
 import { CreatedSignal, Signal, OnUnitEnterSignal, OnUnitExitSignal } from "std:signal/signal.mjs";
 import { TargetType } from "std:sw/sw.mjs";
+import { Synchronize } from "std:synchronize.mjs";
 
-export class Turret {
+export class Turret extends Synchronize {
     constructor(
         transform,
         image,
@@ -10,7 +11,7 @@ export class Turret {
         canShoot,
         attackRadius
     ) {
-        this.entity = sw.register_entity(this)
+        super()
         this.transform = transform
         this.image = image
         this.turnSpeed = turnSpeed

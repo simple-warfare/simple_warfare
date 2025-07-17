@@ -1,32 +1,30 @@
 mod module;
+pub mod user_data;
 use bevy::{asset::LoadedFolder, prelude::*};
 use mlua::{Lua, ObjectLike, Table};
 
 use crate::{
     app_state::AppState,
-    assets::mods::{
-        info::{self, *},
-        js::JsAsset,
-        lua::*,
-    },
+    assets::mods::{info::*, js::JsAsset, lua::*},
+    lua_engine::user_data::{MapManager, ModManager},
     mod_engine::server::ModServer,
 };
 
 #[derive(Resource)]
 pub struct LuaRuntime {
-    engine: Lua,
+    context: Lua,
     global: Table,
 }
 
 impl Default for LuaRuntime {
     fn default() -> Self {
-        let engine = Lua::new();
-        let global = engine.globals();
+        let context = Lua::new();
+        let global = context.globals();
         //添加默认module
-        if let Ok(simple_warfare) = module::mod_engine(&engine) {
+        if let Ok(simple_warfare) = module::mod_engine(&context) {
             global.set("simple_warfare", simple_warfare).expect("");
         }
-        Self { engine, global }
+        Self { context, global }
     }
 }
 
@@ -72,7 +70,7 @@ fn load_main_lua(
 
     next_state.set(AppState::MainLuaExecuting);
     let global = &lua_runtime.global;
-    let engine = &lua_runtime.engine;
+    let context = &lua_runtime.context;
     for (mod_info_id, mod_info) in mod_infos
         .iter()
         .filter(|(_, info)| !info.game_version.is_empty())
@@ -91,28 +89,29 @@ fn load_main_lua(
         //载入main.lua
         if let Some(lua_asset) = lua_assets.get(lua_handle.id()) {
             //添加该mod信息
-            add_default_value(engine, global, mod_info).expect("add default value error");
-            engine.load(lua_asset.context.clone()).exec()?;
+            add_global_value(context, global, mod_info).expect("add global value error");
+            context.load(lua_asset.context.clone()).exec()?;
 
             global.call_function::<()>("Main", ())?;
 
-            let mod_enable_form_lua: ModEnableLua = global.get("mod_enable")?;
+            //mod初始化完毕
+            let mod_manager: ModManager = global.get("mod_manager")?;
 
-            let mod_enables: Vec<(JsAsset, Vec<String>)> = mod_enable_form_lua
-                .enable
+            let mod_enables: Vec<(JsAsset, Vec<String>)> = mod_manager
+                .enables
                 .iter()
-                .filter_map(|mod_class_lua| {
+                .filter_map(|mod_enable_classes_define| {
                     let js_handle = asset_server
                         .get_handle(
                             asset_server
                                 .get_path(mod_info_id)?
                                 .parent()?
-                                .resolve(&mod_class_lua.js_file)
+                                .resolve(&mod_enable_classes_define.js_file_path)
                                 .ok()?,
                         )
                         .unwrap();
                     if let Some(js_asset) = js_assets.get(js_handle.id()) {
-                        Some((js_asset.clone(), mod_class_lua.classes.clone()))
+                        Some((js_asset.clone(), mod_enable_classes_define.classes.clone()))
                     } else {
                         None
                     }
@@ -127,10 +126,12 @@ fn load_main_lua(
     Ok(())
 }
 
-fn add_default_value(engine: &Lua, global: &Table, mod_info: &ModInfo) -> Result {
-    let mod_info_lua = engine.create_ser_userdata(mod_info.clone())?;
-    let mod_enable_lua = engine.create_ser_userdata(ModEnableLua::default())?;
-    global.set("mod_info", mod_info_lua)?;
-    global.set("mod_enable", mod_enable_lua)?;
+fn add_global_value(context: &Lua, global: &Table, mod_info: &ModInfo) -> Result {
+    let mod_info = context.create_ser_userdata(mod_info.clone())?;
+    let mod_manager = context.create_ser_userdata(ModManager::default())?;
+    let map_manager = context.create_ser_userdata(MapManager::default())?;
+    global.set("mod_info", mod_info)?;
+    global.set("mod_manager", mod_manager)?;
+    global.set("map_manager", map_manager)?;
     Ok(())
 }

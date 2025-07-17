@@ -1,8 +1,11 @@
-export class Signal {
+import { Synchronize } from "std:synchronize.mjs"
+
+export class Signal extends Synchronize {
     constructor() {
-        this.entity = sw.register_entity(this)
+        super()
+        this.entity = sw.registerEntity(this)
         this.connectArray = new Array()
-        sw.register_signal(this)
+        sw.registerSignal(this)
     }
 
     connect(func) {
@@ -10,7 +13,7 @@ export class Signal {
     }
 
     emit(args) {
-        sw.signal_emit(this, args)
+        sw.signalEmit(this, args)
     }
 };
 
