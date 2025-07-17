@@ -13,12 +13,16 @@ use crate::{
             ldtk::{LdtkMap, LdtkMapLoader},
             tiled::{TiledMap, TiledMapLoader},
         },
-        mods::{info::*, js::*, lua::*},
+        mods::{
+            ModSet, ModSetLoader, ModSetNowUseConf, ModSetNowUseConfLoader, info::*, js::*, lua::*,
+        },
         texture::{
             TextureAtlasLayoutHandles, chrome::ChromeTextureSlicer, dialog::DialogTextureSlicer,
             process_textures,
         },
     },
+    custom::CustomMod,
+    statistics::MOD_SET_NOW_USE_CONF_PATH,
 };
 
 // 宏用于快速生成资源结构体和默认实现
@@ -58,7 +62,21 @@ define_asset_group!(Interfaces<Image>{
 pub struct GameAsset {
     pub interface: Interfaces,
     pub maps: Vec<Handle<LdtkMap>>,
-    pub all_untyped_handle: Vec<UntypedHandle>,
+    pub enable_mod_set: EnableModSet,
+    pub custom_mods: CustomMods,
+    pub js_untyped_handles: Vec<UntypedHandle>,
+    pub assets_untyped_handle: Vec<UntypedHandle>,
+}
+
+#[derive(Debug, Default)]
+pub struct CustomMods {
+    pub mods: Vec<CustomMod>,
+    pub untyped_handles: Vec<UntypedHandle>,
+}
+#[derive(Debug, Default)]
+pub struct EnableModSet {
+    pub conf_handle: Handle<ModSetNowUseConf>,
+    pub mod_set_handle: Handle<ModSet>,
 }
 pub struct AssetsPlugin;
 
@@ -76,6 +94,10 @@ impl Plugin for AssetsPlugin {
             .init_asset_loader::<LdtkMapLoader>()
             .init_asset::<TiledMap>()
             .init_asset_loader::<TiledMapLoader>()
+            .init_asset::<ModSetNowUseConf>()
+            .init_asset_loader::<ModSetNowUseConfLoader>()
+            .init_asset::<ModSet>()
+            .init_asset_loader::<ModSetLoader>()
             .init_resource::<GameAsset>()
             .init_resource::<DialogTextureSlicer>()
             .init_resource::<ChromeTextureSlicer>()
@@ -91,9 +113,11 @@ impl Plugin for AssetsPlugin {
 
 fn load_assets(mut game_assets: ResMut<GameAsset>, asset_server: Res<AssetServer>) {
     game_assets.interface.load(&asset_server);
+    let mod_set_conf_handle = asset_server.load(MOD_SET_NOW_USE_CONF_PATH);
+    game_assets.enable_mod_set.conf_handle = mod_set_conf_handle.clone();
 
     // 收集所有资源句柄
-    game_assets.all_untyped_handle = game_assets
+    game_assets.assets_untyped_handle = game_assets
         .interface
         .all_untyped()
         .iter()
@@ -106,20 +130,29 @@ fn load_assets(mut game_assets: ResMut<GameAsset>, asset_server: Res<AssetServer
                 .collect::<Vec<UntypedHandle>>(),
         )
         .collect();
+
+    game_assets
+        .assets_untyped_handle
+        .push(mod_set_conf_handle.untyped());
 }
 
 fn check_assets_ready(
-    game_asset: Res<GameAsset>,
+    mut game_asset: ResMut<GameAsset>,
     asset_server: Res<AssetServer>,
     mut system_state: ResMut<NextState<AppState>>,
-) {
-    // 检查所有资源是否都已加载完成
-    let all_loaded = game_asset
-        .all_untyped_handle
-        .iter()
-        .all(|handle| asset_server.is_loaded_with_dependencies(handle.id()));
-    // 只有当所有资源都加载完成时才更新状态
-    if all_loaded {
+    mod_set_confs: Res<Assets<ModSetNowUseConf>>,
+) -> Result {
+    game_asset
+        .assets_untyped_handle
+        .retain(|handle| !asset_server.is_loaded_with_dependencies(handle.id()));
+    if game_asset.assets_untyped_handle.is_empty() {
+        let mod_set_conf = mod_set_confs
+            .get(game_asset.enable_mod_set.conf_handle.id())
+            .ok_or(BevyError::from("Could not get the now_use.conf"))?;
+
+        game_asset.enable_mod_set.mod_set_handle = asset_server.load(&mod_set_conf.use_mod_set);
         system_state.set(AppState::AssetsProcessing);
     }
+
+    Ok(())
 }

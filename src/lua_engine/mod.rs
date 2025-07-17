@@ -1,13 +1,20 @@
 mod module;
 pub mod user_data;
+use std::path::Path;
+
 use bevy::{asset::LoadedFolder, prelude::*};
 use mlua::{Lua, ObjectLike, Table};
 
 use crate::{
     app_state::AppState,
-    assets::mods::{info::*, js::JsAsset, lua::*},
+    assets::{
+        GameAsset,
+        mods::{ModSet, ModSetNowUseConf, info::*, js::JsAsset, lua::*},
+    },
+    custom::CustomMod,
     lua_engine::user_data::{MapManager, ModManager},
     mod_engine::server::ModServer,
+    statistics::CUSTOM_MOD_PATH,
 };
 
 #[derive(Resource)]
@@ -33,95 +40,121 @@ pub struct LuaEnginePlugin;
 impl Plugin for LuaEnginePlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<LuaRuntime>()
-            .add_systems(OnEnter(AppState::ModInfoLoading), load_mod_infos)
             .add_systems(
                 Update,
-                check_mod_infos.run_if(in_state(AppState::ModInfoLoading)),
+                check_mod_set.run_if(in_state(AppState::ModSetLoading)),
             )
-            .add_systems(OnEnter(AppState::ModInfoLoaded), load_main_lua);
+            .add_systems(
+                Update,
+                check_custom_mods.run_if(in_state(AppState::CustomModLoading)),
+            )
+            .add_systems(OnEnter(AppState::MainLuaExecuting), exec_mod_main_lua);
     }
 }
 
-fn load_mod_infos(mut command: Commands, asset_server: Res<AssetServer>) {
-    command.insert_resource(ModsFolderHandle(asset_server.load_folder("mods/custom")));
-}
-fn check_mod_infos(
-    mut next_state: ResMut<NextState<AppState>>,
-    mods_folder_handle: Res<ModsFolderHandle>,
-    mut events: EventReader<AssetEvent<LoadedFolder>>,
-) {
-    for event in events.read() {
-        if event.is_loaded_with_dependencies(&mods_folder_handle.0) {
-            next_state.set(AppState::ModInfoLoaded);
-        }
-    }
-}
-
-fn load_main_lua(
-    lua_assets: Res<Assets<LuaAsset>>,
+fn check_mod_set(
     asset_server: Res<AssetServer>,
-    mod_infos: Res<Assets<ModInfo>>,
-    js_assets: Res<Assets<JsAsset>>,
+    mut game_asset: ResMut<GameAsset>,
     mut next_state: ResMut<NextState<AppState>>,
-    mod_server: Res<ModServer>,
+    mod_sets: Res<Assets<ModSet>>,
+) -> Result {
+    let mod_set_id = game_asset.enable_mod_set.mod_set_handle.id();
+    if asset_server.is_loaded_with_dependencies(mod_set_id) {
+        let now_mod_set = mod_sets
+            .get(mod_set_id)
+            .ok_or(BevyError::from("Could not get the ModSet Asset"))?;
+        now_mod_set.enable_mods.iter().for_each(|mod_name| {
+            let info_handle = asset_server.load(
+                Path::new(CUSTOM_MOD_PATH)
+                    .join(mod_name)
+                    .join("mod_info.toml"),
+            );
+            let main_lua_handle =
+                asset_server.load(Path::new(CUSTOM_MOD_PATH).join(mod_name).join("main.lua"));
+
+            game_asset
+                .custom_mods
+                .untyped_handles
+                .push(info_handle.clone().untyped());
+            game_asset
+                .custom_mods
+                .untyped_handles
+                .push(main_lua_handle.clone().untyped());
+
+            game_asset
+                .custom_mods
+                .mods
+                .push(CustomMod::new(info_handle, main_lua_handle));
+        });
+        next_state.set(AppState::CustomModLoading);
+    }
+
+    Ok(())
+}
+
+fn check_custom_mods(
+    mut game_asset: ResMut<GameAsset>,
+    asset_server: Res<AssetServer>,
+    mut next_state: ResMut<NextState<AppState>>,
+) {
+    game_asset
+        .custom_mods
+        .untyped_handles
+        .retain(|handle| !asset_server.is_loaded_with_dependencies(handle.id()));
+
+    if game_asset.custom_mods.untyped_handles.is_empty() {
+        next_state.set(AppState::MainLuaExecuting);
+    }
+}
+
+fn exec_mod_main_lua(
+    asset_server: Res<AssetServer>,
+    lua_assets: Res<Assets<LuaAsset>>,
+    mod_infos: Res<Assets<ModInfo>>,
+    mut game_asset: ResMut<GameAsset>,
+    mut next_state: ResMut<NextState<AppState>>,
     lua_runtime: Res<LuaRuntime>,
 ) -> Result {
     //获取lua环境
-
-    next_state.set(AppState::MainLuaExecuting);
     let global = &lua_runtime.global;
     let context = &lua_runtime.context;
-    for (mod_info_id, mod_info) in mod_infos
-        .iter()
-        .filter(|(_, info)| !info.game_version.is_empty())
-    {
-        let lua_handle = asset_server
-            .get_handle(
-                asset_server
-                    .get_path(mod_info_id)
-                    .unwrap()
-                    .parent()
-                    .unwrap()
-                    .resolve("main.lua")?,
-            )
-            .unwrap();
+    let custom_mods = &mut game_asset.custom_mods;
+    custom_mods
+        .mods
+        .iter_mut()
+        .try_for_each::<_, Result>(|custom_mod| {
+            if let (Some(lua_asset), Some(mod_info)) = (
+                lua_assets.get(custom_mod.main_lua.id()),
+                mod_infos.get(custom_mod.info.id()),
+            ) {
+                let mod_name = &mod_info.name;
 
-        //载入main.lua
-        if let Some(lua_asset) = lua_assets.get(lua_handle.id()) {
-            //添加该mod信息
-            add_global_value(context, global, mod_info).expect("add global value error");
-            context.load(lua_asset.context.clone()).exec()?;
+                add_global_value(context, global, mod_info).expect("add global value error");
+                context.load(lua_asset.context.clone()).exec()?;
 
-            global.call_function::<()>("Main", ())?;
+                global.call_function::<()>("Main", ())?;
 
-            //mod初始化完毕
-            let mod_manager: ModManager = global.get("mod_manager")?;
+                //mod初始化完毕
+                let mod_manager: ModManager = global.get("mod_manager")?;
 
-            let mod_enables: Vec<(JsAsset, Vec<String>)> = mod_manager
-                .enables
-                .iter()
-                .filter_map(|mod_enable_classes_define| {
-                    let js_handle = asset_server
-                        .get_handle(
-                            asset_server
-                                .get_path(mod_info_id)?
-                                .parent()?
-                                .resolve(&mod_enable_classes_define.js_file_path)
-                                .ok()?,
-                        )
-                        .unwrap();
-                    if let Some(js_asset) = js_assets.get(js_handle.id()) {
-                        Some((js_asset.clone(), mod_enable_classes_define.classes.clone()))
-                    } else {
-                        None
-                    }
-                })
-                .collect();
+                mod_manager
+                    .enables
+                    .iter()
+                    .for_each(|mod_enable_classes_define| {
+                        let js_handle = asset_server.load(
+                            Path::new(CUSTOM_MOD_PATH)
+                                .join(mod_name)
+                                .join(&mod_enable_classes_define.js_file_path),
+                        );
 
-            mod_server.load_mod(mod_enables, mod_info.clone())?;
-        }
-    }
-
+                        custom_mod
+                            .enable_js
+                            .push((js_handle.clone(), mod_enable_classes_define.classes.clone()));
+                        custom_mods.untyped_handles.push(js_handle.untyped());
+                    });
+            }
+            Ok(())
+        });
     next_state.set(AppState::MainLuaExecuted);
     Ok(())
 }

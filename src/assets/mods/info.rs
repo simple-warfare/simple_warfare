@@ -69,9 +69,6 @@ impl AssetLoader for ModInfoLoader {
     ) -> Result<Self::Asset, Self::Error> {
         let mut context = String::new();
         reader.read_to_string(&mut context).await?;
-        if !context.contains("enable") {
-            context.push_str("\nenable = []");
-        }
         Ok(toml::from_str(&context).unwrap_or_default())
     }
 
@@ -80,4 +77,4 @@ impl AssetLoader for ModInfoLoader {
     }
 }
 #[derive(Resource, Default)]
-pub struct ModsFolderHandle(pub Handle<LoadedFolder>);
+pub struct ModSetsFolderHandle(pub Handle<LoadedFolder>);
