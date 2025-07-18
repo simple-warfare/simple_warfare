@@ -3,6 +3,8 @@ pub mod map;
 pub mod mods;
 pub mod texture;
 
+use std::{path::Path, sync::Arc};
+
 use bevy::prelude::*;
 
 use crate::{
@@ -10,8 +12,9 @@ use crate::{
     assets::{
         js_file::{JsTomlFile, JsTomlFileLoader},
         map::{
+            SimpleWarfareMap,
             ldtk::{LdtkMap, LdtkMapLoader},
-            tiled::{TiledMap, TiledMapLoader},
+            tiled::{TiledMap, TiledMapInfo, TiledMapInfoLoader, TiledMapLoader},
         },
         mods::{
             ModSet, ModSetLoader, ModSetNowUseConf, ModSetNowUseConfLoader, info::*, js::*, lua::*,
@@ -22,13 +25,13 @@ use crate::{
         },
     },
     custom::CustomMod,
-    statistics::MOD_SET_NOW_USE_CONF_PATH,
+    statistics::{MOD_SET_NOW_USE_CONF_PATH, MOD_SET_PATH},
 };
 
 // 宏用于快速生成资源结构体和默认实现
 macro_rules! define_asset_group {
     ($name:ident<$asset_type:ident> { $($field:ident: $path:literal),* $(,)? }) => {
-        #[derive(Debug)]
+        #[derive(Debug, Clone)]
         pub struct $name {
             $(pub $field: Handle<$asset_type>,)*
         }
@@ -56,15 +59,16 @@ define_asset_group!(Interfaces<Image>{
     loading_screen: "texture/interface/loading_screen.png",
     dialog:"texture/interface/dialog.png",
     chrome:"texture/interface/chrome.png",
+    missing_map_thumbnail:"texture/interface/missing_map_thumbnail.png",
+    too_larget_thumbnail:"texture/interface/too_larget_thumbnail.png",
 });
 
 #[derive(Debug, Default, Resource)]
 pub struct GameAsset {
     pub interface: Interfaces,
-    pub maps: Vec<Handle<LdtkMap>>,
+    pub maps: Vec<Arc<SimpleWarfareMap>>,
     pub enable_mod_set: EnableModSet,
     pub custom_mods: CustomMods,
-    pub js_untyped_handles: Vec<UntypedHandle>,
     pub assets_untyped_handle: Vec<UntypedHandle>,
 }
 
@@ -94,6 +98,8 @@ impl Plugin for AssetsPlugin {
             .init_asset_loader::<LdtkMapLoader>()
             .init_asset::<TiledMap>()
             .init_asset_loader::<TiledMapLoader>()
+            .init_asset::<TiledMapInfo>()
+            .init_asset_loader::<TiledMapInfoLoader>()
             .init_asset::<ModSetNowUseConf>()
             .init_asset_loader::<ModSetNowUseConfLoader>()
             .init_asset::<ModSet>()
@@ -122,13 +128,6 @@ fn load_assets(mut game_assets: ResMut<GameAsset>, asset_server: Res<AssetServer
         .all_untyped()
         .iter()
         .cloned()
-        .chain(
-            game_assets
-                .maps
-                .iter()
-                .map(|typed_handle| typed_handle.clone().untyped())
-                .collect::<Vec<UntypedHandle>>(),
-        )
         .collect();
 
     game_assets
@@ -150,7 +149,8 @@ fn check_assets_ready(
             .get(game_asset.enable_mod_set.conf_handle.id())
             .ok_or(BevyError::from("Could not get the now_use.conf"))?;
 
-        game_asset.enable_mod_set.mod_set_handle = asset_server.load(&mod_set_conf.use_mod_set);
+        game_asset.enable_mod_set.mod_set_handle =
+            asset_server.load(Path::new(MOD_SET_PATH).join(&mod_set_conf.use_mod_set));
         system_state.set(AppState::AssetsProcessing);
     }
 

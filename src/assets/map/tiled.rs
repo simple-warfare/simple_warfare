@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 
 use bevy::{
-    asset::{AssetLoader, LoadContext, io::Reader},
+    asset::{AssetLoader, AsyncReadExt, LoadContext, io::Reader},
     prelude::*,
 };
 use bevy_ecs_tiled::prelude::*;
@@ -51,20 +51,20 @@ impl AssetLoader for TiledMapLoader {
     ) -> Result<Self::Asset, Self::Error> {
         let path = load_context.path().to_owned();
 
-        let file_name = path
+        let file_stem = path
             .file_stem()
-            .ok_or_else(|| {
-                Self::Error::FileNameNotFound(load_context.path().display().to_string())
-            })?
+            .ok_or(Self::Error::FileNameNotFound(
+                load_context.path().display().to_string(),
+            ))?
             .to_string_lossy()
             .to_string();
 
-        let parent_path = path.parent().ok_or_else(|| {
-            Self::Error::ParentPathNotFound(load_context.path().display().to_string())
-        })?;
+        let parent_path = path.parent().ok_or(Self::Error::ParentPathNotFound(
+            load_context.path().display().to_string(),
+        ))?;
 
-        let info_path = parent_path.join(&file_name).join(".toml");
-        let thumbnail_path = parent_path.join(&file_name).join(".png");
+        let info_path = parent_path.join(format!("{file_stem}.toml"));
+        let thumbnail_path = parent_path.join(format!("{file_stem}.toml"));
 
         let info = load_context.load(info_path);
 
@@ -96,6 +96,7 @@ pub enum TiledMapInfoLoaderError {
     Parse(#[from] toml::de::Error),
 }
 
+#[derive(Default)]
 pub struct TiledMapInfoLoader;
 
 impl AssetLoader for TiledMapInfoLoader {
@@ -111,10 +112,9 @@ impl AssetLoader for TiledMapInfoLoader {
         _settings: &Self::Settings,
         _load_context: &mut LoadContext<'_>,
     ) -> Result<Self::Asset, Self::Error> {
-        let mut data = Vec::new();
-        reader.read_to_end(&mut data);
-
-        Ok(toml::from_slice(&data)?)
+        let mut data = String::new();
+        reader.read_to_string(&mut data).await?;
+        Ok(toml::from_str(&data)?)
     }
 
     fn extensions(&self) -> &[&str] {

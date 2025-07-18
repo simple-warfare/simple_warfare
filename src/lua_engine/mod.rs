@@ -2,18 +2,18 @@ mod module;
 pub mod user_data;
 use std::path::Path;
 
-use bevy::{asset::LoadedFolder, prelude::*};
+use bevy::prelude::*;
 use mlua::{Lua, ObjectLike, Table};
 
 use crate::{
     app_state::AppState,
     assets::{
         GameAsset,
-        mods::{ModSet, ModSetNowUseConf, info::*, js::JsAsset, lua::*},
+        map::{SimpleWarfareMap, ldtk::LdtkMap, tiled::TiledMap},
+        mods::{ModSet, info::*, lua::*},
     },
     custom::CustomMod,
     lua_engine::user_data::{MapManager, ModManager},
-    mod_engine::server::ModServer,
     statistics::CUSTOM_MOD_PATH,
 };
 
@@ -118,6 +118,7 @@ fn exec_mod_main_lua(
     //获取lua环境
     let global = &lua_runtime.global;
     let context = &lua_runtime.context;
+
     let custom_mods = &mut game_asset.custom_mods;
     custom_mods
         .mods
@@ -135,7 +136,7 @@ fn exec_mod_main_lua(
                 global.call_function::<()>("Main", ())?;
 
                 //mod初始化完毕
-                let mod_manager: ModManager = global.get("mod_manager")?;
+                let mod_manager = global.get::<ModManager>("mod_manager")?;
 
                 mod_manager
                     .enables
@@ -152,10 +153,33 @@ fn exec_mod_main_lua(
                             .push((js_handle.clone(), mod_enable_classes_define.classes.clone()));
                         custom_mods.untyped_handles.push(js_handle.untyped());
                     });
+
+                let map_manager = global.get::<MapManager>("map_manager")?;
+                map_manager.map_paths.iter().try_for_each(|map_path| {
+                    let binding = Path::new(CUSTOM_MOD_PATH).join(mod_name).join(map_path);
+                    let real_map_path = binding.as_path();
+                    
+                    if let Some(ext) = real_map_path.extension() {
+                        let (map, untyped) = match ext.to_string_lossy().trim() {
+                            "tmx" => {
+                                let map = asset_server.load(real_map_path);
+                                (SimpleWarfareMap::Tiled(map.clone()), map.untyped())
+                            }
+                            "ldtk" => {
+                                let map = asset_server.load(real_map_path);
+                                (SimpleWarfareMap::Ldtk(map.clone()), map.untyped())
+                            }
+                            _ => return Err(BevyError::from("undefine map type")),
+                        };
+                        custom_mod.maps.push(map);
+                        custom_mods.untyped_handles.push(untyped);
+                    }
+                    Ok(())
+                })?;
             }
             Ok(())
-        });
-    next_state.set(AppState::MainLuaExecuted);
+        })?;
+    next_state.set(AppState::JsLoading);
     Ok(())
 }
 

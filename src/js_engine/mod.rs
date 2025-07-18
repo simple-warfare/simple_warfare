@@ -161,7 +161,7 @@ fn inited_js_engine(
 ) {
     for event in event_reader.read() {
         match event {
-            JsEngineResponseEvent::EngineInited => next_state.set(AppState::ModInfoLoading),
+            JsEngineResponseEvent::EngineInited => next_state.set(AppState::ModSetLoading),
             _ => {}
         }
     }

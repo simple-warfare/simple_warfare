@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 
+pub const MOD_SET_PATH: &'static str = "mod_set/";
 pub const MOD_SET_NOW_USE_CONF_PATH: &'static str = "mod_set/now_use.conf";
 pub const CUSTOM_MOD_PATH: &'static str = "mods/custom/";
 #[derive(Default, Debug, Resource)]

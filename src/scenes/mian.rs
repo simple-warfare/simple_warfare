@@ -33,13 +33,14 @@ enum ButtonLabel {
 
 impl Scene for MainScene {
     fn build(&self, app: &mut App) {
-        app.add_scene_system::<MainSceneMark, _, _>(SceneState::MainScene, (background_map, setup))
-            .add_observer(button_click);
+        app.add_scene_system::<MainSceneMark, _, _>(
+            SceneState::MainScene,
+            (background_map, setup, add_observer_for_button).chain(),
+        )
+        .add_observer(observer_click);
     }
 }
-fn background_map(mut commands: Commands, asset_server: Res<AssetServer>) {
-    
-}
+fn background_map(mut commands: Commands, asset_server: Res<AssetServer>) {}
 fn setup(
     mut commands: Commands,
     game_asset: Res<GameAsset>,
@@ -143,7 +144,7 @@ fn setup(
     ));
 }
 
-fn button_click(
+fn observer_click(
     click: Trigger<Pointer<Click>>,
     buttons: Query<&ButtonLabel, With<Button>>,
     mut exit_event: EventWriter<AppExit>,
@@ -162,4 +163,10 @@ fn button_click(
             }
         }
     }
+}
+
+fn add_observer_for_button(mut commands: Commands, buttons: Query<Entity, With<ButtonLabel>>) {
+    buttons.iter().for_each(|btn_entity| {
+        commands.entity(btn_entity).observe(observer_click);
+    });
 }

@@ -9,5 +9,7 @@ pub enum AppState {
     ModSetLoading,
     CustomModLoading,
     MainLuaExecuting,
-    MainLuaExecuted,
+    JsLoading,
+    ModLoading,
+    ModLoaded
 }
