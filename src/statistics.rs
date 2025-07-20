@@ -1,4 +1,8 @@
+use std::sync::Arc;
+
 use bevy::prelude::*;
+
+use crate::assets::map::SimpleWarfareMap;
 
 pub const MOD_SET_PATH: &'static str = "mod_set/";
 pub const MOD_SET_NOW_USE_CONF_PATH: &'static str = "mod_set/now_use.conf";
@@ -13,6 +17,9 @@ pub enum GameType {
     #[default]
     SandBox,
 }
+
+#[derive(Debug, Resource)]
+pub struct SelectedMap(pub Arc<SimpleWarfareMap>);
 
 #[derive(Resource, Default, Debug)]
 pub struct SelectionState {

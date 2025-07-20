@@ -21,7 +21,8 @@ use crate::{
     js_engine::synchronize::SynchronizePlugin,
     lua_engine::LuaEnginePlugin,
     mod_engine::ModEnginePlugin,
-    scenes::ScenePlugin,
+    panel::PanelPlugin,
+    scenes::{ScenePlugin, SceneState},
     spatial::SpatialPlugin,
     statistics::StatistcsPlugin,
     system::SystemPlugin,
@@ -56,6 +57,7 @@ impl PluginGroup for SimpleWarfarePlugins {
             .add(JsEnginePlugin)
             .add(LuaEnginePlugin)
             .add(ScenePlugin)
+            .add(PanelPlugin)
             .add(ModEnginePlugin)
             .add(SystemPlugin)
             .add(StatistcsPlugin)
@@ -74,6 +76,7 @@ impl Plugin for SimpleWarfarePlugin {
     fn build(&self, app: &mut App) {
         app.init_state::<AppState>()
             .register_type::<AppState>()
+            .register_type::<SceneState>()
             .add_plugins((
                 RemotePlugin::default(),
                 RemoteHttpPlugin::default(),
@@ -86,6 +89,7 @@ impl Plugin for SimpleWarfarePlugin {
             })
             .add_plugins(WorldInspectorPlugin::new())
             .add_plugins(StateInspectorPlugin::<AppState>::default())
+            .add_plugins(StateInspectorPlugin::<SceneState>::default())
             .add_plugins(FlyCameraPlugin)
             .add_plugins(PanicHandler::new().build())
             .add_plugins(LdtkPlugin)

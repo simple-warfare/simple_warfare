@@ -8,11 +8,14 @@ use bevy_ecs_tiled::prelude::*;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
+pub const MISSING_MAP_THUMBNAIL_PATH:&'static str = "texture/interface/missing_map_thumbnail.png";
+
+
 #[derive(Debug, Clone, Asset, TypePath)]
 pub struct TiledMap {
-    pub thumbnail: Option<Handle<Image>>,
+    pub thumbnail: Handle<Image>,
     pub info: Handle<TiledMapInfo>,
-    path: PathBuf,
+    pub path: PathBuf,
     pub map: Option<TiledMapHandle>,
 }
 #[derive(Debug, Error)]
@@ -69,9 +72,9 @@ impl AssetLoader for TiledMapLoader {
         let info = load_context.load(info_path);
 
         let thumbnail = if thumbnail_path.exists() {
-            Some(load_context.load(&*thumbnail_path))
+            load_context.load(&*thumbnail_path)
         } else {
-            None
+            load_context.load(MISSING_MAP_THUMBNAIL_PATH)
         };
 
         Ok(Self::Asset {

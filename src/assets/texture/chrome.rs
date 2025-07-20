@@ -4,13 +4,13 @@ use crate::assets::{GameAsset, texture::TextureAtlasLayoutHandles};
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum ChromeAtlasKind {
-    MapViewer = 0,
+    MainViewer = 0,
     GrayBrickRect = 1,
 }
 
 #[derive(Default, Resource)]
 pub struct ChromeTextureSlicer {
-    pub map_viewer: TextureSlicer,
+    pub main_viewer: TextureSlicer,
     pub gray_brick_rect: TextureSlicer,
 }
 
@@ -31,17 +31,17 @@ pub(super) fn process(
 
         texture_atlas.add_texture(URect::from_corners(UVec2::new(56, 0), UVec2::new(84, 28)));
 
-        chrome_texture_slicer.map_viewer = TextureSlicer {
+        chrome_texture_slicer.main_viewer = TextureSlicer {
             border: BorderRect::axes(190., 15.),
             center_scale_mode: SliceScaleMode::Stretch,
             sides_scale_mode: SliceScaleMode::Stretch,
-            max_corner_scale: 4.0,
+            max_corner_scale: 1.0,
         };
         chrome_texture_slicer.gray_brick_rect = TextureSlicer {
             border: BorderRect::all(22.),
             center_scale_mode: SliceScaleMode::Stretch,
             sides_scale_mode: SliceScaleMode::Stretch,
-            max_corner_scale: 4.0,
+            max_corner_scale: 1.0,
         };
         texture_atlas_layout_handles.chrome = texture_atlases.add(texture_atlas);
     }

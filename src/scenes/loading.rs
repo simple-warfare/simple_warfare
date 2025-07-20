@@ -31,6 +31,7 @@ impl Scene for LoadingScene {
 }
 
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>, game_asset: Res<GameAsset>) {
+    commands.spawn((Camera2d, Camera::default()));
     let mut background_music = SamplePlayer::new(asset_server.load("music/background/war.mp3"));
     background_music.repeat_mode = RepeatMode::RepeatEndlessly;
     commands.spawn(background_music);

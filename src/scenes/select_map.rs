@@ -2,7 +2,6 @@ use std::sync::Arc;
 
 use bevy::{color::palettes::css::*, prelude::*};
 use serde::{Deserialize, Serialize};
-use url::form_urlencoded::Target;
 
 use crate::{
     assets::{
@@ -19,6 +18,7 @@ use crate::{
         },
     },
     bevy_ext::app::AppExt,
+    statistics::SelectedMap,
 };
 
 use super::{Scene, SceneState};
@@ -37,8 +37,7 @@ impl Scene for SelectMapScene {
         app.add_scene_system::<SelectMapSceneMark, _, _>(
             SceneState::SelectMapScene,
             (setup, add_observer_for_button, show_map).chain(),
-        )
-        .add_observer(observer_click);
+        );
     }
 }
 
@@ -59,7 +58,7 @@ fn setup(
 ) -> Result {
     let chrome = &game_asset.interface.chrome;
     let chrome_layout = &texture_atlas_layout_handles.chrome;
-    let map_viewer_slicer = &chrome_texture_slicer.map_viewer;
+    let main_viewer_slicer = &chrome_texture_slicer.main_viewer;
     let gray_brick_rect = &chrome_texture_slicer.gray_brick_rect;
 
     commands.spawn((SelectMapSceneMark, Camera2d));
@@ -80,7 +79,7 @@ fn setup(
                 display: Display::Grid,
                 width: Val::Percent(80.),
                 height: Val::Percent(80.),
-                grid_template_columns: vec![GridTrack::flex(1.9), GridTrack::flex(1.0)],
+                grid_template_columns: vec![GridTrack::flex(4.8), GridTrack::flex(1.0)],
                 grid_template_rows: vec![
                     GridTrack::flex(1.0),
                     GridTrack::flex(1.0),
@@ -92,10 +91,10 @@ fn setup(
                 chrome.clone(),
                 TextureAtlas {
                     layout: chrome_layout.clone(),
-                    index: ChromeAtlasKind::MapViewer as usize,
+                    index: ChromeAtlasKind::MainViewer as usize,
                 },
             )
-            .with_mode(NodeImageMode::Sliced(map_viewer_slicer.clone())),
+            .with_mode(NodeImageMode::Sliced(main_viewer_slicer.clone())),
             children![
                 (
                     MapGridContainer,
@@ -135,7 +134,7 @@ fn setup(
                                 height: Val::Percent(100.),
                                 ..Default::default()
                             },
-                            children![
+                            children![(
                                 MapTitleViewer,
                                 Text::default(),
                                 TextFont::from_font_size(10.),
@@ -144,7 +143,7 @@ fn setup(
                                     linebreak: LineBreak::AnyCharacter
                                 },
                                 TextColor(Color::Srgba(BLACK),)
-                            ]
+                            )]
                         ),
                         (Node {
                             display: Display::Grid,
@@ -169,7 +168,7 @@ fn setup(
                                 }
                             )
                             .with_mode(NodeImageMode::Sliced(gray_brick_rect.clone())),
-                            children![(Text::new("Ok"), TextColor(Color::Srgba(WHITE),))]
+                            children![(Text::new("Oh this"), TextColor(Color::Srgba(WHITE),))]
                         )
                     ]
                 )
@@ -204,12 +203,10 @@ fn show_map(
             let tiled_map = tiled_maps.get(map_handle.id()).unwrap();
             let tiled_map_info = tiled_map_infos.get(tiled_map.info.id()).unwrap();
 
-            let thumbnail = tiled_map
-                .thumbnail
-                .clone()
-                .unwrap_or(game_asset.interface.missing_map_thumbnail.clone());
+            let thumbnail = tiled_map.thumbnail.clone();
             (
                 Node {
+                    display: Display::Grid,
                     width: Val::Percent(100.),
                     height: Val::Percent(100.),
                     padding: UiRect::all(Val::Px(6.)),
@@ -232,6 +229,7 @@ fn show_map(
                 children![
                     (
                         Node {
+                            display: Display::Grid,
                             width: Val::Percent(90.),
                             max_height: Val::Percent(80.),
                             aspect_ratio: Some(1.),
@@ -244,8 +242,10 @@ fn show_map(
                     ),
                     (
                         Node {
+                            display: Display::Grid,
                             width: Val::Percent(90.),
                             max_height: Val::Percent(20.),
+                            padding: UiRect::all(Val::Px(10.)),
                             align_content: AlignContent::Center,
                             justify_content: JustifyContent::Center,
                             ..Default::default()
@@ -277,6 +277,7 @@ fn show_map(
 
 fn observer_click(
     click: Trigger<Pointer<Click>>,
+    mut commands: Commands,
     tiled_maps: Res<Assets<TiledMap>>,
     tiled_map_infos: Res<Assets<TiledMapInfo>>,
     map_pointers: Query<&MapPointer>,
@@ -284,9 +285,8 @@ fn observer_click(
     buttons: Query<&ButtonLabel, With<Button>>,
     mut scene_state: ResMut<NextState<SceneState>>,
 ) {
-    info!("observer_click");
     if let Ok(map_pointer) = map_pointers.get(click.target()) {
-        info!("map_pointer");
+        commands.insert_resource(SelectedMap(map_pointer.0.clone()));
         match map_pointer.0.as_ref() {
             SimpleWarfareMap::Ldtk(handle) => todo!(),
             SimpleWarfareMap::Tiled(map_handle) => {
@@ -297,14 +297,13 @@ fn observer_click(
         }
     } else if let Ok(lable) = buttons.get(click.target()) {
         match lable {
-            ButtonLabel::Ok => scene_state.set(SceneState::GameScene),
+            ButtonLabel::Ok => scene_state.set(SceneState::SkirmishGame),
         }
     }
 }
 
 fn add_observer_for_button(mut commands: Commands, buttons: Query<Entity, With<ButtonLabel>>) {
     buttons.iter().for_each(|btn_entity| {
-        info!("add_observer_for_button");
         commands.entity(btn_entity).observe(observer_click);
     });
 }
