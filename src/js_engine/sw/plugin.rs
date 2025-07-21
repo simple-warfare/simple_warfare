@@ -1,9 +1,7 @@
-use std::sync::Arc;
-
 use crate::{
     assets::js_file::JsTomlFile,
     custom::{
-        ui::quick::{QuickComfirmDialog, QuickDialogData, QuickUi},
+        ui::quick::{QuickDialogData, QuickUi},
         unit::unit::Custom,
     },
     js_engine::{
@@ -13,7 +11,7 @@ use crate::{
         sw::{SwRequestEvent, SwRequestReceiver, SwResponseEvent, SwResponseSender},
     },
 };
-use bevy::{asset::AssetEvents, platform::collections::HashMap, prelude::*};
+use bevy::{platform::collections::HashMap, prelude::*};
 use bevy_hui::prelude::*;
 pub struct SwPlugin;
 

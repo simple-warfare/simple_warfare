@@ -19,15 +19,15 @@ use serde::{Deserialize, Serialize};
 use super::{Scene, SceneState};
 
 #[derive(Default)]
-pub struct SkirmishGame;
+pub struct MultiplayerGame;
 
 #[derive(Component)]
-struct SkirmishGameMark;
+struct MultiplayerGameMark;
 
-impl Scene for SkirmishGame {
+impl Scene for MultiplayerGame {
     fn build(&self, app: &mut App) {
-        app.add_scene_system::<SkirmishGameMark, _, _>(
-            SceneState::SkirmishGame,
+        app.add_scene_system::<MultiplayerGameMark, _, _>(
+            SceneState::MultiplayerGame,
             (setup, add_observer_for_button).chain(),
         );
     }
@@ -37,6 +37,9 @@ impl Scene for SkirmishGame {
 #[reflect(Component, Serialize, Deserialize)]
 enum ButtonLabel {
     ChangeMap,
+    FilterGames,
+    DirectIp,
+    Create,
 }
 
 fn setup(
@@ -47,7 +50,6 @@ fn setup(
     tiled_map_infos: Res<Assets<TiledMapInfo>>,
     texture_atlas_layout_handles: Res<TextureAtlasLayoutHandles>,
     dialog_texture_slicer: Res<DialogTextureSlicer>,
-    selected_map: Res<SelectedMap>,
 ) {
     let main_menu_slicer = &dialog_texture_slicer.main_menu;
     let dialog_layout = &texture_atlas_layout_handles.dialog;
@@ -94,7 +96,7 @@ fn setup(
     };
 
     commands.spawn((
-        SkirmishGameMark,
+        MultiplayerGameMark,
         Node {
             display: Display::Grid,
             width: Val::Percent(70.),
@@ -126,45 +128,46 @@ fn setup(
             (
                 Node {
                     display: Display::Grid,
+                    width: Val::Percent(100.),
+                    height: Val::Percent(100.),
                     justify_self: JustifySelf::Center,
                     align_self: AlignSelf::Center,
                     grid_column: GridPlacement::span(2),
                     ..Default::default()
                 },
-                create_text("Skirmish Game", 20.)
+                create_text("Multiplayer", 20.)
             ),
             (
                 Node {
                     display: Display::Grid,
                     width: Val::Percent(100.),
                     height: Val::Percent(100.),
-                    grid_template_rows: vec![GridTrack::min_content(), GridTrack::max_content()],
+                    grid_auto_columns: vec![
+                        GridTrack::min_content(),
+                        GridTrack::max_content(),
+                        GridTrack::min_content()
+                    ],
                     ..Default::default()
                 },
                 children![
                     (
                         Node {
                             display: Display::Grid,
-                            grid_template_columns: RepeatedGridTrack::flex(7, 1.),
+                            grid_template_columns: RepeatedGridTrack::flex(4, 1.),
                             column_gap: Val::Px(2.),
                             ..Default::default()
                         },
                         children![
-                            create_text("Name", 10.),
-                            create_text("Color", 10.),
-                            create_text("Faction", 10.),
-                            create_text("Team", 10.),
-                            create_text("Handicap", 10.),
-                            create_text("Spawn", 10.),
-                            create_text("Ready", 10.),
+                            create_text("Server", 10.),
+                            create_text("Players", 10.),
+                            create_text("Location", 10.),
+                            create_text("Status", 10.),
                         ]
                     ),
                     (
                         Node {
                             display: Display::Grid,
                             width: Val::Percent(100.),
-                            height: Val::Percent(100.),
-                            padding: UiRect::all(Val::Px(5.)),
                             overflow: Overflow::scroll_y(),
                             ..Default::default()
                         },
@@ -176,7 +179,21 @@ fn setup(
                             },
                         )
                         .with_mode(NodeImageMode::Sliced(dark_gray_rect_slicer.clone())),
-                    )
+                    ),
+                    (
+                        Node {
+                            display: Display::Grid,
+                            grid_template_columns: RepeatedGridTrack::flex(4, 1.),
+                            column_gap: Val::Px(2.),
+                            ..Default::default()
+                        },
+                        children![
+                            create_text("Server", 10.),
+                            create_text("Players", 10.),
+                            create_text("Location", 10.),
+                            create_text("Status", 10.),
+                        ]
+                    ),
                 ]
             ),
             (
@@ -205,22 +222,22 @@ fn setup(
                             justify_self: JustifySelf::Center,
                             ..Default::default()
                         },
-                        children![(
-                            Node {
-                                display: Display::Grid,
-                                max_width: Val::Percent(100.),
-                                max_height: Val::Percent(100.),
-                                aspect_ratio: Some(1.),
-                                justify_self: JustifySelf::Center,
-                                ..Default::default()
+                        ImageNode::from_atlas_image(
+                            dialog.clone(),
+                            TextureAtlas {
+                                layout: dialog_layout.clone(),
+                                index: DialogAtlasKind::DarkGrayRect2 as usize,
                             },
-                            ImageNode::new(
-                                selected_map
-                                    .0
-                                    .get_thumbnail(&tiled_maps, &ldtk_maps)
-                                    .clone()
-                            ),
-                        )]
+                        )
+                        .with_mode(NodeImageMode::Sliced(dark_gray_rect_slicer.clone())),
+                        children![(Node {
+                            display: Display::Grid,
+                            max_width: Val::Percent(100.),
+                            max_height: Val::Percent(100.),
+                            aspect_ratio: Some(1.),
+                            justify_self: JustifySelf::Center,
+                            ..Default::default()
+                        },)]
                     ),
                     (
                         Node {
@@ -230,12 +247,7 @@ fn setup(
                             justify_self: JustifySelf::Center,
                             ..Default::default()
                         },
-                        create_text(
-                            &selected_map
-                                .0
-                                .get_title(&tiled_maps, &ldtk_maps, &tiled_map_infos),
-                            10.
-                        )
+                        create_text("No Server Selected", 10.)
                     ),
                     create_button("Change Map", 15., ButtonLabel::ChangeMap)
                 ]
@@ -248,7 +260,6 @@ fn setup(
                     align_self: AlignSelf::Center,
                     justify_self: JustifySelf::Center,
                     margin: UiRect::top(Val::Px(10.)),
-                    padding: UiRect::all(Val::Px(5.)),
                     grid_column: GridPlacement::span(2),
                     grid_template_rows: vec![GridTrack::flex(8.), GridTrack::flex(2.),],
                     column_gap: Val::Px(5.),
@@ -270,7 +281,7 @@ fn setup(
                         },
                     )
                     .with_mode(NodeImageMode::Sliced(dark_gray_rect_slicer.clone())),
-                )]
+                ),]
             )
         ],
     ));
@@ -284,6 +295,9 @@ fn observer_click(
     if let Ok(lable) = buttons.get(click.target()) {
         match lable {
             ButtonLabel::ChangeMap => scene_state.set(SceneState::SelectMapScene),
+            ButtonLabel::FilterGames => todo!(),
+            ButtonLabel::DirectIp => todo!(),
+            ButtonLabel::Create => todo!(),
         }
     }
 }
@@ -293,3 +307,5 @@ fn add_observer_for_button(mut commands: Commands, buttons: Query<Entity, With<B
         commands.entity(btn_entity).observe(observer_click);
     });
 }
+
+fn refresh_lobby() {}

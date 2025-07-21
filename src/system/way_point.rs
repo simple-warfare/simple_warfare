@@ -1,4 +1,4 @@
-use avian2d::prelude::{AngularVelocity, ExternalForce, LinearVelocity};
+use avian2d::prelude::{AngularVelocity, LinearVelocity};
 use bevy::prelude::*;
 
 use crate::{

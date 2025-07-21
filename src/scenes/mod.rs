@@ -1,6 +1,7 @@
 pub mod game;
 pub mod loading;
 pub mod mian;
+pub mod multiplayer_game;
 pub mod select_map;
 pub mod skirmish_game;
 
@@ -9,8 +10,8 @@ use bevy::prelude::*;
 use crate::{
     bevy_ext::app::AppExt,
     scenes::{
-        game::GameScene, loading::LoadingScene, mian::MainScene, select_map::SelectMapScene,
-        skirmish_game::SkirmishGame,
+        game::GameScene, loading::LoadingScene, mian::MainScene, multiplayer_game::MultiplayerGame,
+        select_map::SelectMapScene, skirmish_game::SkirmishGame,
     },
 };
 
@@ -25,6 +26,7 @@ pub enum SceneState {
     MainScene,
     SelectMapScene,
     GameScene,
+    MultiplayerGame,
     SkirmishGame,
 }
 
@@ -37,6 +39,7 @@ impl Plugin for ScenePlugin {
             .init_scene::<MainScene>()
             .init_scene::<SelectMapScene>()
             .init_scene::<GameScene>()
-            .init_scene::<SkirmishGame>();
+            .init_scene::<SkirmishGame>()
+            .init_scene::<MultiplayerGame>();
     }
 }

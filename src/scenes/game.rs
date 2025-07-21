@@ -1,15 +1,11 @@
 use crate::{
-    assets::{
-        GameAsset,
-        map::{ldtk::LdtkMap, tiled::TiledMap},
-    },
+    assets::map::{ldtk::LdtkMap, tiled::TiledMap},
     bevy_ext::app::AppExt,
     mod_engine::server::ModServer,
     statistics::SelectedMap,
 };
 use bevy::prelude::*;
 use bevy_ecs_tiled::{map::TiledMapHandle, prelude::TilemapAnchor};
-use bevy_fly_camera::FlyCamera2d;
 
 use super::{Scene, SceneState};
 

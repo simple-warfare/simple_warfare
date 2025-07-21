@@ -213,7 +213,10 @@ fn observer_click(
     if let Ok(lable) = buttons.get(click.target()) {
         match lable {
             ButtonLabel::SinglePlayer => main_menu_state.set(MainMenuState::Second),
-            ButtonLabel::MultipPlayer => todo!(),
+            ButtonLabel::MultipPlayer => {
+                main_menu_state.set(MainMenuState::Disable);
+                scene_state.set(SceneState::MultiplayerGame)
+            }
             ButtonLabel::Setting => todo!(),
             ButtonLabel::News => todo!(),
             ButtonLabel::Quit => {

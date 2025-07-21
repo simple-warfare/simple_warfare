@@ -1,8 +1,6 @@
-use crate::{bevy_ext::app::AppExt, panel::main_menu::MainMenuState};
-use bevy::{prelude::*, render::view::RenderLayers};
-use bevy_fly_camera::FlyCamera2d;
-
 use super::{Scene, SceneState};
+use crate::{bevy_ext::app::AppExt, panel::main_menu::MainMenuState};
+use bevy::prelude::*;
 
 #[derive(Default)]
 pub struct MainScene;

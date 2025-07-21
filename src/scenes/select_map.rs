@@ -297,7 +297,9 @@ fn observer_click(
         }
     } else if let Ok(lable) = buttons.get(click.target()) {
         match lable {
-            ButtonLabel::Ok => scene_state.set(SceneState::SkirmishGame),
+            ButtonLabel::Ok => {
+                scene_state.set(SceneState::GameScene)
+            },
         }
     }
 }

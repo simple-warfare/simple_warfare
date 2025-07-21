@@ -6,7 +6,7 @@ import { SingleTurret } from "custom:example/tank/single_turret.js";
 import { ComfirmDialog } from "std:ui/quick/dialog/comfirm.mjs";
 import { parse } from "package:smol-toml/index.js";
 
-class Tank extends CustomUnit {
+export class Tank extends CustomUnit {
     constructor() {
         super()
         this.core = manyFromValues.core("坦克", 100, 100, 100, 500., 3., 50., true)
@@ -32,6 +32,4 @@ class Tank extends CustomUnit {
             console.log("Cancel")
         }
     }
-}
-
-export { Tank };
+};

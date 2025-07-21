@@ -5,7 +5,7 @@ use boa_engine::{
     JsArgs, JsResult, js_string,
     object::{
         ObjectInitializer,
-        builtins::{JsArray, JsFunction, JsProxy},
+        builtins::{JsArray, JsProxy},
     },
     prelude::*,
     property::Attribute,

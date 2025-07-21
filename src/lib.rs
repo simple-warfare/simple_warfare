@@ -6,6 +6,7 @@ pub mod debug;
 pub mod js_engine;
 pub mod lua_engine;
 pub mod mod_engine;
+pub mod net;
 pub mod panel;
 pub mod scenes;
 pub mod spatial;
@@ -14,18 +15,7 @@ pub mod system;
 pub mod utils;
 
 use crate::{
-    app_state::AppState,
-    assets::AssetsPlugin,
-    custom::{ui::CustomUiPlugin, unit::CustomUnitPlugin},
-    debug::DebugPlugin,
-    js_engine::synchronize::SynchronizePlugin,
-    lua_engine::LuaEnginePlugin,
-    mod_engine::ModEnginePlugin,
-    panel::PanelPlugin,
-    scenes::{ScenePlugin, SceneState},
-    spatial::SpatialPlugin,
-    statistics::StatistcsPlugin,
-    system::SystemPlugin,
+    app_state::AppState, assets::AssetsPlugin, custom::{ui::CustomUiPlugin, unit::CustomUnitPlugin}, debug::DebugPlugin, js_engine::synchronize::SynchronizePlugin, lua_engine::LuaEnginePlugin, mod_engine::ModEnginePlugin, net::NetPlugin, panel::PanelPlugin, scenes::{ScenePlugin, SceneState}, spatial::SpatialPlugin, statistics::StatistcsPlugin, system::SystemPlugin
 };
 use avian2d::prelude::*;
 use bevy::{
@@ -43,7 +33,7 @@ use bevy_inspector_egui::{
     quick::{StateInspectorPlugin, WorldInspectorPlugin},
 };
 use bevy_light_2d::prelude::*;
-use bevy_panic_handler::PanicHandler;
+//use bevy_panic_handler::PanicHandler;
 use bevy_seedling::SeedlingPlugin;
 use js_engine::JsEnginePlugin;
 
@@ -65,7 +55,8 @@ impl PluginGroup for SimpleWarfarePlugins {
             .add(SpatialPlugin)
             .add(DebugPlugin)
             .add(CustomUiPlugin)
-            .add(SynchronizePlugin);
+            .add(SynchronizePlugin)
+            .add(NetPlugin);
         group
     }
 }
@@ -82,7 +73,12 @@ impl Plugin for SimpleWarfarePlugin {
                 RemoteHttpPlugin::default(),
                 HuiPlugin,
             ))
-            .add_plugins(PhysicsPlugins::default())
+            .add_plugins(
+                PhysicsPlugins::default()
+                    .build()
+                    // disable Sync as it is handled by lightyear_avian
+                    .disable::<SyncPlugin>(),
+            )
             .add_plugins(PhysicsDebugPlugin::default())
             .add_plugins(EguiPlugin {
                 enable_multipass_for_primary_context: true,
@@ -91,7 +87,7 @@ impl Plugin for SimpleWarfarePlugin {
             .add_plugins(StateInspectorPlugin::<AppState>::default())
             .add_plugins(StateInspectorPlugin::<SceneState>::default())
             .add_plugins(FlyCameraPlugin)
-            .add_plugins(PanicHandler::new().build())
+            //.add_plugins(PanicHandler::new().build())
             .add_plugins(LdtkPlugin)
             .add_plugins(AsepriteUltraPlugin)
             .insert_resource(LevelSelection::default())

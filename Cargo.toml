@@ -8,6 +8,7 @@ resolver = "2"
 [workspace]
 members = ["crates/simple_warfare_macros"]
 
+
 [dependencies]
 thiserror = "2.0.12"
 rand = "0.9.1"
@@ -24,7 +25,7 @@ mlua = { version = "0.11.1", features = [
   'serialize',
   "send",
 ] }
-simple_warfare_macros ={ path = "crates/simple_warfare_macros"}
+simple_warfare_macros = { path = "crates/simple_warfare_macros" }
 oneshot = "0.1.11"
 boa_engine = "0.20.0"
 boa_runtime = "0.20.0"
@@ -36,7 +37,7 @@ bevy_rand = "0.11"
 bevy_prng = { version = "0.11.1", features = ["rand_chacha", "wyrand"] }
 bevy_light_2d = "0.6.0"
 bevy_fly_camera = "0.16.0"
-bevy-panic-handler = "5.0.0"
+#bevy-panic-handler = "5.0.0"
 avian2d = "0.3"
 bevy_spritesheet_animation = { git = "https://github.com/merwaaan/bevy_spritesheet_animation", features = [
   "custom_cursor",
@@ -60,8 +61,15 @@ bevy_hui_widgets = "0.3.0"
 bevy_spatial = "0.11.0"
 bevy_aseprite_ultra = "0.6.1"
 fluent = "0.17.0"
-bevy_ecs_tiled = { version = "0.7.3", features = ["atlas"] }
+bevy_ecs_tiled = { version = "0.7.4", features = ["atlas"] }
 bevy_ecs_tilemap = "0.16.0"
+
+lightyear = { version = "0.22.4", features = ["avian2d", "udp", "netcode"] }
+bevy_webgate = "0.1.1"
+bevy_web_asset = "0.11.0"
+axum = "0.8.4"
+bevy_defer = { version = "0.14.0", default-features = false }
+
 
 [dependencies.bevy]
 version = "0.16.1"
@@ -97,6 +105,7 @@ features = [
   "tonemapping_luts",
   "webgl2",
   "x11",
+  "wayland",
   "jpeg",
   "serialize",
 ]

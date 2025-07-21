@@ -18,6 +18,14 @@ pub enum GameType {
     SandBox,
 }
 
+#[derive(States, Debug, Hash, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Default, Reflect)]
+pub enum NetState {
+    #[default]
+    None,
+    Client,
+    Server,
+}
+
 #[derive(Debug, Resource)]
 pub struct SelectedMap(pub Arc<SimpleWarfareMap>);
 
@@ -58,6 +66,8 @@ pub struct StatistcsPlugin;
 
 impl Plugin for StatistcsPlugin {
     fn build(&self, app: &mut App) {
-        app.init_resource::<Statistics>().init_state::<MouseState>();
+        app.init_resource::<Statistics>()
+            .init_state::<MouseState>()
+            .init_state::<NetState>();
     }
 }
