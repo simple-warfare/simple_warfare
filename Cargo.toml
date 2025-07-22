@@ -70,7 +70,7 @@ bevy_web_asset = "0.11.0"
 axum = "0.8.4"
 bevy_defer = { version = "0.14.0", default-features = false }
 
-
+new_mime_guess = "4.0.4"
 [dependencies.bevy]
 version = "0.16.1"
 features = [

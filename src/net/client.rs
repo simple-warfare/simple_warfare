@@ -7,7 +7,7 @@ pub struct ClinetPlugin;
 
 impl Plugin for ClinetPlugin {
     fn build(&self, app: &mut App) {
-        todo!()
+        
     }
 }
 
