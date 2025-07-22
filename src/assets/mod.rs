@@ -88,7 +88,7 @@ pub struct AssetsPlugin;
 
 impl Plugin for AssetsPlugin {
     fn build(&self, app: &mut App) {
-        app.init_asset::<JsTomlFile>()
+        app.init_asset::<JsTomlFile>()  //js读取toml格式的文件将以String返回js
             .init_asset_loader::<JsTomlFileLoader>()
             .init_asset::<ModInfo>()
             .init_asset_loader::<ModInfoLoader>()

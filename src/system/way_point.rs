@@ -9,7 +9,6 @@ use crate::{
     },
     scenes::SceneState,
 };
-use lightyear::prelude::*;
 
 pub struct WayPointSystemPlugin;
 
@@ -23,7 +22,6 @@ impl Plugin for WayPointSystemPlugin {
 }
 
 fn handle_move_way_point(
-    timeline: Single<&LocalTimeline, With<Client>>,
     time: Res<Time>,
     way_point_queue: Query<
         (
@@ -36,7 +34,6 @@ fn handle_move_way_point(
         With<Movement>,
     >,
 ) {
-    timeline.tick();
     use std::f32::consts::*;
 
     const TWO_PI: f32 = 2.0 * PI;

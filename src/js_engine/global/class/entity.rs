@@ -4,6 +4,9 @@ use boa_engine::{
     value::{TryFromJs, TryIntoJs},
 };
 use serde::{Deserialize, Serialize};
+
+/// Js端的Entity,但不可以直接转换成Entity
+/// TODO:在Js端使用Json存储Entity得了
 #[derive(
     Debug,
     Clone,

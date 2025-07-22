@@ -4,8 +4,9 @@ use crate::js_engine::global::class::entity::JsEntity;
 use avian2d::math::Scalar;
 use bevy::prelude::*;
 use boa_engine::value::TryFromJs;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Component, Reflect, TryFromJs)]
+#[derive(Debug, Clone, Component, Serialize, Deserialize, PartialEq, Reflect, TryFromJs)]
 
 pub struct JsTurret {
     #[boa(from_js_with = "entity_try_from_js")]
@@ -20,7 +21,10 @@ pub struct JsTurret {
     pub attack_radius: Scalar,
     #[boa(rename = "UnitsInRange")]
     pub units_in_range: Vec<JsEntity>,
-    #[boa(from_js_with = "entity_try_from_js", rename = "OnUnitEnterSignalEntity")]
+    #[boa(
+        from_js_with = "entity_try_from_js",
+        rename = "OnUnitEnterSignalEntity"
+    )]
     pub on_unit_enter_signal_entity: Entity,
     #[boa(from_js_with = "entity_try_from_js", rename = "OnUnitExitSignalEntity")]
     pub on_unit_exit_signal_entity: Entity,

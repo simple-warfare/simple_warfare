@@ -1,3 +1,4 @@
+/// TODO:ldtk的支持暂时停止
 use bevy::{
     asset::{AssetLoader, LoadContext, io::Reader},
     prelude::*,
@@ -39,22 +40,6 @@ impl AssetLoader for LdtkMapLoader {
         _settings: &Self::Settings,
         load_context: &mut LoadContext<'_>,
     ) -> Result<Self::Asset, Self::Error> {
-        /*
-        let mut context = String::new();
-        reader.read_to_string(&mut context).await?;
-        let mut json: LdtkJson = serde_json::from_str(&context)?;
-        for level in json.levels.iter_mut() {
-            if let Some(ref mut external_rel_path) = level.external_rel_path {
-                let real_path = Path::new(&external_rel_path);
-                let file_name = real_path
-                    .file_name()
-                    .ok_or_else(|| Self::Error::FileNameNotFound(external_rel_path.to_string()))?
-                    .to_string_lossy();
-
-                *external_rel_path = format!("texture/tiles/{}", file_name);
-            }
-        }
-        */
 
         let asset_path = load_context.asset_path().clone();
 

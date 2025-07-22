@@ -20,7 +20,6 @@ use crate::{
 };
 use avian2d::prelude::*;
 use bevy::prelude::*;
-use lightyear::prelude::*;
 
 pub struct UnitSystemPlugin;
 impl Plugin for UnitSystemPlugin {

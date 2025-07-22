@@ -70,14 +70,7 @@ fluent = "0.17.0"
 bevy_ecs_tiled = { version = "0.7.4", features = ["atlas"] }
 bevy_ecs_tilemap = "0.16.0"
 
-lightyear = { version = "0.22.5", features = [
-  "avian2d",
-  "udp",
-  "netcode",
-  "interpolation",
-  "prediction",
-  "replication",
-] }
+bevy_quinnet = "0.17.0"
 bevy_webgate = "0.1.1"
 bevy_web_asset = "0.11.0"
 axum = "0.8.4"

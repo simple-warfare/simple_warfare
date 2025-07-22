@@ -38,6 +38,7 @@ impl TryFromJs for JsCollider {
 }
 
 impl JsCollider {
+    /// 将从Js中得到的碰撞体转化成Bevy的碰撞体
     pub fn to_avian2d(&self) -> Collider {
         match self {
             JsCollider::Circle(radius) => Collider::circle(*radius),

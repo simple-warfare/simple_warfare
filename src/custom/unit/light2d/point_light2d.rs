@@ -4,7 +4,9 @@ use boa_engine::value::TryFromJs;
 
 use crate::bevy_ext::try_from_js::*;
 use crate::custom::unit::transform::transform::JsTransform;
-#[derive(Debug, Clone, Component, Reflect, TryFromJs)]
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Clone, Component, Serialize, Deserialize, PartialEq, Reflect, TryFromJs)]
 pub struct JsPointLight2d {
     pub transform: JsTransform,
     /// The light's color tint.
@@ -37,7 +39,9 @@ impl Default for JsPointLight2d {
         }
     }
 }
+
 impl JsPointLight2d {
+    /// 将从Js中得到的点光源转化成Bevy的点光源
     pub fn to_point_light2d(&self) -> impl Bundle {
         (
             self.transform.to_transform(),

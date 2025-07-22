@@ -1,7 +1,9 @@
 use crate::bevy_ext::try_from_js::*;
 use bevy::{prelude::*, sprite::Anchor};
 use boa_engine::value::TryFromJs;
-#[derive(Debug, Clone, Component, Reflect, TryFromJs)]
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Clone, Component, Serialize, Deserialize, PartialEq, Reflect, TryFromJs)]
 pub struct Graphic {
     pub width: u32,
     pub height: u32,
@@ -21,6 +23,7 @@ pub struct Graphic {
 }
 
 impl Graphic {
+    /// 将mod贴图定义的x,y偏移值转化成Bevy Sprite的锚点
     pub fn anchor(&self) -> Anchor {
         if let (Some(frame_width), Some(frame_height)) = (self.frame_width, self.frame_height) {
             Anchor::Custom(Vec2::new(
