@@ -25,8 +25,6 @@ pub struct CommonClient {
     pub server_addr: SocketAddr,
     /// Possibly add a conditioner to simulate network conditions
     pub conditioner: Option<RecvLinkConditioner>,
-    /// Which transport to use
-    pub local_port: u16,
     pub shared: SharedSettings,
 }
 
@@ -68,11 +66,13 @@ impl CommonClient {
 
             add_netcode(&mut entity_mut)?;
             entity_mut.insert(UdpIo::default());
+            let client_connect_system = world.register_system_cached(client_connect);
+            world.run_system(client_connect_system)?;
             Ok(())
         });
     }
 }
 
-pub(crate) fn connect(mut commands: Commands, client: Single<Entity, With<Client>>) {
+pub(crate) fn client_connect(mut commands: Commands, client: Single<Entity, With<Client>>) {
     commands.trigger_targets(Connect, client.into_inner());
 }

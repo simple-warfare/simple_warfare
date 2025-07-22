@@ -38,7 +38,13 @@ bevy_prng = { version = "0.11.1", features = ["rand_chacha", "wyrand"] }
 bevy_light_2d = "0.6.0"
 bevy_fly_camera = "0.16.0"
 #bevy-panic-handler = "5.0.0"
-avian2d = "0.3"
+avian2d = { version = "0.3.0", features = [
+  "2d",
+  "f32",
+  "parry-f32",
+  "parallel",
+  "serialize",
+] }
 bevy_spritesheet_animation = { git = "https://github.com/merwaaan/bevy_spritesheet_animation", features = [
   "custom_cursor",
 ] }
@@ -64,7 +70,14 @@ fluent = "0.17.0"
 bevy_ecs_tiled = { version = "0.7.4", features = ["atlas"] }
 bevy_ecs_tilemap = "0.16.0"
 
-lightyear = { version = "0.22.4", features = ["avian2d", "udp", "netcode"] }
+lightyear = { version = "0.22.5", features = [
+  "avian2d",
+  "udp",
+  "netcode",
+  "interpolation",
+  "prediction",
+  "replication",
+] }
 bevy_webgate = "0.1.1"
 bevy_web_asset = "0.11.0"
 axum = "0.8.4"
@@ -105,7 +118,6 @@ features = [
   "tonemapping_luts",
   "webgl2",
   "x11",
-  "wayland",
   "jpeg",
   "serialize",
 ]
@@ -145,7 +157,6 @@ features = [
   "webgl2",
   "x11",
   "jpeg",
-  "wayland",
   "dynamic_linking",
 ]
 

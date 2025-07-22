@@ -13,7 +13,7 @@ pub struct TurretSystemPlugin;
 impl Plugin for TurretSystemPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
-            Update,
+            FixedUpdate,
             unit_enter.run_if(resource_exists::<JsEngineRequestSender>),
         );
     }

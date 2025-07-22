@@ -53,12 +53,15 @@ impl CommonServer {
             add_netcode(&mut entity_mut);
             let server_addr = SocketAddr::new(Ipv4Addr::UNSPECIFIED.into(), settings.local_port);
             entity_mut.insert((LocalAddr(server_addr), ServerUdpIo::default()));
+
+            let server_start_system = world.register_system_cached(server_start);
+            world.run_system(server_start_system)?;
             Ok(())
         });
     }
 }
 
-pub(crate) fn start(mut commands: Commands, server: Single<Entity, With<Server>>) {
+pub(crate) fn server_start(mut commands: Commands, server: Single<Entity, With<Server>>) {
     commands.trigger_targets(Start, server.into_inner());
 }
 

@@ -24,6 +24,7 @@ pub enum NetState {
     None,
     Client,
     Server,
+    HostServer
 }
 
 #[derive(Debug, Resource)]

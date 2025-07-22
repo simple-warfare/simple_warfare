@@ -4,7 +4,6 @@ use std::{
 };
 
 use bevy::prelude::*;
-use lightyear::prelude::*;
 
 use crate::net::protocol::ProtocolPlugin;
 

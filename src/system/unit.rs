@@ -1,8 +1,5 @@
 use std::path::Path;
 
-use avian2d::prelude::*;
-use bevy::prelude::*;
-
 use crate::{
     custom::unit::{
         NewSpawnedUnit,
@@ -21,6 +18,9 @@ use crate::{
     spatial::Spatial,
     statistics::*,
 };
+use avian2d::prelude::*;
+use bevy::prelude::*;
+use lightyear::prelude::*;
 
 pub struct UnitSystemPlugin;
 impl Plugin for UnitSystemPlugin {
@@ -34,7 +34,7 @@ impl Plugin for UnitSystemPlugin {
             .register_type::<Graphics>()
             .register_type::<Movement>()
             .add_systems(
-                Update,
+                FixedUpdate,
                 check_new_unit.run_if(on_event::<JsEngineResponseEvent>),
             );
     }

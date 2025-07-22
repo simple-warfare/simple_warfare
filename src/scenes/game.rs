@@ -2,7 +2,7 @@ use crate::{
     assets::map::{ldtk::LdtkMap, tiled::TiledMap},
     bevy_ext::app::AppExt,
     mod_engine::server::ModServer,
-    statistics::SelectedMap,
+    statistics::{NetState, SelectedMap},
 };
 use bevy::prelude::*;
 use bevy_ecs_tiled::{map::TiledMapHandle, prelude::TilemapAnchor};
@@ -28,7 +28,9 @@ fn setup(
     asset_server: Res<AssetServer>,
     selected_map: Res<SelectedMap>,
     mod_server: Res<ModServer>,
+    mut net_state: ResMut<NextState<NetState>>,
 ) {
+    net_state.set(NetState::HostServer);
     commands.spawn((
         TiledMapHandle(asset_server.load(selected_map.0.get_path(&tiled_maps, &ldtk_maps))),
         TilemapAnchor::Center,
