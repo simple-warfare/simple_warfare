@@ -86,6 +86,8 @@ impl TryFromJs for JsTargetType {
         }
     }
 }
+
+/// 创建Sw这个Js端的全局对象
 impl Sw {
     pub const NAME: JsString = js_string!("sw");
 
@@ -96,6 +98,8 @@ impl Sw {
         sw_request_sender: Arc<Sender<SwRequestEvent>>,
         sw_response_receiver: Arc<Mutex<Receiver<SwResponseEvent>>>,
     ) -> JsObject {
+
+        // Js传送单位位置的方法
         let teleport = unsafe {
             let js_engine_request_sender = js_engine_request_sender.clone();
             NativeFunction::from_closure(move |_referrer, args, ctx| {
@@ -119,6 +123,7 @@ impl Sw {
             })
         };
 
+        // Js设置单位朝向的方法
         let look_at = unsafe {
             let js_engine_request_sender = js_engine_request_sender.clone();
             NativeFunction::from_closure(move |_referrer, args, ctx| {
@@ -142,6 +147,7 @@ impl Sw {
             })
         };
 
+        // Js触发Signal的方法
         let signal_emit = unsafe {
             NativeFunction::from_closure(|_referrer, args, ctx| {
                 let signal = args.first().unwrap().to_object(ctx)?;
@@ -162,6 +168,7 @@ impl Sw {
             })
         };
 
+        // Js注册由bevy触发的Signal的方法
         let register_default_signal = unsafe {
             NativeFunction::from_closure(|_referrer, args, ctx| {
                 let signal = args.first().unwrap().to_object(ctx)?;
@@ -210,6 +217,7 @@ impl Sw {
             })
         };
 
+        // 将Js的Object与Bevy的Entity绑定的方法
         let register_entity = unsafe {
             let sw_request_sender = sw_request_sender.clone();
             let sw_response_receiver = sw_response_receiver.clone();
