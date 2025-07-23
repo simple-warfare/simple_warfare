@@ -14,7 +14,7 @@ use crate::{
     },
     custom::CustomMod,
     lua_engine::user_data::{MapManager, ModManager},
-    statistics::CUSTOM_MOD_PATH,
+    consts::CUSTOM_MOD_PATH,
 };
 
 #[derive(Resource)]

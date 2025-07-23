@@ -65,7 +65,7 @@ fn check_js_and_map(
     asset_server: Res<AssetServer>,
     mut app_state: ResMut<NextState<AppState>>,
     mut scene_state: ResMut<NextState<SceneState>>,
-    mod_server: Res<ModServer>,
+    mut mod_server: ResMut<ModServer>,
     js_assets: Res<Assets<JsAsset>>,
     mod_infos: Res<Assets<ModInfo>>,
 ) -> Result {
@@ -95,7 +95,8 @@ fn check_js_and_map(
                             })
                             .collect(),
                         info.clone(),
-                    )
+                    );
+                    Ok(())
                 } else {
                     Err(BevyError::from("Could not get the info asset"))
                 }

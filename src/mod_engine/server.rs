@@ -6,21 +6,25 @@ use crate::{
     assets::mods::{info::ModInfo, js::JsAsset},
     js_engine::event::JsEngineRequestEvent,
     lua_engine::user_data::ModEnableClasses,
+    net::protocol::ClientMessage,
 };
 
 #[derive(Resource)]
 pub struct ModServer {
     sender: Arc<Sender<JsEngineRequestEvent>>,
+    pub client_messages: Vec<ClientMessage>,
 }
 
 impl ModServer {
     pub fn new(sender: Arc<Sender<JsEngineRequestEvent>>) -> Self {
-        Self { sender }
+        Self {
+            sender,
+            client_messages: Vec::new(),
+        }
     }
-    pub fn spawn_unit(&self, unit_str: &str) {
-        self.sender
-            .send(JsEngineRequestEvent::SpawnUnit(unit_str.to_string()))
-            .unwrap();
+    pub fn spawn_unit(&mut self, unit_str: &str) {
+        self.client_messages
+            .push(ClientMessage::spawn_unit(unit_str.to_string()));
     }
 
     pub fn load_mod(&self, enables: Vec<(JsAsset, Vec<String>)>, info: ModInfo) -> Result<()> {

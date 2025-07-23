@@ -1,17 +1,29 @@
+pub mod client;
+pub mod host_server;
+pub mod protocol;
+pub mod server;
+pub mod shared;
 pub mod web_asset;
-
-use std::time::Duration;
-
-use crate::net::web_asset::get_thumbnail_from_this;
 use bevy::prelude::*;
-use bevy_webgate::{BevyWebServerPlugin, RouterAppExt};
+use bevy_quinnet::{client::QuinnetClientPlugin, server::QuinnetServerPlugin};
+
+use crate::net::{
+    client::SimpleWarfareClientPlugin, host_server::SimpleWarfareHostServerPlugin,
+    server::SimpleWarfareServerPlugin, web_asset::SimpleWarfareWebAssetPlugin,
+};
 pub struct NetPlugin;
 
 impl Plugin for NetPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins(BevyWebServerPlugin).route(
-            "/simple_warfare/clinet/get_room_info/thumbnail",
-            axum::routing::get(get_thumbnail_from_this),
-        );
+        app.add_plugins((
+            QuinnetClientPlugin::default(),
+            QuinnetServerPlugin::default(),
+        ))
+        .add_plugins(SimpleWarfareWebAssetPlugin)
+        .add_plugins((
+            SimpleWarfareServerPlugin,
+            SimpleWarfareClientPlugin,
+            SimpleWarfareHostServerPlugin,
+        ));
     }
 }

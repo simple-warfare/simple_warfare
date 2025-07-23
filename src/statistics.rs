@@ -1,12 +1,13 @@
 use std::sync::Arc;
 
 use bevy::prelude::*;
+use serde::{Deserialize, Serialize};
 
-use crate::assets::map::SimpleWarfareMap;
+use crate::{
+    assets::map::SimpleWarfareMap,
+    consts::{GAME_VERSION, GAME_VERSION_TYPE},
+};
 
-pub const MOD_SET_PATH: &'static str = "mod_set/";
-pub const MOD_SET_NOW_USE_CONF_PATH: &'static str = "mod_set/now_use.conf";
-pub const CUSTOM_MOD_PATH: &'static str = "mods/custom/";
 #[derive(Default, Debug, Resource)]
 pub struct Statistics {
     pub player_name: String,
@@ -24,7 +25,7 @@ pub enum NetState {
     None,
     Client,
     Server,
-    HostServer
+    HostServer,
 }
 
 #[derive(Debug, Resource)]
@@ -63,11 +64,31 @@ pub enum MouseState {
     Selected,
 }
 
+#[derive(Debug, Resource, Serialize, Deserialize, PartialEq, Clone)]
+pub struct GameInfo {
+    pub game_version: String,
+    pub game_version_type: GameVersionType,
+}
+#[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
+pub enum GameVersionType {
+    Beta,
+}
+
+impl Default for GameInfo {
+    fn default() -> Self {
+        Self {
+            game_version: GAME_VERSION.into(),
+            game_version_type: GAME_VERSION_TYPE,
+        }
+    }
+}
+
 pub struct StatistcsPlugin;
 
 impl Plugin for StatistcsPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<Statistics>()
+            .init_resource::<GameInfo>()
             .init_state::<MouseState>()
             .init_state::<NetState>();
     }

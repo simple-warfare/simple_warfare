@@ -4,6 +4,7 @@ use axum::{
 };
 use bevy::prelude::*;
 use bevy_defer::{AsyncAccess, AsyncWorld};
+use bevy_webgate::{BevyWebServerPlugin, RouterAppExt};
 
 use crate::{
     assets::{
@@ -12,6 +13,19 @@ use crate::{
     },
     statistics::SelectedMap,
 };
+
+
+pub struct SimpleWarfareWebAssetPlugin;
+
+impl Plugin for SimpleWarfareWebAssetPlugin {
+    fn build(&self, app: &mut App) {
+        app.add_plugins(BevyWebServerPlugin).route(
+            "/simple_warfare/clinet/get_room_info/thumbnail",
+            axum::routing::get(get_thumbnail_from_this),
+        );
+    }
+}
+
 
 pub(super) async fn get_thumbnail_from_this() -> impl IntoResponse {
     let mut headers = HeaderMap::new();

@@ -27,7 +27,7 @@ fn setup(
     tiled_maps: Res<Assets<TiledMap>>,
     asset_server: Res<AssetServer>,
     selected_map: Res<SelectedMap>,
-    mod_server: Res<ModServer>,
+    mut mod_server: ResMut<ModServer>,
     mut net_state: ResMut<NextState<NetState>>,
 ) {
     net_state.set(NetState::HostServer);

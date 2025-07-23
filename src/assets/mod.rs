@@ -27,7 +27,7 @@ use crate::{
         },
     },
     custom::CustomMod,
-    statistics::{MOD_SET_NOW_USE_CONF_PATH, MOD_SET_PATH},
+    consts::{MOD_SET_NOW_USE_CONF_PATH, MOD_SET_PATH},
 };
 
 // 宏用于快速生成资源结构体和默认实现
@@ -126,6 +126,7 @@ fn load_assets(mut game_assets: ResMut<GameAsset>, asset_server: Res<AssetServer
     let mod_set_conf_handle = asset_server.load(MOD_SET_NOW_USE_CONF_PATH);
     game_assets.enable_mod_set.conf_handle = mod_set_conf_handle.clone();
 
+    
     // 收集所有资源句柄
     game_assets.assets_untyped_handle = game_assets
         .interface
