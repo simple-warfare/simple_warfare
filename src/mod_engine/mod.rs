@@ -29,8 +29,11 @@ fn init_mod_server(mut commands: Commands, js_engine_event_sender: Res<JsEngineR
 }
 
 fn handle_mod_server_events(mut mod_server: ResMut<ModServer>, mut client: ResMut<QuinnetClient>) {
+    let Some(connection) = client.get_connection_mut() else {
+        return;
+    };
     mod_server
         .client_messages
         .drain(..)
-        .for_each(|message| client.connection_mut().send_message(message).unwrap());
+        .for_each(|message| connection.send_message(message).unwrap());
 }

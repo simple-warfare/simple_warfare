@@ -6,13 +6,7 @@ use std::{
     },
 };
 
-use crate::{
-    assets::mods::js::JsAsset,
-    js_engine::event::{
-        SwModuleLoaderRequestEvent, SwModuleLoaderResponseEvent, SwRequireLoaderRequestEvent,
-        SwRequireLoaderResponseEvent,
-    },
-};
+use crate::{assets::mods::js::JsAsset, js_engine::event::SwModuleLoaderRequestEvent};
 use bevy::prelude::*;
 use boa_engine::{
     JsResult, js_string,
@@ -29,29 +23,18 @@ use url::Url;
 #[derive(Resource)]
 pub struct SwModuleLoaderRequestReceiver(pub Arc<Mutex<Receiver<SwModuleLoaderRequestEvent>>>);
 
-#[derive(Resource, Clone)]
-pub struct SwModuleLoaderResponseSender(pub Arc<Sender<SwModuleLoaderResponseEvent>>);
-
-#[derive(Resource)]
-pub struct SwRequireLoaderRequestReceiver(pub Arc<Mutex<Receiver<SwRequireLoaderRequestEvent>>>);
-
-#[derive(Resource, Clone)]
-pub struct SwRequireLoaderResponseSender(pub Arc<Sender<SwRequireLoaderResponseEvent>>);
-
 #[derive(Debug)]
 pub struct SimpleWarfareModuleLoader {
     _root: PathBuf,
     module_map: GcRefCell<FxHashMap<String, Module>>,
     path_url: Arc<FxHashMap<&'static str, &'static str>>,
     request_sender: Arc<Sender<SwModuleLoaderRequestEvent>>,
-    response_receiver: Arc<Mutex<Receiver<SwModuleLoaderResponseEvent>>>,
 }
 
 impl SimpleWarfareModuleLoader {
     pub fn new<P: AsRef<Path>>(
         root: P,
         request_sender: Arc<Sender<SwModuleLoaderRequestEvent>>,
-        response_receiver: Arc<Mutex<Receiver<SwModuleLoaderResponseEvent>>>,
     ) -> JsResult<Self> {
         let _timer = Profiler::global().start_event("Loader::new", "Loader");
         if cfg!(target_family = "wasm") {
@@ -74,7 +57,6 @@ impl SimpleWarfareModuleLoader {
             module_map: GcRefCell::default(),
             path_url: Arc::new(path_url),
             request_sender,
-            response_receiver,
         })
     }
 
@@ -103,29 +85,18 @@ impl SimpleWarfareModuleLoader {
     }
 
     pub fn load(&self, real_path: String) -> JsResult<JsAsset> {
+        let (sender, receiver) = oneshot::channel();
         self.request_sender
-            .send(SwModuleLoaderRequestEvent::LoadJsAsset(real_path.clone()))
+            .send(SwModuleLoaderRequestEvent::load_js_asset(
+                real_path.clone(),
+                Box::new(sender),
+            ))
             .or(Err(JsError::from_opaque(
                 js_string!(format!("request_sender could not send `{real_path}`")).into(),
             )))?;
 
-        match self
-            .response_receiver
-            .lock()
-            .map_err(|err| {
-                JsNativeError::typ()
-                    .with_message(format!(
-                        "could lock the Response receiver when load `{real_path}`"
-                    ))
-                    .with_cause(JsError::from_opaque(JsValue::String(js_string!(
-                        err.to_string()
-                    ))))
-            })?
-            .recv()
-        {
-            Ok(event) => match event {
-                SwModuleLoaderResponseEvent::LoadedJsAsset(js_asset) => return Ok(js_asset),
-            },
+        match receiver.recv() {
+            Ok(js_asset) => Ok(js_asset),
             Err(err) => Err(JsNativeError::typ()
                 .with_message(format!(
                     "could lock the Response receiver when load `{real_path}`"

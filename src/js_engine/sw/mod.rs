@@ -98,7 +98,6 @@ impl Sw {
         sw_request_sender: Arc<Sender<SwRequestEvent>>,
         sw_response_receiver: Arc<Mutex<Receiver<SwResponseEvent>>>,
     ) -> JsObject {
-
         // Js传送单位位置的方法
         let teleport = unsafe {
             let js_engine_request_sender = js_engine_request_sender.clone();
@@ -335,8 +334,9 @@ impl Sw {
             })
         };
 
+        // TODO
         let alter_target_state = unsafe {
-            NativeFunction::from_closure(move |_referrer, args, ctx| Ok(JsValue::Undefined))
+            NativeFunction::from_closure(move |_referrer, _args, _ctx| Ok(JsValue::Undefined))
         };
 
         let synchronize = unsafe {
@@ -367,12 +367,7 @@ impl Sw {
             })
         };
 
-        let fs = Fs::init(
-            context,
-            js_engine_request_sender.clone(),
-            sw_request_sender.clone(),
-            sw_response_receiver.clone(),
-        );
+        let fs = Fs::init(context, sw_request_sender.clone());
 
         ObjectInitializer::with_native_data_and_proto(
             Self::default(),

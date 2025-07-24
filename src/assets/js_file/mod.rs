@@ -7,11 +7,13 @@ use thiserror::Error;
 #[derive(Debug, Default, Asset, TypePath, Clone)]
 pub struct JsTomlFile {
     pub data: String,
+    pub crc32: u32,
 }
 
 impl JsTomlFile {
     pub fn new(data: String) -> Self {
-        Self { data }
+        let crc32 = crc32fast::hash(data.as_bytes());
+        Self { data, crc32 }
     }
 }
 
@@ -40,7 +42,6 @@ impl AssetLoader for JsTomlFileLoader {
     ) -> Result<Self::Asset, Self::Error> {
         let mut context = String::new();
         reader.read_to_string(&mut context).await?;
-
         Ok(Self::Asset::new(context))
     }
 

@@ -1,22 +1,22 @@
-use bevy::prelude::{Entity, Vec2, Vec3};
+use bevy::platform::collections::HashMap;
 use bevy_quinnet::shared::{
     ClientId,
     channels::{ChannelId, ChannelKind, ChannelsConfiguration, DEFAULT_MAX_RELIABLE_FRAME_LEN},
 };
 use serde::{Deserialize, Serialize};
 
-use crate::{assets::mods::ModSet, net::shared::Player, statistics::GameInfo};
+use crate::{net::shared::Player, statistics::GameInfo};
 
 // Messages from clients
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub(crate) enum ClientMessage {
+pub enum ClientMessage {
     InitClient {
         //mod_set: ModSet,
         game_info: GameInfo,
         player_info: Player,
         //package_list:Vec<>
     },
-    FetchModSet,
+    FetchMods,
     SpawnUnit {
         unit_str: String,
     },
@@ -30,7 +30,7 @@ impl ClientMessage {
 
 // Messages from the server
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub(crate) enum ServerMessage {
+pub enum ServerMessage {
     InitClient {
         client_id: ClientId,
     },
@@ -39,8 +39,8 @@ pub(crate) enum ServerMessage {
         player_info: Player,
     },
     StartGame,
-    PushModSet {
-        mod_set: ModSet,
+    FetchMods {
+        js_crc32: Vec<(String, u32)>,
     },
     SpawnUnit {
         client_id: ClientId,
@@ -65,6 +65,10 @@ impl ServerMessage {
 
     pub fn disconnect_client(info: impl Into<String>) -> Self {
         Self::DisconnectClient { info: info.into() }
+    }
+
+    pub fn fetch_mods(js_crc32: Vec<(String, u32)>) -> Self {
+        Self::FetchMods { js_crc32 }
     }
 }
 

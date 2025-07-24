@@ -4,9 +4,17 @@ use bevy::{
 };
 use thiserror::Error;
 
-#[derive(Debug, Default, Asset, TypePath)]
+#[derive(Debug, Default, Asset, TypePath, Clone)]
 pub struct LuaAsset {
     pub context: String,
+    pub crc32: u32,
+}
+
+impl LuaAsset {
+    pub fn new(context: String) -> Self {
+        let crc32 = crc32fast::hash(context.as_bytes());
+        Self { context, crc32 }
+    }
 }
 
 #[derive(Debug, Error)]
@@ -34,8 +42,7 @@ impl AssetLoader for LuaAssetLoader {
     ) -> Result<Self::Asset, Self::Error> {
         let mut context = String::new();
         reader.read_to_string(&mut context).await?;
-
-        Ok(Self::Asset { context })
+        Ok(Self::Asset::new(context))
     }
 
     fn extensions(&self) -> &[&str] {

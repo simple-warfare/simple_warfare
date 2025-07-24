@@ -47,7 +47,7 @@ pub(super) fn process_js_event(
                 let module = Module::parse(
                     Source::from_reader(
                         js_asset.context.as_bytes(),
-                        Some(&Path::new(&js_asset.from).join(js_asset.file_name)),
+                        Some(&Path::new(&js_asset.path)),
                     ),
                     None,
                     context,

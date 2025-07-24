@@ -1,10 +1,7 @@
 use bevy::prelude::*;
 
 use crate::{
-    net::{
-        client::{self, handle_server_messages},
-        server::{self, handle_client_messages},
-    },
+    net::{client, server},
     statistics::NetState,
 };
 
@@ -15,10 +12,6 @@ impl Plugin for SimpleWarfareHostServerPlugin {
         app.add_systems(
             OnEnter(NetState::HostServer),
             (server::start_listening, client::start_connection),
-        )
-        .add_systems(
-            Update,
-            (handle_server_messages, handle_client_messages).run_if(in_state(NetState::HostServer)),
         );
     }
 }

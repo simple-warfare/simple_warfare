@@ -8,6 +8,10 @@ use bevy_quinnet::{
 };
 
 use crate::{
+    assets::{
+        GameAsset,
+        mods::{info::ModInfo, js::JsAsset, lua::LuaAsset},
+    },
     net::{
         protocol::{ClientMessage, ServerChannel, ServerMessage},
         shared::{LOCAL_BIND_IP, Player, SERVER_HOST, SERVER_PORT},
@@ -18,20 +22,59 @@ use crate::{
 pub struct SimpleWarfareServerPlugin;
 
 #[derive(Resource, Debug, Clone, Default)]
-pub(crate) struct Players {
+pub struct Players {
     pub map: HashMap<ClientId, Player>,
+}
+
+#[derive(Debug, Resource)]
+pub struct ServerData {
+    pub js_crc32: Vec<(String, u32)>,
 }
 
 impl Plugin for SimpleWarfareServerPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<Players>().add_systems(
             Update,
-            handle_client_messages.run_if(in_state(NetState::Server)),
+            (handle_client_messages, handle_server_events)
+                .run_if(in_state(NetState::Server).or(in_state(NetState::HostServer))),
         );
     }
 }
 
-pub(crate) fn start_listening(mut server: ResMut<QuinnetServer>) {
+pub fn start_listening(
+    mut commands: Commands,
+    mut server: ResMut<QuinnetServer>,
+    mut game_asset: ResMut<GameAsset>,
+    js_assets: Res<Assets<JsAsset>>,
+    mod_infos: Res<Assets<ModInfo>>,
+    lua_assets: Res<Assets<LuaAsset>>,
+) {
+    let custom_mods: Vec<crate::custom::CustomModAsset> = game_asset
+        .custom_mod_handles
+        .mod_handles
+        .iter()
+        .map(|custom_mod_handle| custom_mod_handle.to_asset(&js_assets, &mod_infos, &lua_assets))
+        .collect();
+
+    commands.insert_resource(ServerData {
+        js_crc32: custom_mods
+            .iter()
+            .flat_map(|custom_mod_asset| {
+                custom_mod_asset
+                    .custom_mod_enable_js
+                    .iter()
+                    .map(|custom_mod_enable_js| {
+                        (
+                            custom_mod_enable_js.js_asset.path.clone(),
+                            custom_mod_enable_js.js_asset.crc32,
+                        )
+                    })
+            })
+            .collect(),
+    });
+
+    game_asset.custom_mods = Some(custom_mods);
+
     server
         .start_endpoint(
             ServerEndpointConfiguration::from_ip(LOCAL_BIND_IP, SERVER_PORT),
@@ -43,10 +86,11 @@ pub(crate) fn start_listening(mut server: ResMut<QuinnetServer>) {
         .unwrap();
 }
 
-pub(crate) fn handle_client_messages(
+pub fn handle_client_messages(
     mut server: ResMut<QuinnetServer>,
     mut players: ResMut<Players>,
     self_game_info: Res<GameInfo>,
+    server_data: Res<ServerData>,
 ) -> Result {
     let endpoint = server.endpoint_mut();
     for client_id in endpoint.clients() {
@@ -73,19 +117,28 @@ pub(crate) fn handle_client_messages(
                     }
                 }
                 ClientMessage::SpawnUnit { unit_str } => {}
-                ClientMessage::FetchModSet => todo!(),
+                ClientMessage::FetchMods => {
+                    //game_asset.custom_mods.mods.iter().map(|custom_mod|custom_mod.)
+                    endpoint.send_message(
+                        client_id,
+                        ServerMessage::fetch_mods(server_data.js_crc32.clone()),
+                    )?;
+                }
             }
-            
         }
     }
 
     Ok(())
 }
 
-pub(crate) fn handle_server_events(
-    mut commands: Commands,
+pub fn handle_server_events(
     mut connection_events: EventReader<ConnectionEvent>,
     mut server: ResMut<QuinnetServer>,
-    mut players: ResMut<Players>,
-) {
+) -> Result {
+    for client in connection_events.read() {
+        server
+            .endpoint_mut()
+            .send_message(client.id, ServerMessage::init_client(client.id))?;
+    }
+    Ok(())
 }

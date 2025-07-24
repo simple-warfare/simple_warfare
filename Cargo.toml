@@ -16,14 +16,14 @@ bevy-inspector-egui = "0.31.0"
 serde = "1.0.219"
 toml = "0.9.2"
 mlua = { version = "0.11.1", features = [
-  "lua54",
-  "async",
-  "vendored",
-  "anyhow",
-  "macros",
-  "mlua_derive",
-  'serialize',
-  "send",
+    "lua54",
+    "async",
+    "vendored",
+    "anyhow",
+    "macros",
+    "mlua_derive",
+    'serialize',
+    "send",
 ] }
 simple_warfare_macros = { path = "crates/simple_warfare_macros" }
 oneshot = "0.1.11"
@@ -39,14 +39,14 @@ bevy_light_2d = "0.6.0"
 bevy_fly_camera = "0.16.0"
 #bevy-panic-handler = "5.0.0"
 avian2d = { version = "0.3.0", features = [
-  "2d",
-  "f32",
-  "parry-f32",
-  "parallel",
-  "serialize",
+    "2d",
+    "f32",
+    "parry-f32",
+    "parallel",
+    "serialize",
 ] }
 bevy_spritesheet_animation = { git = "https://github.com/merwaaan/bevy_spritesheet_animation", features = [
-  "custom_cursor",
+    "custom_cursor",
 ] }
 bevy_tween = "0.9.0"
 serde_json = "1.0.140"
@@ -59,8 +59,8 @@ tokio = { version = "1.46.1", features = ["rt", "rt-multi-thread", "time"] }
 vleue_navigator = "0.12.0"
 bevy_seedling = { version = "0.4.3", features = ["mp3"] } #audio
 bevy_hanabi = { version = "0.16", default-features = false, features = [
-  "2d",
-  "serde",
+    "2d",
+    "serde",
 ] }
 bevy_hui = { git = "https://github.com/shishanyue/bevy_hui.git" }
 bevy_hui_widgets = "0.3.0"
@@ -76,81 +76,85 @@ bevy_web_asset = "0.11.0"
 axum = "0.8.4"
 bevy_defer = { version = "0.14.0", default-features = false }
 
+crc32fast = "1.5.0"
+uuid-simd = "0.8.0"
+#bevy_window_utils = "0.16.0"
+bevy_async_task = "0.8.1"
 new_mime_guess = "4.0.4"
 [dependencies.bevy]
 version = "0.16.1"
 features = [
-  "bevy_remote",
-  "file_watcher",
-  "animation",
-  "bevy_asset",
-  "bevy_color",
-  "bevy_core_pipeline",
-  "bevy_gilrs",
-  "bevy_gizmos",
-  "bevy_gltf",
-  "bevy_mesh_picking_backend",
-  "bevy_picking",
-  "bevy_render",
-  "bevy_scene",
-  "bevy_sprite",
-  "bevy_sprite_picking_backend",
-  "bevy_state",
-  "bevy_text",
-  "bevy_ui",
-  "bevy_ui_picking_backend",
-  "bevy_window",
-  "bevy_winit",
-  "custom_cursor",
-  "default_font",
-  "hdr",
-  "multi_threaded",
-  "png",
-  "smaa_luts",
-  "sysinfo_plugin",
-  "tonemapping_luts",
-  "webgl2",
-  "x11",
-  "jpeg",
-  "serialize",
+    "bevy_remote",
+    "file_watcher",
+    "animation",
+    "bevy_asset",
+    "bevy_color",
+    "bevy_core_pipeline",
+    "bevy_gilrs",
+    "bevy_gizmos",
+    "bevy_gltf",
+    "bevy_mesh_picking_backend",
+    "bevy_picking",
+    "bevy_render",
+    "bevy_scene",
+    "bevy_sprite",
+    "bevy_sprite_picking_backend",
+    "bevy_state",
+    "bevy_text",
+    "bevy_ui",
+    "bevy_ui_picking_backend",
+    "bevy_window",
+    "bevy_winit",
+    "custom_cursor",
+    "default_font",
+    "hdr",
+    "multi_threaded",
+    "png",
+    "smaa_luts",
+    "sysinfo_plugin",
+    "tonemapping_luts",
+    "webgl2",
+    "x11",
+    "jpeg",
+    "serialize",
 ]
 
 [dev-dependencies.bevy]
 version = "0.16.1"
 features = [
-  "bevy_remote",
-  "file_watcher",
-  "animation",
-  "bevy_asset",
-  "bevy_color",
-  "bevy_core_pipeline",
-  "bevy_gilrs",
-  "bevy_gizmos",
-  "bevy_gltf",
-  "bevy_mesh_picking_backend",
-  "bevy_picking",
-  "bevy_render",
-  "bevy_scene",
-  "bevy_sprite",
-  "bevy_sprite_picking_backend",
-  "bevy_state",
-  "bevy_text",
-  "bevy_ui",
-  "bevy_ui_picking_backend",
-  "bevy_window",
-  "bevy_winit",
-  "custom_cursor",
-  "default_font",
-  "hdr",
-  "multi_threaded",
-  "png",
-  "smaa_luts",
-  "sysinfo_plugin",
-  "tonemapping_luts",
-  "webgl2",
-  "x11",
-  "jpeg",
-  "dynamic_linking",
+    "bevy_remote",
+    "file_watcher",
+    "animation",
+    "bevy_asset",
+    "bevy_color",
+    "bevy_core_pipeline",
+    "bevy_gilrs",
+    "bevy_gizmos",
+    "bevy_gltf",
+    "bevy_mesh_picking_backend",
+    "bevy_picking",
+    "bevy_render",
+    "bevy_scene",
+    "bevy_sprite",
+    "bevy_sprite_picking_backend",
+    "bevy_state",
+    "bevy_text",
+    "bevy_ui",
+    "bevy_ui_picking_backend",
+    "bevy_window",
+    "bevy_winit",
+    "custom_cursor",
+    "default_font",
+    "hdr",
+    "multi_threaded",
+    "png",
+    "smaa_luts",
+    "sysinfo_plugin",
+    "tonemapping_luts",
+    "webgl2",
+    "x11",
+    "jpeg",
+    "dynamic_linking",
 ]
 
 [profile.release]

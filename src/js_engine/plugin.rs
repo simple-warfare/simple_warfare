@@ -1,64 +1,56 @@
-use bevy::prelude::*;
+use bevy::{platform::collections::HashMap, prelude::*};
 
 use crate::{
     assets::mods::js::JsAsset,
-    js_engine::{
-        event::{
-            SwModuleLoaderRequestEvent, SwModuleLoaderResponseEvent, SwRequireLoaderRequestEvent,
-            SwRequireLoaderResponseEvent,
-        },
-        loader::*,
-    },
+    bevy_ext::condition::boa_load_js_asset_has_data,
+    js_engine::{event::SwModuleLoaderRequestEvent, loader::*},
 };
 
 pub struct SwLoaderPlugin;
 
+#[derive(Default, Resource)]
+pub struct BoaLoadJsAsset {
+    pub map: HashMap<Handle<JsAsset>, Vec<Box<oneshot::Sender<JsAsset>>>>,
+}
+
 impl Plugin for SwLoaderPlugin {
     fn build(&self, app: &mut App) {
-        app.init_resource::<ModuleJsAssetHandles>()
-            .init_resource::<RequireJsAssetHandles>()
+        app.init_resource::<BoaLoadJsAsset>()
             .add_systems(
                 Update,
-                (module_receiver_request, require_receiver_request).run_if(
-                    resource_exists::<SwModuleLoaderRequestReceiver>
-                        .and(resource_exists::<SwRequireLoaderRequestReceiver>),
-                ),
+                module_receiver_request.run_if(resource_exists::<SwModuleLoaderRequestReceiver>),
             )
             .add_systems(
                 Update,
-                (module_check_js_asset_ready, require_check_js_asset_ready).run_if(
-                    resource_exists::<SwModuleLoaderResponseSender>
-                        .and(resource_exists::<SwRequireLoaderResponseSender>),
-                ),
+                module_check_js_asset_ready.run_if(boa_load_js_asset_has_data()),
             );
     }
 }
 
-#[derive(Resource, Default)]
-pub struct ModuleJsAssetHandles(pub Vec<Handle<JsAsset>>);
-#[derive(Resource, Default)]
-pub struct RequireJsAssetHandles(pub Vec<Handle<JsAsset>>);
-
 pub(super) fn module_receiver_request(
     asset_server: Res<AssetServer>,
     event_receiver: Res<SwModuleLoaderRequestReceiver>,
-    mut js_asset_handles: ResMut<ModuleJsAssetHandles>,
+    mut boa_load_js_asset: ResMut<BoaLoadJsAsset>,
     js_assets: Res<Assets<JsAsset>>,
-    sender: Res<SwModuleLoaderResponseSender>,
 ) -> Result {
-    if let Ok(SwModuleLoaderRequestEvent::LoadJsAsset(path)) =
-        event_receiver.0.lock().unwrap().try_recv()
-    {
-        let asset = asset_server.load(path);
-        if asset_server.is_loaded_with_dependencies(asset.id()) {
-            sender
-                .0
-                .send(SwModuleLoaderResponseEvent::LoadedJsAsset(
-                    js_assets.get(asset.id()).unwrap().clone(),
-                ))
-                .unwrap();
+    let Ok(module_loader_request_rx) = event_receiver.0.try_lock() else {
+        return Ok(());
+    };
+
+    let Ok(SwModuleLoaderRequestEvent::LoadJsAsset { path, sender }) =
+        module_loader_request_rx.try_recv()
+    else {
+        return Ok(());
+    };
+
+    let file_handle = asset_server.load(path);
+    if asset_server.is_loaded(file_handle.id()) {
+        sender.send(js_assets.get(file_handle.id()).unwrap().clone())?;
+    } else {
+        if let Some(file_senders) = boa_load_js_asset.map.get_mut(&file_handle) {
+            file_senders.push(sender);
         } else {
-            js_asset_handles.0.push(asset);
+            boa_load_js_asset.map.insert(file_handle, vec![sender]);
         }
     }
 
@@ -67,75 +59,26 @@ pub(super) fn module_receiver_request(
 
 fn module_check_js_asset_ready(
     asset_server: Res<AssetServer>,
-    js_asset_handles: Res<ModuleJsAssetHandles>,
+    mut boa_load_js_asset: ResMut<BoaLoadJsAsset>,
     js_assets: Res<Assets<JsAsset>>,
     mut events: EventReader<AssetEvent<JsAsset>>,
-    sender: Res<SwModuleLoaderResponseSender>,
 ) -> Result {
     for event in events.read() {
-        match event {
-            AssetEvent::LoadedWithDependencies { id } => {
-                if js_asset_handles
-                    .0
-                    .contains(&asset_server.get_id_handle(*id).unwrap())
-                {
-                    sender.0.send(SwModuleLoaderResponseEvent::LoadedJsAsset(
-                        js_assets.get(*id).unwrap().clone(),
-                    ))?;
-                }
+        if let AssetEvent::LoadedWithDependencies { id } = *event {
+            if let Some(mut senders) = boa_load_js_asset
+                .map
+                .remove(&asset_server.get_id_handle(id).unwrap())
+            {
+                senders.drain(..).try_for_each::<_, Result>(|sender| {
+                    sender.send(
+                        js_assets
+                            .get(id)
+                            .ok_or(BevyError::from("Could not get the js asset"))?
+                            .clone(),
+                    )?;
+                    Ok(())
+                })?;
             }
-            _ => {}
-        }
-    }
-    Ok(())
-}
-
-pub(super) fn require_receiver_request(
-    asset_server: Res<AssetServer>,
-    event_receiver: Res<SwRequireLoaderRequestReceiver>,
-    mut js_asset_handles: ResMut<RequireJsAssetHandles>,
-    js_assets: Res<Assets<JsAsset>>,
-    sender: Res<SwRequireLoaderResponseSender>,
-) -> Result {
-    if let Ok(SwRequireLoaderRequestEvent::LoadJsAsset(path)) =
-        event_receiver.0.lock().unwrap().try_recv()
-    {
-        let asset = asset_server.load(path);
-        if asset_server.is_loaded_with_dependencies(asset.id()) {
-            sender
-                .0
-                .send(SwRequireLoaderResponseEvent::LoadedJsAsset(
-                    js_assets.get(asset.id()).unwrap().clone(),
-                ))
-                .unwrap();
-        } else {
-            js_asset_handles.0.push(asset);
-        }
-    }
-
-    Ok(())
-}
-
-fn require_check_js_asset_ready(
-    asset_server: Res<AssetServer>,
-    js_asset_handles: Res<RequireJsAssetHandles>,
-    js_assets: Res<Assets<JsAsset>>,
-    mut events: EventReader<AssetEvent<JsAsset>>,
-    sender: Res<SwRequireLoaderResponseSender>,
-) -> Result {
-    for event in events.read() {
-        match event {
-            AssetEvent::LoadedWithDependencies { id } => {
-                if js_asset_handles
-                    .0
-                    .contains(&asset_server.get_id_handle(*id).unwrap())
-                {
-                    sender.0.send(SwRequireLoaderResponseEvent::LoadedJsAsset(
-                        js_assets.get(*id).unwrap().clone(),
-                    ))?;
-                }
-            }
-            _ => {}
         }
     }
     Ok(())

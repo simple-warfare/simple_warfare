@@ -7,9 +7,20 @@ use thiserror::Error;
 
 #[derive(Debug, Default, Asset, TypePath, Clone, FromLua)]
 pub struct JsAsset {
-    pub file_name: String,
+    pub path: String,
     pub context: String,
-    pub from: String,
+    pub crc32: u32,
+}
+
+impl JsAsset {
+    pub fn new(path: impl Into<String>, context: String) -> Self {
+        let crc32 = crc32fast::hash(context.as_bytes());
+        Self {
+            path: path.into(),
+            context,
+            crc32,
+        }
+    }
 }
 
 #[derive(Debug, Error)]
@@ -37,32 +48,13 @@ impl AssetLoader for JsAssetLoader {
         _settings: &(),
         load_context: &mut LoadContext<'_>,
     ) -> Result<Self::Asset, Self::Error> {
-        let file_name = load_context
-            .path()
-            .file_name()
-            .ok_or(Self::Error::FileNameNotFound(
-                load_context.path().display().to_string(),
-            ))?
-            .to_string_lossy()
-            .into_owned();
-
-        let from = load_context
-            .path()
-            .parent()
-            .ok_or(Self::Error::FileNameNotFound(
-                load_context.path().display().to_string(),
-            ))?
-            .to_string_lossy()
-            .into_owned();
-
         let mut context = String::new();
         reader.read_to_string(&mut context).await?;
 
-        Ok(Self::Asset {
-            file_name,
+        Ok(Self::Asset::new(
+            load_context.path().to_string_lossy(),
             context,
-            from
-        })
+        ))
     }
 
     fn extensions(&self) -> &[&str] {

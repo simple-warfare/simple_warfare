@@ -1,5 +1,5 @@
 use bevy::{
-    asset::{AssetLoader, AsyncReadExt, LoadContext, LoadedFolder, io::Reader},
+    asset::{AssetLoader, AsyncReadExt, LoadContext, LoadedFolder, io::Reader, uuid::Uuid},
     prelude::*,
 };
 use mlua::{FromLua, MetaMethod, UserData, UserDataFields, UserDataMethods};
@@ -14,6 +14,7 @@ pub struct ModInfo {
     pub version: String,
     pub game_version: String,
     pub author: String,
+    pub uuid: Uuid,
 }
 
 impl UserData for ModInfo {

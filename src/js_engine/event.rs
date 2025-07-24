@@ -1,15 +1,14 @@
 use bevy::prelude::*;
 
 use crate::{
-    assets::mods::{
-        info::ModInfo,
-        js::JsAsset,
-    },
+    assets::mods::{info::ModInfo, js::JsAsset},
     custom::unit::{section::core::Core, unit::SpawnedUnitData},
     js_engine::{
         global::class::entity::JsEntity,
-        sw::{LookType, TeleportType}, synchronize::SynchronizeData,
-    }, lua_engine::user_data::ModEnableClasses
+        sw::{LookType, TeleportType},
+        synchronize::SynchronizeData,
+    },
+    lua_engine::user_data::ModEnableClasses,
 };
 
 #[derive(Event)]
@@ -25,8 +24,7 @@ pub enum JsEngineRequestEvent {
     OnUnitEnterSignal(Vec<JsEntity>, Entity),
     OnUnitExitSignal(Vec<JsEntity>, Entity),
     EmitEmptySignal(JsEntity),
-    SynchronizeData(SynchronizeData)
-    //RemoteJsProxy(Box<dyn Fn(JsProxy) -> String + Send + Sync + 'static>),
+    SynchronizeData(SynchronizeData), //RemoteJsProxy(Box<dyn Fn(JsProxy) -> String + Send + Sync + 'static>),
 }
 
 #[derive(Debug, Event, Clone)]
@@ -37,7 +35,7 @@ pub enum JsEngineResponseEvent {
     EntityToTeleport(EntityTeleportType),
     EntityToLook(EntityLookType),
 
-    SynchronizeCore(Core)
+    SynchronizeCore(Core),
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -51,23 +49,19 @@ pub enum EntityLookType {
     Position(Entity, Vec2),
     Entity(Entity, Entity),
 }
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub enum SwModuleLoaderRequestEvent {
-    LoadJsAsset(String),
-}
-#[derive(Debug, Clone)]
-pub enum SwModuleLoaderResponseEvent {
-    LoadedJsAsset(JsAsset),
-}
-#[derive(Debug, Clone)]
-pub enum SwRequireLoaderRequestEvent {
-    LoadJsAsset(String),
-}
-#[derive(Debug, Clone)]
-pub enum SwRequireLoaderResponseEvent {
-    LoadedJsAsset(JsAsset),
+    LoadJsAsset {
+        path: String,
+        sender: Box<oneshot::Sender<JsAsset>>,
+    },
 }
 
+impl SwModuleLoaderRequestEvent {
+    pub fn load_js_asset(path: String, sender: Box<oneshot::Sender<JsAsset>>) -> Self {
+        Self::LoadJsAsset { path, sender }
+    }
+}
 pub struct EventPlugin;
 
 impl Plugin for EventPlugin {

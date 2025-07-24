@@ -70,18 +70,20 @@ fn check_js_and_map(
     mod_infos: Res<Assets<ModInfo>>,
 ) -> Result {
     game_asset
-        .custom_mods
+        .custom_mod_handles
         .untyped_handles
         .retain(|handle| !asset_server.is_loaded_with_dependencies(handle.id()));
 
-    if game_asset.custom_mods.untyped_handles.is_empty() {
+    if game_asset.custom_mod_handles.untyped_handles.is_empty() {
         app_state.set(AppState::ModLoading);
         game_asset
-            .custom_mods
-            .mods
+            .custom_mod_handles
+            .mod_handles
             .iter()
             .try_for_each::<_, Result>(|custom_mod| {
                 if let Some(info) = mod_infos.get(custom_mod.info.id()) {
+                    /*
+
                     mod_server.load_mod(
                         custom_mod
                             .enable_js
@@ -95,15 +97,17 @@ fn check_js_and_map(
                             })
                             .collect(),
                         info.clone(),
-                    );
+                    )?;
+
+                    */
                     Ok(())
                 } else {
                     Err(BevyError::from("Could not get the info asset"))
                 }
             })?;
         let mut all_maps = game_asset
-            .custom_mods
-            .mods
+            .custom_mod_handles
+            .mod_handles
             .iter()
             .flat_map(|custom_mod| custom_mod.maps.iter().cloned().map(|map| Arc::new(map)))
             .collect();

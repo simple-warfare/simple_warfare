@@ -1,14 +1,8 @@
-use std::sync::{
-    Arc, Mutex,
-    mpsc::{Receiver, Sender},
-};
+use std::sync::{Arc, mpsc::Sender};
 
 use boa_engine::{js_string, object::ObjectInitializer, prelude::*, property::Attribute};
 
-use crate::js_engine::{
-    event::JsEngineRequestEvent,
-    sw::{SwRequestEvent, SwResponseEvent},
-};
+use crate::js_engine::sw::SwRequestEvent;
 
 /// Js端Sw的成员之一，负责实现Js加载文件
 #[derive(Debug, Default, Trace, Finalize, JsData)]
@@ -18,12 +12,7 @@ impl Fs {
     pub const NAME: JsString = js_string!("fs");
 
     /// TODO:目前只能加载String到Js端,等待完善
-    pub fn init(
-        context: &mut Context,
-        js_engine_request_sender: Arc<Sender<JsEngineRequestEvent>>,
-        sw_request_sender: Arc<Sender<SwRequestEvent>>,
-        sw_response_receiver: Arc<Mutex<Receiver<SwResponseEvent>>>,
-    ) -> JsObject {
+    pub fn init(context: &mut Context, sw_request_sender: Arc<Sender<SwRequestEvent>>) -> JsObject {
         let read_file = unsafe {
             let sw_request_sender = sw_request_sender.clone();
             NativeFunction::from_closure(move |_referrer, args, ctx| {
@@ -39,9 +28,7 @@ impl Fs {
                         path_str.to_string(ctx)?.to_std_string_lossy(),
                     ))
                     .unwrap();
-                if let Ok(string) =
-                    receiver.recv()
-                {
+                if let Ok(string) = receiver.recv() {
                     Ok(JsValue::String(js_string!(string)))
                 } else {
                     Ok(JsValue::undefined())

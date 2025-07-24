@@ -12,9 +12,9 @@ use crate::{
         map::SimpleWarfareMap,
         mods::{ModSet, info::*, lua::*},
     },
-    custom::CustomMod,
-    lua_engine::user_data::{MapManager, ModManager},
     consts::CUSTOM_MOD_PATH,
+    custom::{CustomModEnableJsHandle, CustomModHandle},
+    lua_engine::user_data::{MapManager, ModManager},
 };
 
 #[derive(Resource)]
@@ -73,18 +73,18 @@ fn check_mod_set(
                 asset_server.load(Path::new(CUSTOM_MOD_PATH).join(mod_name).join("main.lua"));
 
             game_asset
-                .custom_mods
+                .custom_mod_handles
                 .untyped_handles
                 .push(info_handle.clone().untyped());
             game_asset
-                .custom_mods
+                .custom_mod_handles
                 .untyped_handles
                 .push(main_lua_handle.clone().untyped());
 
             game_asset
-                .custom_mods
-                .mods
-                .push(CustomMod::new(info_handle, main_lua_handle));
+                .custom_mod_handles
+                .mod_handles
+                .push(CustomModHandle::new(info_handle, main_lua_handle));
         });
         next_state.set(AppState::CustomModLoading);
     }
@@ -98,11 +98,11 @@ fn check_custom_mods(
     mut next_state: ResMut<NextState<AppState>>,
 ) {
     game_asset
-        .custom_mods
+        .custom_mod_handles
         .untyped_handles
         .retain(|handle| !asset_server.is_loaded_with_dependencies(handle.id()));
 
-    if game_asset.custom_mods.untyped_handles.is_empty() {
+    if game_asset.custom_mod_handles.untyped_handles.is_empty() {
         next_state.set(AppState::MainLuaExecuting);
     }
 }
@@ -119,9 +119,9 @@ fn exec_mod_main_lua(
     let global = &lua_runtime.global;
     let context = &lua_runtime.context;
 
-    let custom_mods = &mut game_asset.custom_mods;
+    let custom_mods = &mut game_asset.custom_mod_handles;
     custom_mods
-        .mods
+        .mod_handles
         .iter_mut()
         .try_for_each::<_, Result>(|custom_mod| {
             if let (Some(lua_asset), Some(mod_info)) = (
@@ -149,8 +149,12 @@ fn exec_mod_main_lua(
                         );
 
                         custom_mod
-                            .enable_js
-                            .push((js_handle.clone(), mod_enable_classes_define.classes.clone()));
+                            .custom_mod_enable_js_handles
+                            .push(CustomModEnableJsHandle::new(
+                                js_handle.clone(),
+                                mod_enable_classes_define.classes.clone(),
+                            ));
+
                         custom_mods.untyped_handles.push(js_handle.untyped());
                     });
 
@@ -158,7 +162,7 @@ fn exec_mod_main_lua(
                 map_manager.map_paths.iter().try_for_each(|map_path| {
                     let binding = Path::new(CUSTOM_MOD_PATH).join(mod_name).join(map_path);
                     let real_map_path = binding.as_path();
-                    
+
                     if let Some(ext) = real_map_path.extension() {
                         let (map, untyped) = match ext.to_string_lossy().trim() {
                             "tmx" => {

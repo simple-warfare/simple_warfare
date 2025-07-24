@@ -26,8 +26,8 @@ use crate::{
             process_textures,
         },
     },
-    custom::CustomMod,
     consts::{MOD_SET_NOW_USE_CONF_PATH, MOD_SET_PATH},
+    custom::{CustomModAsset, CustomModHandle},
 };
 
 // 宏用于快速生成资源结构体和默认实现
@@ -70,13 +70,14 @@ pub struct GameAsset {
     pub interface: Interfaces,
     pub maps: Vec<Arc<SimpleWarfareMap>>,
     pub enable_mod_set: EnableModSet,
-    pub custom_mods: CustomMods,
+    pub custom_mod_handles: CustomModHandles,
+    pub custom_mods: Option<Vec<CustomModAsset>>,
     pub assets_untyped_handle: Vec<UntypedHandle>,
 }
 
 #[derive(Debug, Default)]
-pub struct CustomMods {
-    pub mods: Vec<CustomMod>,
+pub struct CustomModHandles {
+    pub mod_handles: Vec<CustomModHandle>,
     pub untyped_handles: Vec<UntypedHandle>,
 }
 #[derive(Debug, Default)]
@@ -88,7 +89,7 @@ pub struct AssetsPlugin;
 
 impl Plugin for AssetsPlugin {
     fn build(&self, app: &mut App) {
-        app.init_asset::<JsTomlFile>()  //js读取toml格式的文件将以String返回js
+        app.init_asset::<JsTomlFile>() //js读取toml格式的文件将以String返回js
             .init_asset_loader::<JsTomlFileLoader>()
             .init_asset::<ModInfo>()
             .init_asset_loader::<ModInfoLoader>()
@@ -126,7 +127,6 @@ fn load_assets(mut game_assets: ResMut<GameAsset>, asset_server: Res<AssetServer
     let mod_set_conf_handle = asset_server.load(MOD_SET_NOW_USE_CONF_PATH);
     game_assets.enable_mod_set.conf_handle = mod_set_conf_handle.clone();
 
-    
     // 收集所有资源句柄
     game_assets.assets_untyped_handle = game_assets
         .interface

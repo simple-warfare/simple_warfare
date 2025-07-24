@@ -21,10 +21,7 @@ use crate::{
         context::*,
         engine::JsEngine,
         event::{EventPlugin, JsEngineRequestEvent, JsEngineResponseEvent},
-        loader::{
-            SimpleWarfareModuleLoader, SwModuleLoaderRequestReceiver, SwModuleLoaderResponseSender,
-            SwRequireLoaderRequestReceiver, SwRequireLoaderResponseSender,
-        },
+        loader::{SimpleWarfareModuleLoader, SwModuleLoaderRequestReceiver},
         plugin::SwLoaderPlugin,
         sw::{SwRequestReceiver, SwResponseSender, plugin::SwPlugin},
     },
@@ -81,21 +78,9 @@ fn init_js_context(mut commands: Commands) -> Result {
     ))));
 
     let (sw_module_request_sender, sw_module_request_receiver) = mpsc::channel();
-    let (sw_module_response_sender, sw_module_response_receiver) = mpsc::channel();
-    commands.insert_resource(SwModuleLoaderResponseSender(Arc::new(
-        sw_module_response_sender.clone(),
-    )));
+
     commands.insert_resource(SwModuleLoaderRequestReceiver(Arc::new(Mutex::new(
         sw_module_request_receiver,
-    ))));
-
-    let (sw_require_request_sender, sw_require_request_receiver) = mpsc::channel();
-    let (sw_require_response_sender, sw_require_response_receiver) = mpsc::channel();
-    commands.insert_resource(SwRequireLoaderResponseSender(Arc::new(
-        sw_require_response_sender.clone(),
-    )));
-    commands.insert_resource(SwRequireLoaderRequestReceiver(Arc::new(Mutex::new(
-        sw_require_request_receiver,
     ))));
 
     let (sw_request_sender, sw_request_receiver) = mpsc::channel();
@@ -107,16 +92,9 @@ fn init_js_context(mut commands: Commands) -> Result {
 
     std::thread::spawn(move || {
         let engine = &mut JsEngine::new(
-            SimpleWarfareModuleLoader::new(
-                "assets/",
-                Arc::new(sw_module_request_sender),
-                Arc::new(Mutex::new(sw_module_response_receiver)),
-            )
-            .unwrap(),
+            SimpleWarfareModuleLoader::new("assets/", Arc::new(sw_module_request_sender)).unwrap(),
             js_request_sender.clone(),
             js_response_sender.clone(),
-            Arc::new(sw_require_request_sender),
-            Arc::new(Mutex::new(sw_require_response_receiver)),
             Arc::new(sw_request_sender),
             Arc::new(Mutex::new(sw_response_receiver)),
         );

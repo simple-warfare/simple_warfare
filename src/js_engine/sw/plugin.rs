@@ -1,5 +1,6 @@
 use crate::{
     assets::js_file::JsTomlFile,
+    bevy_ext::condition::js_read_toml_files_has_data,
     custom::{
         ui::quick::{QuickDialogData, QuickUi},
         unit::unit::Custom,
@@ -16,7 +17,9 @@ use bevy_hui::prelude::*;
 pub struct SwPlugin;
 
 #[derive(Default, Resource)]
-pub struct JsReadTomlFiles(pub HashMap<Handle<JsTomlFile>, Vec<Box<oneshot::Sender<String>>>>);
+pub struct JsReadTomlFiles {
+    pub map: HashMap<Handle<JsTomlFile>, Vec<Box<oneshot::Sender<String>>>>,
+}
 
 impl Plugin for SwPlugin {
     fn build(&self, app: &mut App) {
@@ -25,7 +28,10 @@ impl Plugin for SwPlugin {
                 Update,
                 handle_sw_event.run_if(resource_exists::<SwRequestReceiver>),
             )
-            .add_systems(Update, check_js_read_file)
+            .add_systems(
+                Update,
+                check_js_read_file.run_if(js_read_toml_files_has_data()),
+            )
             .add_systems(Update, (finish_teleport, finish_look));
     }
 }
@@ -78,10 +84,10 @@ fn handle_sw_event(
                 if asset_server.is_loaded(file_handle.id()) {
                     sender.send(js_files.get(file_handle.id()).unwrap().data.clone())?;
                 } else {
-                    if let Some(file_senders) = js_read_files.0.get_mut(&file_handle) {
+                    if let Some(file_senders) = js_read_files.map.get_mut(&file_handle) {
                         file_senders.push(sender);
                     } else {
-                        js_read_files.0.insert(file_handle, vec![sender]);
+                        js_read_files.map.insert(file_handle, vec![sender]);
                     }
                 }
 
@@ -101,7 +107,7 @@ fn check_js_read_file(
     for event in evnets.read() {
         if let AssetEvent::LoadedWithDependencies { id } = *event {
             if let Some(mut senders) = js_read_files
-                .0
+                .map
                 .remove(&asset_server.get_id_handle(id).unwrap())
             {
                 senders.drain(..).for_each(|sender| {
