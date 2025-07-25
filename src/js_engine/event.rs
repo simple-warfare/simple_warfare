@@ -1,19 +1,21 @@
 use bevy::prelude::*;
 
 use crate::{
-    assets::mods::{info::ModInfo, js::JsAsset},
-    custom::unit::{section::core::Core, unit::SpawnedUnitData},
+    assets::mods::js::JsAsset,
+    custom::{
+        CustomModAsset,
+        unit::{section::core::Core, unit::SpawnedUnitData},
+    },
     js_engine::{
         global::class::entity::JsEntity,
         sw::{LookType, TeleportType},
         synchronize::SynchronizeData,
     },
-    lua_engine::user_data::ModEnableClasses,
 };
 
 #[derive(Event)]
 pub enum JsEngineRequestEvent {
-    LoadMod(ModEnableClasses, ModInfo),
+    LoadMod(CustomModAsset),
     SpawnUnit(String),
     InsertEntity(JsEntity, Entity),
     ToTeleport(TeleportType),

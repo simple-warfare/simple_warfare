@@ -9,7 +9,6 @@ use std::{path::Path, sync::Arc};
 use bevy::prelude::*;
 
 use crate::{
-    app_state::AppState,
     assets::{
         byte::{ByteFile, ByteFileLoader},
         js_file::{JsTomlFile, JsTomlFileLoader},
@@ -28,6 +27,7 @@ use crate::{
     },
     consts::{MOD_SET_NOW_USE_CONF_PATH, MOD_SET_PATH},
     custom::{CustomModAsset, CustomModHandle},
+    statistics::AppState,
 };
 
 // 宏用于快速生成资源结构体和默认实现

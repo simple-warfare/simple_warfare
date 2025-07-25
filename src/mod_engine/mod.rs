@@ -5,7 +5,7 @@ use bevy_quinnet::client::QuinnetClient;
 
 use crate::{
     bevy_ext::condition::mod_server_has_data, js_engine::JsEngineRequestSender,
-    mod_engine::server::ModServer,
+    mod_engine::server::ModServer, statistics::NetClientState,
 };
 
 pub struct ModEnginePlugin;
@@ -18,8 +18,10 @@ impl Plugin for ModEnginePlugin {
         )
         .add_systems(
             Update,
-            handle_mod_server_events
-                .run_if(resource_exists::<ModServer>.and(mod_server_has_data())),
+            handle_mod_server_events.run_if(
+                in_state(NetClientState::Ready)
+                    .and(resource_exists::<ModServer>.and(mod_server_has_data())),
+            ),
         );
     }
 }

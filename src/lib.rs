@@ -1,4 +1,3 @@
-pub mod app_state;
 pub mod assets;
 pub mod bevy_ext;
 pub mod consts;
@@ -16,7 +15,6 @@ pub mod system;
 pub mod utils;
 
 use crate::{
-    app_state::AppState,
     assets::AssetsPlugin,
     custom::{ui::CustomUiPlugin, unit::CustomUnitPlugin},
     debug::DebugPlugin,
@@ -27,7 +25,7 @@ use crate::{
     panel::PanelPlugin,
     scenes::{ScenePlugin, SceneState},
     spatial::SpatialPlugin,
-    statistics::StatistcsPlugin,
+    statistics::{AppState, StatistcsPlugin},
     system::SystemPlugin,
 };
 use avian2d::prelude::*;
@@ -79,8 +77,7 @@ pub struct SimpleWarfarePlugin;
 
 impl Plugin for SimpleWarfarePlugin {
     fn build(&self, app: &mut App) {
-        app.init_state::<AppState>()
-            .register_type::<AppState>()
+        app.register_type::<AppState>()
             .register_type::<SceneState>()
             .add_plugins((
                 RemotePlugin::default(),

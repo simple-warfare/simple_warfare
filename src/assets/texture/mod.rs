@@ -4,8 +4,11 @@ pub mod dialog;
 use bevy::prelude::*;
 
 use crate::{
-    app_state::AppState,
-    assets::{texture::{chrome::ChromeTextureSlicer, dialog::*}, GameAsset},
+    assets::{
+        GameAsset,
+        texture::{chrome::ChromeTextureSlicer, dialog::*},
+    },
+    statistics::AppState,
 };
 
 pub struct TexturePlugin;

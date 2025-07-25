@@ -28,7 +28,7 @@ pub struct Players {
 
 #[derive(Debug, Resource)]
 pub struct ServerData {
-    pub js_crc32: Vec<(String, u32)>,
+    pub mod_js_crc32: Vec<(String, u32)>,
 }
 
 impl Plugin for SimpleWarfareServerPlugin {
@@ -57,7 +57,7 @@ pub fn start_listening(
         .collect();
 
     commands.insert_resource(ServerData {
-        js_crc32: custom_mods
+        mod_js_crc32: custom_mods
             .iter()
             .flat_map(|custom_mod_asset| {
                 custom_mod_asset
@@ -117,13 +117,14 @@ pub fn handle_client_messages(
                     }
                 }
                 ClientMessage::SpawnUnit { unit_str } => {}
-                ClientMessage::FetchMods => {
+                ClientMessage::VerifyMods => {
                     //game_asset.custom_mods.mods.iter().map(|custom_mod|custom_mod.)
                     endpoint.send_message(
                         client_id,
-                        ServerMessage::fetch_mods(server_data.js_crc32.clone()),
+                        ServerMessage::verify_mods(server_data.mod_js_crc32.clone()),
                     )?;
                 }
+                ClientMessage::FetchMods { mods } => todo!(),
             }
         }
     }

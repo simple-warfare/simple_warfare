@@ -20,12 +20,43 @@ pub enum GameType {
 }
 
 #[derive(States, Debug, Hash, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Default, Reflect)]
+pub enum AppState {
+    #[default]
+    AssetsLoading,
+    AssetsProcessing,
+    InitJsContext,
+    ModSetLoading,
+    CustomModLoading,
+    MainLuaExecuting,
+    JsLoading,
+    ModLoading,
+    ModLoaded,
+    FetchMods,
+}
+
+#[derive(States, Debug, Hash, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Default, Reflect)]
 pub enum NetState {
     #[default]
     None,
     Client,
     Server,
     HostServer,
+}
+
+#[derive(States, Debug, Hash, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Default, Reflect)]
+pub enum NetClientState {
+    #[default]
+    None,
+    VerifyMods,
+    FetchMods,
+    Ready
+}
+
+#[derive(States, Debug, Hash, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Default, Reflect)]
+pub enum NetServerState {
+    #[default]
+    None,
+    Ready
 }
 
 #[derive(Debug, Resource)]
@@ -90,6 +121,9 @@ impl Plugin for StatistcsPlugin {
         app.init_resource::<Statistics>()
             .init_resource::<GameInfo>()
             .init_state::<MouseState>()
-            .init_state::<NetState>();
+            .init_state::<NetState>()
+            .init_state::<AppState>()
+            .init_state::<NetClientState>()
+            .init_state::<NetServerState>();
     }
 }

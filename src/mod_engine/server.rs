@@ -4,6 +4,7 @@ use bevy::prelude::*;
 
 use crate::{
     assets::mods::{info::ModInfo, js::JsAsset},
+    custom::CustomModAsset,
     js_engine::event::JsEngineRequestEvent,
     lua_engine::user_data::ModEnableClasses,
     net::protocol::ClientMessage,
@@ -27,11 +28,8 @@ impl ModServer {
             .push(ClientMessage::spawn_unit(unit_str.to_string()));
     }
 
-    pub fn load_mod(&self, enables: Vec<(JsAsset, Vec<String>)>, info: ModInfo) -> Result<()> {
-        self.sender.send(JsEngineRequestEvent::LoadMod(
-            ModEnableClasses::new(enables),
-            info.clone(),
-        ))?;
+    pub fn load_mod(&self, mod_asset: CustomModAsset) -> Result<()> {
+        self.sender.send(JsEngineRequestEvent::LoadMod(mod_asset))?;
         Ok(())
     }
 }

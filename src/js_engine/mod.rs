@@ -16,7 +16,6 @@ use std::sync::{
 };
 
 use crate::{
-    app_state::AppState,
     js_engine::{
         context::*,
         engine::JsEngine,
@@ -25,6 +24,7 @@ use crate::{
         plugin::SwLoaderPlugin,
         sw::{SwRequestReceiver, SwResponseSender, plugin::SwPlugin},
     },
+    statistics::AppState,
 };
 use bevy::prelude::*;
 use boa_engine::prelude::*;

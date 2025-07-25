@@ -4,13 +4,11 @@ use bevy::prelude::*;
 
 use super::{Scene, SceneState};
 use crate::{
-    app_state::AppState,
     assets::{
-        GameAsset,
-        mods::{info::ModInfo, js::JsAsset},
+        mods::{info::ModInfo, js::JsAsset, lua::LuaAsset}, GameAsset
     },
     bevy_ext::app::AppExt,
-    mod_engine::server::ModServer,
+    mod_engine::server::ModServer, statistics::AppState,
 };
 use bevy_seedling::prelude::*;
 
@@ -65,8 +63,9 @@ fn check_js_and_map(
     asset_server: Res<AssetServer>,
     mut app_state: ResMut<NextState<AppState>>,
     mut scene_state: ResMut<NextState<SceneState>>,
-    mut mod_server: ResMut<ModServer>,
+    mod_server: Res<ModServer>,
     js_assets: Res<Assets<JsAsset>>,
+    lua_assets: Res<Assets<LuaAsset>>,
     mod_infos: Res<Assets<ModInfo>>,
 ) -> Result {
     game_asset
@@ -80,30 +79,12 @@ fn check_js_and_map(
             .custom_mod_handles
             .mod_handles
             .iter()
-            .try_for_each::<_, Result>(|custom_mod| {
-                if let Some(info) = mod_infos.get(custom_mod.info.id()) {
-                    /*
-
-                    mod_server.load_mod(
-                        custom_mod
-                            .enable_js
-                            .iter()
-                            .filter_map(|(js_handle, enables)| {
-                                if let Some(js_asset) = js_assets.get(js_handle.id()) {
-                                    Some((js_asset.clone(), enables.clone()))
-                                } else {
-                                    None
-                                }
-                            })
-                            .collect(),
-                        info.clone(),
-                    )?;
-
-                    */
-                    Ok(())
-                } else {
-                    Err(BevyError::from("Could not get the info asset"))
-                }
+            .map(|custom_mod_handle| {
+                custom_mod_handle.to_asset(&js_assets, &mod_infos, &lua_assets)
+            })
+            .try_for_each::<_, Result>(|custom_mod_asset| {
+                mod_server.load_mod(custom_mod_asset)?;
+                Ok(())
             })?;
         let mut all_maps = game_asset
             .custom_mod_handles

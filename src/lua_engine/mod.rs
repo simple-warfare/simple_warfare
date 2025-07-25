@@ -6,7 +6,6 @@ use bevy::prelude::*;
 use mlua::{Lua, ObjectLike, Table};
 
 use crate::{
-    app_state::AppState,
     assets::{
         GameAsset,
         map::SimpleWarfareMap,
@@ -15,6 +14,7 @@ use crate::{
     consts::CUSTOM_MOD_PATH,
     custom::{CustomModEnableJsHandle, CustomModHandle},
     lua_engine::user_data::{MapManager, ModManager},
+    statistics::AppState,
 };
 
 #[derive(Resource)]

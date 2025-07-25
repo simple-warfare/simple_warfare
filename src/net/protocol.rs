@@ -16,7 +16,10 @@ pub enum ClientMessage {
         player_info: Player,
         //package_list:Vec<>
     },
-    FetchMods,
+    VerifyMods,
+    FetchMods {
+        mods: Vec<String>,
+    },
     SpawnUnit {
         unit_str: String,
     },
@@ -39,8 +42,9 @@ pub enum ServerMessage {
         player_info: Player,
     },
     StartGame,
-    FetchMods {
-        js_crc32: Vec<(String, u32)>,
+
+    VerifyMods {
+        mod_js_crc32: Vec<(String, u32)>,
     },
     SpawnUnit {
         client_id: ClientId,
@@ -67,8 +71,8 @@ impl ServerMessage {
         Self::DisconnectClient { info: info.into() }
     }
 
-    pub fn fetch_mods(js_crc32: Vec<(String, u32)>) -> Self {
-        Self::FetchMods { js_crc32 }
+    pub fn verify_mods(mod_js_crc32: Vec<(String, u32)>) -> Self {
+        Self::VerifyMods { mod_js_crc32 }
     }
 }
 
