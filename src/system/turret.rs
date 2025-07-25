@@ -60,7 +60,7 @@ fn unit_enter(
         if !new_units_in_range.is_empty() {
             js_engine_request_sender
                 .0
-                .send(JsEngineRequestEvent::OnUnitEnterSignal(
+                .send(JsEngineRequestEvent::on_unit_enter_signal_entity(
                     new_units_in_range,
                     turret.on_unit_enter_signal_entity,
                 ))?;
@@ -69,7 +69,7 @@ fn unit_enter(
         if !exited_units.is_empty() {
             js_engine_request_sender
                 .0
-                .send(JsEngineRequestEvent::OnUnitExitSignal(
+                .send(JsEngineRequestEvent::on_unit_exit_signal_entity(
                     exited_units,
                     turret.on_unit_exit_signal_entity,
                 ))?;

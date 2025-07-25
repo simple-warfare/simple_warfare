@@ -15,6 +15,7 @@ use crate::{
         way_point::WayPointQueue,
     },
     js_engine::event::JsEngineResponseEvent,
+    net::shared::UnitMapping,
     spatial::Spatial,
     statistics::*,
 };
@@ -43,19 +44,27 @@ fn check_new_unit(
     asset_server: Res<AssetServer>,
     mut reader: EventReader<JsEngineResponseEvent>,
     mut writer: EventWriter<NewSpawnedUnit>,
+    mut unit_mapping: ResMut<UnitMapping>,
 ) -> Result {
     for event in reader.read() {
-        if let JsEngineResponseEvent::SpawnedUnit(entity, form, spawned_unit_data) = event {
-            let core = &spawned_unit_data.section.core;
-            let graphics = &spawned_unit_data.section.graphics;
-            let colliders = &spawned_unit_data.section.colliders;
-            let point_lights = &spawned_unit_data.section.point_lights;
-            let turrets = &spawned_unit_data.section.turrets;
+        if let JsEngineResponseEvent::SpawnedUnit {
+            unit_id,
+            entity,
+            module_path,
+            data,
+        } = event
+        {
+            unit_mapping.add_entity(*unit_id, *entity);
+            let core = &data.section.core;
+            let graphics = &data.section.graphics;
+            let colliders = &data.section.colliders;
+            let point_lights = &data.section.point_lights;
+            let turrets = &data.section.turrets;
             let turret_entities: Vec<Entity> = turrets
                 .data
                 .iter()
                 .map(|turret| {
-                    let image_path = Path::new(form)
+                    let image_path = Path::new(module_path)
                         .parent()
                         .unwrap()
                         .join(turret.image.path.clone());
@@ -87,7 +96,7 @@ fn check_new_unit(
                     EnablePhysics,
                 ))
                 .insert((
-                    spawned_unit_data.section.clone(),
+                    data.section.clone(),
                     EnablePhysics,
                     Selectable,
                     Spatial,
@@ -100,7 +109,7 @@ fn check_new_unit(
                     ComputedMass::new(core.mass),
                     Sprite {
                         image: asset_server.load(
-                            Path::new(form)
+                            Path::new(module_path)
                                 .parent()
                                 .unwrap()
                                 .join(graphics.data[0].path.clone()),

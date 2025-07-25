@@ -11,7 +11,7 @@ pub const TIME_STEP: f32 = 1.0 / 60.0;
 
 #[derive(Resource, Default)]
 pub struct UnitMapping {
-    map: HashMap<UnitId, Vec<Entity>>,
+   pub map: HashMap<UnitId, Vec<Entity>>,
 }
 
 pub type UnitId = Entity;

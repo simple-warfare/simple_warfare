@@ -41,8 +41,6 @@ impl QuickComfirmDialog {
     }
 }
 
-
-
 impl TryFromJs for QuickUi {
     fn try_from_js(value: &JsValue, context: &mut Context) -> JsResult<Self> {
         let quick_ui_object = value.to_object(context)?;
@@ -128,15 +126,15 @@ fn quick_ui_comfirm_dialog_comfirm(
 
     js_engine_request_sender
         .0
-        .send(JsEngineRequestEvent::EmitEmptySignal(
-            dialog.on_press_comfirm_signal.clone(),
+        .send(JsEngineRequestEvent::emit_empty_signal(
+            dialog.on_press_comfirm_signal.to_entity(),
         ))
         .unwrap();
 }
 
 fn quick_ui_comfirm_dialog_cancel(
     In(entity): In<Entity>,
-    mut commands:Commands,
+    mut commands: Commands,
     button_tags: Query<&Tags>,
     dialog_query: Query<&QuickComfirmDialog>,
     js_engine_request_sender: Res<JsEngineRequestSender>,
@@ -158,11 +156,10 @@ fn quick_ui_comfirm_dialog_cancel(
 
     js_engine_request_sender
         .0
-        .send(JsEngineRequestEvent::EmitEmptySignal(
-            dialog.on_press_cancel_signal.clone(),
+        .send(JsEngineRequestEvent::emit_empty_signal(
+            dialog.on_press_cancel_signal.to_entity(),
         ))
         .unwrap();
 
     commands.entity(node_entity).despawn();
-    
 }

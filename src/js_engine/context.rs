@@ -46,265 +46,232 @@ pub(super) fn process_js_event(
     let module_map = &mut engine.module_map;
     match event {
         JsEngineRequestEvent::LoadMod(custom_mod_asset) => {
-                        let mod_info = custom_mod_asset.info.clone();
-                        for CustomModEnableJs {
-                            js_asset,
-                            enable_class,
-                        } in custom_mod_asset.custom_mod_enable_js
-                        {
-                            let module = Module::parse(
-                                Source::from_reader(
-                                    js_asset.context.as_bytes(),
-                                    Some(&Path::new(&js_asset.path)),
-                                ),
-                                None,
-                                context,
-                            )?;
-        
-                            let promise = module.load_link_evaluate(context);
-        
-                            context.run_jobs();
-        
-                            match promise.state() {
-                                PromiseState::Pending => panic!("module didn't execute!"),
-                                PromiseState::Fulfilled(v) => {
-                                    assert_eq!(v, JsValue::undefined())
-                                }
-                                PromiseState::Rejected(err) => {
-                                    panic!("{}", err.display());
-                                }
-                            }
-                            // 将模块添加到模块映射中
-                            if let Some(modules) = module_map.get_mut(&mod_info.name) {
-                                modules.push(ModModule::new(module.clone(), enable_class));
-                            } else {
-                                module_map.insert(
-                                    mod_info.name.clone(),
-                                    vec![ModModule::new(module.clone(), enable_class)],
-                                );
-                            }
-                        }
+            let mod_info = custom_mod_asset.info.clone();
+            for CustomModEnableJs {
+                js_asset,
+                enable_class,
+            } in custom_mod_asset.custom_mod_enable_js
+            {
+                let module = Module::parse(
+                    Source::from_reader(
+                        js_asset.context.as_bytes(),
+                        Some(&Path::new(&js_asset.path)),
+                    ),
+                    None,
+                    context,
+                )?;
+
+                let promise = module.load_link_evaluate(context);
+
+                context.run_jobs();
+
+                match promise.state() {
+                    PromiseState::Pending => panic!("module didn't execute!"),
+                    PromiseState::Fulfilled(v) => {
+                        assert_eq!(v, JsValue::undefined())
+                    }
+                    PromiseState::Rejected(err) => {
+                        panic!("{}", err.display());
+                    }
+                }
+                // 将模块添加到模块映射中
+                if let Some(modules) = module_map.get_mut(&mod_info.name) {
+                    modules.push(ModModule::new(module.clone(), enable_class));
+                } else {
+                    module_map.insert(
+                        mod_info.name.clone(),
+                        vec![ModModule::new(module.clone(), enable_class)],
+                    );
+                }
             }
-        JsEngineRequestEvent::SpawnUnit(unit_str) => {
-                let unit_from: Vec<&str> = unit_str.split(':').collect();
-                if let Some(modules) = module_map.get(unit_from[0]) {
-                    for module in modules {
-                        let target_class = unit_from[1].to_string();
-                        if module.classes.contains(&target_class) {
-                            let module_path =
-                                module.module.path().unwrap().to_string_lossy().into_owned();
-                            let class = module
-                                .module
-                                .namespace(context)
-                                .get(js_string!(unit_from[1]), context)?;
+        }
+        JsEngineRequestEvent::SpawnUnit { unit_id, unit_str } => {
+            let unit_from: Vec<&str> = unit_str.split(':').collect();
+            if let Some(modules) = module_map.get(unit_from[0]) {
+                for module in modules {
+                    let target_class = unit_from[1].to_string();
+                    if module.classes.contains(&target_class) {
+                        let module_path =
+                            module.module.path().unwrap().to_string_lossy().into_owned();
+                        let class = module
+                            .module
+                            .namespace(context)
+                            .get(js_string!(unit_from[1]), context)?;
 
-                            let class_obj = class
+                        let class_obj = class
+                            .to_object(context)?
+                            .construct(&[], None, context)
+                            .expect("construct error");
+
+                        let unit_proxy = JsProxy::from_object(
+                            class_obj
+                                .get(js_string!("getSynchronizeProxy"), context)?
+                                .as_function()
+                                .unwrap()
+                                .call(&JsValue::Object(class_obj), &[], context)?
                                 .to_object(context)?
-                                .construct(&[], None, context)
-                                .expect("construct error");
+                                .clone(),
+                        )?;
+                        let entity = JsEntity::try_from_js(
+                            &unit_proxy.get(js_string!("entity"), context)?,
+                            context,
+                        )?
+                        .to_entity();
 
-                            let unit_proxy = JsProxy::from_object(
-                                class_obj
-                                    .get(js_string!("getSynchronizeProxy"), context)?
-                                    .as_function()
-                                    .unwrap()
-                                    .call(&JsValue::Object(class_obj), &[], context)?
-                                    .to_object(context)?
-                                    .clone(),
-                            )?;
-                            let js_entity = JsEntity::try_from_js(
-                                &unit_proxy.get(js_string!("entity"), context)?,
-                                context,
-                            )?;
+                        emit_signal(
+                            &unit_proxy
+                                .get(js_string!("created"), context)?
+                                .to_object(context)?,
+                            &[],
+                            context,
+                        )?;
 
-                            emit_signal(
-                                &unit_proxy
-                                    .get(js_string!("created"), context)?
-                                    .to_object(context)?,
-                                &[],
-                                context,
-                            )?;
+                        let section = Section::try_from_proxy(&unit_proxy, context)?;
 
-                            let section = Section::try_from_proxy(&unit_proxy, context)?;
+                        context
+                            .realm()
+                            .host_defined_mut()
+                            .get_mut::<UnitMap>()
+                            .unwrap()
+                            .map
+                            .borrow_mut()
+                            .insert(entity, unit_proxy);
 
-                            context
-                                .realm()
-                                .host_defined_mut()
-                                .get_mut::<UnitMap>()
-                                .unwrap()
-                                .map
-                                .borrow_mut()
-                                .insert(js_entity, unit_proxy);
-                            let entity = context
-                                .realm()
-                                .host_defined_mut()
-                                .get::<EntityMap>()
-                                .unwrap()
-                                .map
-                                .borrow()
-                                .get(&js_entity)
-                                .unwrap()
-                                .clone();
-
-                            response_sender
-                                .send(JsEngineResponseEvent::SpawnedUnit(
-                                    entity,
-                                    module_path,
-                                    SpawnedUnitData::new(section),
-                                ))
-                                .unwrap();
-                        }
+                        response_sender
+                            .send(JsEngineResponseEvent::spawned_unit(
+                                unit_id,
+                                entity,
+                                module_path,
+                                SpawnedUnitData::new(section),
+                            ))
+                            .unwrap();
                     }
                 }
             }
+        }
         JsEngineRequestEvent::ToTeleport(teleport_type) => match teleport_type {
-                TeleportType::Position(js_entity, vec2) => {
-                    let host_defined = context.realm().host_defined();
-                    let entity_map = &host_defined.get::<EntityMap>().unwrap().map;
-
-                    response_sender
-                        .send(JsEngineResponseEvent::EntityToTeleport(
-                            EntityTeleportType::Position(
-                                *entity_map.borrow().get(&js_entity).unwrap(),
-                                vec2,
-                            ),
-                        ))
-                        .unwrap();
-                }
-                TeleportType::Entity(this_entity, target_entity) => {
-                    let host_defined = context.realm().host_defined();
-                    let entity_map = &host_defined.get::<EntityMap>().unwrap().map;
-
-                    response_sender
-                        .send(JsEngineResponseEvent::EntityToTeleport(
-                            EntityTeleportType::Entity(
-                                *entity_map.borrow().get(&this_entity).unwrap(),
-                                *entity_map.borrow().get(&target_entity).unwrap(),
-                            ),
-                        ))
-                        .unwrap();
-                }
-            },
+            TeleportType::Position { this, position } => {
+                response_sender
+                    .send(JsEngineResponseEvent::ToTeleport(TeleportType::position(
+                        this, position,
+                    )))
+                    .unwrap();
+            }
+            TeleportType::Entity { this, target } => {
+                response_sender
+                    .send(JsEngineResponseEvent::ToTeleport(TeleportType::entity(
+                        this, target,
+                    )))
+                    .unwrap();
+            }
+        },
         JsEngineRequestEvent::SelectedSignalEmit => {
-                let selected_signal_map = context
-                    .realm()
-                    .host_defined()
-                    .get::<SelectedSignalMap>()
-                    .unwrap()
-                    .map
-                    .clone();
-                selected_signal_map.borrow().iter().for_each(|(_, signal)| {
-                    emit_signal(&signal, &[], context).unwrap();
-                });
-            }
+            let selected_signal_map = context
+                .realm()
+                .host_defined()
+                .get::<SelectedSignalMap>()
+                .unwrap()
+                .map
+                .clone();
+            selected_signal_map.borrow().iter().for_each(|(_, signal)| {
+                emit_signal(&signal, &[], context).unwrap();
+            });
+        }
         JsEngineRequestEvent::ToLook(look_type) => match look_type {
-                LookType::Position(js_entity, vec2) => {
-                    let host_defined = context.realm().host_defined();
-                    let entity_map = &host_defined.get::<EntityMap>().unwrap().map;
-                    response_sender
-                        .send(JsEngineResponseEvent::EntityToLook(
-                            EntityLookType::Position(
-                                *entity_map.borrow().get(&js_entity).unwrap(),
-                                vec2,
-                            ),
-                        ))
-                        .unwrap();
-                }
-                LookType::Entity(this_entity, target_entity) => {
-                    let host_defined = context.realm().host_defined();
-                    let entity_map = &host_defined.get::<EntityMap>().unwrap().map;
+            LookType::Position { this, position } => {
+                response_sender
+                    .send(JsEngineResponseEvent::ToLook(LookType::position(
+                        this, position,
+                    )))
+                    .unwrap();
+            }
+            LookType::Entity { this, target } => {
+                response_sender
+                    .send(JsEngineResponseEvent::ToLook(LookType::entity(
+                        this, target,
+                    )))
+                    .unwrap();
+            }
+        },
+        JsEngineRequestEvent::OnUnitEnterSignal {
+            target_entities,
+            signal_entity,
+        } => {
+            let unit_enter_signal = context
+                .realm()
+                .host_defined()
+                .get::<OnUnitEnterSignalMap>()
+                .unwrap()
+                .map
+                .borrow()
+                .get(&signal_entity)
+                .unwrap()
+                .clone();
 
-                    response_sender
-                        .send(JsEngineResponseEvent::EntityToLook(EntityLookType::Entity(
-                            *entity_map.borrow().get(&this_entity).unwrap(),
-                            *entity_map.borrow().get(&target_entity).unwrap(),
-                        )))
-                        .unwrap();
-                }
-            },
-        JsEngineRequestEvent::InsertEntity(js_entity, entity) => {
-                context
-                    .realm()
-                    .host_defined_mut()
-                    .get_mut::<EntityMap>()
-                    .unwrap()
-                    .map
-                    .borrow_mut()
-                    .insert(js_entity, entity);
-            }
-        JsEngineRequestEvent::OnUnitEnterSignal(unit_entitys, entity) => {
-                let unit_enter_signal = context
-                    .realm()
-                    .host_defined()
-                    .get::<OnUnitEnterSignalMap>()
-                    .unwrap()
-                    .map
-                    .borrow()
-                    .get(&JsEntity::from_entity(&entity))
-                    .unwrap()
-                    .clone();
-
-                emit_signal(
-                    &unit_enter_signal,
-                    &[unit_entitys.try_into_js(context)?],
-                    context,
-                )?;
-            }
-        JsEngineRequestEvent::OnUnitExitSignal(items, entity) => {
-                let unit_exit_signal = context
-                    .realm()
-                    .host_defined()
-                    .get::<OnUnitExitSignalMap>()
-                    .unwrap()
-                    .map
-                    .borrow()
-                    .get(&JsEntity::from_entity(&entity))
-                    .unwrap()
-                    .clone();
-                let args: Vec<JsValue> = items
-                    .iter()
-                    .map(|js_entity| js_entity.try_into_js(context).unwrap())
-                    .collect();
-                emit_signal(&unit_exit_signal, &args, context)?;
-            }
-        JsEngineRequestEvent::EmitEmptySignal(js_entity) => {
-                let signal = context
-                    .realm()
-                    .host_defined()
-                    .get::<SignalEntityMap>()
-                    .unwrap()
-                    .map
-                    .borrow()
-                    .get(&js_entity)
-                    .unwrap()
-                    .clone();
-                emit_signal(&signal, &[], context)?;
-            }
+            emit_signal(
+                &unit_enter_signal,
+                &[target_entities.try_into_js(context)?],
+                context,
+            )?;
+        }
+        JsEngineRequestEvent::OnUnitExitSignal {
+            target_entities,
+            signal_entity,
+        } => {
+            let unit_exit_signal = context
+                .realm()
+                .host_defined()
+                .get::<OnUnitExitSignalMap>()
+                .unwrap()
+                .map
+                .borrow()
+                .get(&signal_entity)
+                .unwrap()
+                .clone();
+            emit_signal(
+                &unit_exit_signal,
+                &[target_entities.try_into_js(context)?],
+                context,
+            )?;
+        }
+        JsEngineRequestEvent::EmitEmptySignal { signal_entity } => {
+            let signal = context
+                .realm()
+                .host_defined()
+                .get::<SignalEntityMap>()
+                .unwrap()
+                .map
+                .borrow()
+                .get(&signal_entity)
+                .unwrap()
+                .clone();
+            emit_signal(&signal, &[], context)?;
+        }
         JsEngineRequestEvent::SynchronizeData(synchronize_data) => match synchronize_data {
-                SynchronizeData::Core(core) => {
-                    let core_object = context
-                        .realm()
-                        .host_defined()
-                        .get::<JsObjectMap>()
-                        .unwrap()
-                        .map
-                        .borrow()
-                        .get(&JsEntity::from_entity(&core.entity))
-                        .unwrap()
-                        .clone();
+            SynchronizeData::Core(core) => {
+                let core_object = context
+                    .realm()
+                    .host_defined()
+                    .get::<JsObjectMap>()
+                    .unwrap()
+                    .map
+                    .borrow()
+                    .get(&core.entity)
+                    .unwrap()
+                    .clone();
 
-                    core_object
-                        .get(js_string!("synchronize"), context)?
-                        .as_function()
-                        .unwrap()
-                        .call(
-                            &JsValue::Object(core_object),
-                            &[core.try_into_js(context)?],
-                            context,
-                        )?;
-                }
-                SynchronizeData::Movement(movement) => {}
-            },
+                core_object
+                    .get(js_string!("synchronize"), context)?
+                    .as_function()
+                    .unwrap()
+                    .call(
+                        &JsValue::Object(core_object),
+                        &[core.try_into_js(context)?],
+                        context,
+                    )?;
+            }
+            SynchronizeData::Movement(movement) => {}
+        },
     }
     Ok(())
 }

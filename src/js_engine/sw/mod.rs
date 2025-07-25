@@ -52,22 +52,40 @@ pub enum SwResponseEvent {
     RegisteredEntity(Entity),
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub enum TeleportType {
-    Position(JsEntity, Vec2),
-    Entity(JsEntity, JsEntity),
+    Position { this: Entity, position: Vec2 },
+    Entity { this: Entity, target: Entity },
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub enum LookType {
-    Position(JsEntity, Vec2),
-    Entity(JsEntity, JsEntity),
+    Position { this: Entity, position: Vec2 },
+    Entity { this: Entity, target: Entity },
 }
 
 #[derive(Debug, Clone, Copy)]
 pub enum JsTargetType {
     Position,
     Entity,
+}
+
+impl TeleportType {
+    pub fn entity(this: Entity, target: Entity) -> Self {
+        Self::Entity { this, target }
+    }
+    pub fn position(this: Entity, position: Vec2) -> Self {
+        Self::Position { this, position }
+    }
+}
+
+impl LookType {
+    pub fn entity(this: Entity, target: Entity) -> Self {
+        Self::Entity { this, target }
+    }
+    pub fn position(this: Entity, position: Vec2) -> Self {
+        Self::Position { this, position }
+    }
 }
 
 impl TryFromJs for JsTargetType {
@@ -105,16 +123,16 @@ impl Sw {
                 let js_teleport_type = JsTargetType::try_from_js(args.first().unwrap(), ctx)?;
                 match js_teleport_type {
                     JsTargetType::Position => js_engine_request_sender
-                        .send(JsEngineRequestEvent::ToTeleport(TeleportType::Position(
-                            JsEntity::try_from_js(args.get(1).unwrap(), ctx)?,
+                        .send(JsEngineRequestEvent::ToTeleport(TeleportType::position(
+                            JsEntity::try_from_js(args.get(1).unwrap(), ctx)?.to_entity(),
                             vec2_try_from_js(args.get(2).unwrap(), ctx)?,
                         )))
                         .unwrap(),
 
                     JsTargetType::Entity => js_engine_request_sender
-                        .send(JsEngineRequestEvent::ToLook(LookType::Entity(
-                            JsEntity::try_from_js(args.get(1).unwrap(), ctx)?,
-                            JsEntity::try_from_js(args.get(2).unwrap(), ctx)?,
+                        .send(JsEngineRequestEvent::ToLook(LookType::entity(
+                            JsEntity::try_from_js(args.get(1).unwrap(), ctx)?.to_entity(),
+                            JsEntity::try_from_js(args.get(2).unwrap(), ctx)?.to_entity(),
                         )))
                         .unwrap(),
                 }
@@ -129,16 +147,16 @@ impl Sw {
                 let js_look_type = JsTargetType::try_from_js(args.first().unwrap(), ctx)?;
                 match js_look_type {
                     JsTargetType::Position => js_engine_request_sender
-                        .send(JsEngineRequestEvent::ToLook(LookType::Position(
-                            JsEntity::try_from_js(args.get(1).unwrap(), ctx)?,
+                        .send(JsEngineRequestEvent::ToLook(LookType::position(
+                            JsEntity::try_from_js(args.get(1).unwrap(), ctx)?.to_entity(),
                             vec2_try_from_js(args.get(2).unwrap(), ctx)?,
                         )))
                         .unwrap(),
 
                     JsTargetType::Entity => js_engine_request_sender
-                        .send(JsEngineRequestEvent::ToLook(LookType::Entity(
-                            JsEntity::try_from_js(args.get(1).unwrap(), ctx)?,
-                            JsEntity::try_from_js(args.get(2).unwrap(), ctx)?,
+                        .send(JsEngineRequestEvent::ToLook(LookType::entity(
+                            JsEntity::try_from_js(args.get(1).unwrap(), ctx)?.to_entity(),
+                            JsEntity::try_from_js(args.get(2).unwrap(), ctx)?.to_entity(),
                         )))
                         .unwrap(),
                 }
@@ -178,37 +196,40 @@ impl Sw {
                 match default_signal_type {
                     JsDefaultSignalType::Created => emit_signal(&signal, &[], ctx)?,
                     JsDefaultSignalType::Selected => {
-                        let js_entity =
-                            JsEntity::try_from_js(&signal.get(js_string!("entity"), ctx)?, ctx)?;
+                        let entity =
+                            JsEntity::try_from_js(&signal.get(js_string!("entity"), ctx)?, ctx)?
+                                .to_entity();
                         ctx.realm()
                             .host_defined_mut()
                             .get_mut::<SelectedSignalMap>()
                             .unwrap()
                             .map
                             .borrow_mut()
-                            .insert(js_entity, signal);
+                            .insert(entity, signal);
                     }
                     JsDefaultSignalType::OnUnitEnter => {
-                        let js_entity =
-                            JsEntity::try_from_js(&signal.get(js_string!("entity"), ctx)?, ctx)?;
+                        let entity =
+                            JsEntity::try_from_js(&signal.get(js_string!("entity"), ctx)?, ctx)?
+                                .to_entity();
                         ctx.realm()
                             .host_defined_mut()
                             .get_mut::<OnUnitEnterSignalMap>()
                             .unwrap()
                             .map
                             .borrow_mut()
-                            .insert(js_entity, signal);
+                            .insert(entity, signal);
                     }
                     JsDefaultSignalType::OnUnitExit => {
-                        let js_entity =
-                            JsEntity::try_from_js(&signal.get(js_string!("entity"), ctx)?, ctx)?;
+                        let entity =
+                            JsEntity::try_from_js(&signal.get(js_string!("entity"), ctx)?, ctx)?
+                                .to_entity();
                         ctx.realm()
                             .host_defined_mut()
                             .get_mut::<OnUnitExitSignalMap>()
                             .unwrap()
                             .map
                             .borrow_mut()
-                            .insert(js_entity, signal);
+                            .insert(entity, signal);
                     }
                 }
 
@@ -227,22 +248,15 @@ impl Sw {
                 if let SwResponseEvent::RegisteredEntity(entity) =
                     sw_response_receiver.lock().unwrap().recv().unwrap()
                 {
-                    let js_entity = JsEntity::from_entity(&entity);
                     let js_object = args.get_or_undefined(0).to_object(ctx)?;
-                    ctx.realm()
-                        .host_defined_mut()
-                        .get_mut::<EntityMap>()
-                        .unwrap()
-                        .map
-                        .borrow_mut()
-                        .insert(js_entity, entity);
+
                     ctx.realm()
                         .host_defined_mut()
                         .get_mut::<JsObjectMap>()
                         .unwrap()
                         .map
                         .borrow_mut()
-                        .insert(js_entity, js_object.clone());
+                        .insert(entity, js_object.clone());
 
                     if let Ok(js_proxy_func) = js_object.get(js_string!("getSynchronizeProxy"), ctx)
                     {
@@ -260,9 +274,13 @@ impl Sw {
                             .unwrap()
                             .map
                             .borrow_mut()
-                            .insert(js_entity, js_proxy);
+                            .insert(entity, js_proxy);
                     };
-                    Ok(JsValue::Object(js_entity.try_into_js(ctx)?.to_object(ctx)?))
+                    Ok(JsValue::Object(
+                        JsEntity::from_entity(&entity)
+                            .try_into_js(ctx)?
+                            .to_object(ctx)?,
+                    ))
                 } else {
                     Ok(JsValue::undefined())
                 }
@@ -285,22 +303,24 @@ impl Sw {
         let register_signal = unsafe {
             NativeFunction::from_closure(move |_referrer, args, ctx| {
                 let signal_object = args.get_or_undefined(0).to_object(ctx)?;
-                let js_entity =
-                    JsEntity::try_from_js(&signal_object.get(js_string!("entity"), ctx)?, ctx)?;
+                let entity =
+                    JsEntity::try_from_js(&signal_object.get(js_string!("entity"), ctx)?, ctx)?
+                        .to_entity();
                 ctx.realm()
                     .host_defined_mut()
                     .get_mut::<SignalEntityMap>()
                     .unwrap()
                     .map
                     .borrow_mut()
-                    .insert(js_entity, signal_object);
+                    .insert(entity, signal_object);
                 Ok(JsValue::Undefined)
             })
         };
 
         let get_object = unsafe {
             NativeFunction::from_closure(move |_referrer, args, ctx| {
-                let target_entity = JsEntity::try_from_js(args.get_or_undefined(0), ctx)?;
+                let target_entity =
+                    JsEntity::try_from_js(args.get_or_undefined(0), ctx)?.to_entity();
                 match ctx
                     .realm()
                     .host_defined_mut()
@@ -318,7 +338,8 @@ impl Sw {
 
         let get_proxy = unsafe {
             NativeFunction::from_closure(move |_referrer, args, ctx| {
-                let target_entity = JsEntity::try_from_js(args.get_or_undefined(0), ctx)?;
+                let target_entity =
+                    JsEntity::try_from_js(args.get_or_undefined(0), ctx)?.to_entity();
                 match ctx
                     .realm()
                     .host_defined_mut()
@@ -342,7 +363,7 @@ impl Sw {
         let synchronize = unsafe {
             let js_engine_response_sender = js_engine_response_sender.clone();
             NativeFunction::from_closure(move |_referrer, args, ctx| {
-                let js_entity = JsEntity::try_from_js(args.first().unwrap(), ctx)?;
+                let entity = JsEntity::try_from_js(args.first().unwrap(), ctx)?.to_entity();
                 let object = ctx
                     .realm()
                     .host_defined()
@@ -350,7 +371,7 @@ impl Sw {
                     .unwrap()
                     .map
                     .borrow()
-                    .get(&js_entity)
+                    .get(&entity)
                     .unwrap()
                     .clone();
 

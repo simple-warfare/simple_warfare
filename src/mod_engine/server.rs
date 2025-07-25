@@ -7,7 +7,7 @@ use crate::{
     custom::CustomModAsset,
     js_engine::event::JsEngineRequestEvent,
     lua_engine::user_data::ModEnableClasses,
-    net::protocol::ClientMessage,
+    net::{protocol::ClientMessage, shared::UnitId},
 };
 
 #[derive(Resource)]
@@ -28,9 +28,9 @@ impl ModServer {
             .push(ClientMessage::spawn_unit(unit_str.to_string()));
     }
 
-    pub fn spawn_unit(&self, unit_str: &str) {
+    pub fn spawn_unit(&self, unit_id: UnitId, unit_str: impl Into<String>) {
         self.sender
-            .send(JsEngineRequestEvent::SpawnUnit(unit_str.to_string()))
+            .send(JsEngineRequestEvent::spawn_unit(unit_id, unit_str.into()))
             .unwrap();
     }
 

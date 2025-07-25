@@ -104,7 +104,6 @@ fn register_global_callable(ctx: &mut Context) {
 
 fn insert_host_defined_data(ctx: &mut Context) {
     ctx.realm().host_defined_mut().insert(UnitMap::default());
-    ctx.realm().host_defined_mut().insert(EntityMap::default());
     ctx.realm()
         .host_defined_mut()
         .insert(SelectedSignalMap::default());

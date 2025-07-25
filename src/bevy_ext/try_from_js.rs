@@ -48,16 +48,7 @@ pub fn f32_try_from_js(value: &JsValue, context: &mut Context) -> JsResult<f32> 
 
 pub fn entity_try_from_js(value: &JsValue, context: &mut Context) -> JsResult<Entity> {
     let js_entity = JsEntity::try_from_js(value, context).expect("try_from_js error");
-    Ok(context
-        .realm()
-        .host_defined()
-        .get::<EntityMap>()
-        .unwrap()
-        .map
-        .borrow()
-        .get(&js_entity)
-        .unwrap()
-        .clone())
+    Ok(js_entity.to_entity())
 }
 
 pub fn quat_try_from_js(value: &JsValue, context: &mut Context) -> JsResult<Quat> {

@@ -96,8 +96,7 @@ pub fn handle_server_messages(
             unit_id,
             unit_str,
         } => {
-            unit_mapping.add_entity(unit_id, entity);
-            mod_server.spawn_unit(&unit_str);
+            mod_server.spawn_unit(unit_id, &unit_str);
         }
         ServerMessage::DisconnectClient { info } => {}
         ServerMessage::NewClient {

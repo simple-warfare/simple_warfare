@@ -7,9 +7,11 @@ use crate::{
     },
     js_engine::{
         JsEngineRequestSender,
-        event::{EntityLookType, EntityTeleportType, JsEngineRequestEvent, JsEngineResponseEvent},
-        global::class::entity::JsEntity,
-        sw::{SwRequestEvent, SwRequestReceiver, SwResponseEvent, SwResponseSender},
+        event::JsEngineResponseEvent,
+        sw::{
+            LookType, SwRequestEvent, SwRequestReceiver, SwResponseEvent, SwResponseSender,
+            TeleportType,
+        },
     },
 };
 use bevy::{platform::collections::HashMap, prelude::*};
@@ -57,12 +59,6 @@ fn handle_sw_event(
                 sw_response_sender
                     .0
                     .send(SwResponseEvent::RegisteredEntity(entity))?;
-                js_engine_event_sender
-                    .0
-                    .send(JsEngineRequestEvent::InsertEntity(
-                        JsEntity::from_entity(&entity),
-                        entity,
-                    ))?;
             }
             SwRequestEvent::CreateQuickUi(quick_ui) => match quick_ui {
                 QuickUi::Dialog(quick_dialog) => match quick_dialog {
@@ -123,15 +119,16 @@ fn finish_teleport(
     mut customs: Query<&mut Transform, With<Custom>>,
 ) -> Result {
     for js_response in js_response_reader.read() {
-        if let JsEngineResponseEvent::EntityToTeleport(telepoty_type) = *js_response {
+        if let JsEngineResponseEvent::ToTeleport(telepoty_type) = js_response {
             match telepoty_type {
-                EntityTeleportType::Position(entity, vec2) => {
-                    let mut transform = customs.get_mut(entity)?;
-                    transform.translation = Vec3::new(vec2.x, vec2.y, transform.translation.z);
+                TeleportType::Position { this, position } => {
+                    let mut transform = customs.get_mut(*this)?;
+                    transform.translation =
+                        Vec3::new(position.x, position.y, transform.translation.z);
                 }
-                EntityTeleportType::Entity(this_entity, target_entity) => {
-                    let target_transform = customs.get(target_entity)?.clone();
-                    let mut this_transform = customs.get_mut(this_entity)?;
+                TeleportType::Entity { this, target } => {
+                    let target_transform = customs.get(*target)?.clone();
+                    let mut this_transform = customs.get_mut(*this)?;
                     *this_transform = target_transform;
                 }
             }
@@ -145,20 +142,19 @@ fn finish_look(
     mut customs: Query<(&mut Transform, &GlobalTransform, Option<&ChildOf>), With<Custom>>,
 ) -> Result {
     for js_response in js_response_reader.read() {
-        if let JsEngineResponseEvent::EntityToLook(telepoty_type) = *js_response {
+        if let JsEngineResponseEvent::ToLook(telepoty_type) = js_response {
             match telepoty_type {
-                EntityLookType::Position(entity, vec2) => {
-                    let mut transform = customs.get_mut(entity)?.0;
-                    let target = vec2.extend(0.);
+                LookType::Position { this, position } => {
+                    let mut transform = customs.get_mut(*this)?.0;
+                    let target = position.extend(0.);
                     let diff = target - transform.translation;
                     let angle = diff.y.atan2(diff.x);
 
                     transform.rotation = Quat::from_rotation_z(angle);
                 }
-                EntityLookType::Entity(this_entity, target_entity) => {
-                    let (target_transform, target_global, _) = customs.get(target_entity)?;
-                    let (this_transform, this_global, child_of_option) =
-                        customs.get(this_entity)?;
+                LookType::Entity { this, target } => {
+                    let (target_transform, target_global, _) = customs.get(*target)?;
+                    let (this_transform, this_global, child_of_option) = customs.get(*this)?;
 
                     fn calculate_target_rotation(origin: Vec2, target: Vec2) -> Quat {
                         let direction = target - origin;
@@ -166,7 +162,7 @@ fn finish_look(
                         Quat::from_rotation_z(angle)
                     }
 
-                    customs.get_mut(this_entity)?.0.rotation = match child_of_option {
+                    customs.get_mut(*this)?.0.rotation = match child_of_option {
                         Some(child_of) => {
                             customs.get(child_of.0)?.1.rotation().inverse()
                                 * calculate_target_rotation(
