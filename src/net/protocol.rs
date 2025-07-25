@@ -5,7 +5,10 @@ use bevy_quinnet::shared::{
 };
 use serde::{Deserialize, Serialize};
 
-use crate::{net::shared::Player, statistics::GameInfo};
+use crate::{
+    net::shared::{Player, UnitId},
+    statistics::GameInfo,
+};
 
 // Messages from clients
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -47,6 +50,7 @@ pub enum ServerMessage {
         mod_js_crc32: Vec<(String, u32)>,
     },
     SpawnUnit {
+        unit_id: UnitId,
         client_id: ClientId,
         unit_str: String,
     },
@@ -75,9 +79,10 @@ impl ServerMessage {
         Self::VerifyMods { mod_js_crc32 }
     }
 
-    pub fn spawn_unit(client_id: ClientId, unit_str: String) -> Self {
+    pub fn spawn_unit(client_id: ClientId, unit_id: UnitId, unit_str: String) -> Self {
         Self::SpawnUnit {
             client_id,
+            unit_id,
             unit_str,
         }
     }

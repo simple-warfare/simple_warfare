@@ -15,7 +15,7 @@ use crate::{
     net::{
         protocol::{ClientChannel, ClientMessage, ServerMessage},
         server::Players,
-        shared::{LOCAL_BIND_IP, SERVER_HOST, SERVER_PORT},
+        shared::{LOCAL_BIND_IP, SERVER_HOST, SERVER_PORT, UnitMapping},
     },
     statistics::{NetClientState, NetState},
 };
@@ -75,6 +75,7 @@ pub fn handle_server_messages(
     mut net_client_state: ResMut<NextState<NetClientState>>,
     mod_server: ResMut<ModServer>,
     js_assets: Res<Assets<JsAsset>>,
+    mut unit_mapping: ResMut<UnitMapping>,
 ) -> Result {
     let Some(connection) = client.get_connection_mut() else {
         return Ok(());
@@ -92,8 +93,10 @@ pub fn handle_server_messages(
         ServerMessage::StartGame => {}
         ServerMessage::SpawnUnit {
             client_id,
+            unit_id,
             unit_str,
         } => {
+            unit_mapping.add_entity(unit_id, entity);
             mod_server.spawn_unit(&unit_str);
         }
         ServerMessage::DisconnectClient { info } => {}

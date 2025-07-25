@@ -12,9 +12,10 @@ use crate::{
         GameAsset,
         mods::{info::ModInfo, js::JsAsset, lua::LuaAsset},
     },
+    custom::unit,
     net::{
         protocol::{ClientMessage, ServerChannel, ServerMessage},
-        shared::{LOCAL_BIND_IP, Player, SERVER_HOST, SERVER_PORT},
+        shared::{LOCAL_BIND_IP, Player, SERVER_HOST, SERVER_PORT, UnitMapping},
     },
     statistics::{GameInfo, NetState},
 };
@@ -87,10 +88,12 @@ pub fn start_listening(
 }
 
 pub fn handle_client_messages(
+    mut commands: Commands,
     mut server: ResMut<QuinnetServer>,
     mut players: ResMut<Players>,
     self_game_info: Res<GameInfo>,
     server_data: Res<ServerData>,
+    mut unit_mapping: ResMut<UnitMapping>,
 ) -> Result {
     let endpoint = server.endpoint_mut();
     for client_id in endpoint.clients() {
@@ -117,9 +120,10 @@ pub fn handle_client_messages(
                     }
                 }
                 ClientMessage::SpawnUnit { unit_str } => {
+                    let unit_id = unit_mapping.new_unit(&mut commands);
                     endpoint.send_group_message(
                         endpoint.clients().iter(),
-                        ServerMessage::spawn_unit(client_id, unit_str),
+                        ServerMessage::spawn_unit(client_id, unit_id, unit_str),
                     )?;
                 }
                 ClientMessage::VerifyMods => {
