@@ -116,7 +116,12 @@ pub fn handle_client_messages(
                         )?;
                     }
                 }
-                ClientMessage::SpawnUnit { unit_str } => {}
+                ClientMessage::SpawnUnit { unit_str } => {
+                    endpoint.send_group_message(
+                        endpoint.clients().iter(),
+                        ServerMessage::spawn_unit(client_id, unit_str),
+                    )?;
+                }
                 ClientMessage::VerifyMods => {
                     //game_asset.custom_mods.mods.iter().map(|custom_mod|custom_mod.)
                     endpoint.send_message(

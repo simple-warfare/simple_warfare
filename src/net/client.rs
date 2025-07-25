@@ -48,8 +48,11 @@ impl Plugin for SimpleWarfareClientPlugin {
             )
             .add_systems(
                 Update,
-                check_fetch_mods
-                    .run_if(in_state(NetState::Client).and(in_state(NetClientState::VerifyMods))),
+                check_fetch_mods.run_if(
+                    in_state(NetState::Client)
+                        .or(in_state(NetState::HostServer))
+                        .and(in_state(NetClientState::VerifyMods)),
+                ),
             );
     }
 }
@@ -70,6 +73,7 @@ pub fn handle_server_messages(
     mut client_data: ResMut<ClientData>,
     mut players: ResMut<Players>,
     mut net_client_state: ResMut<NextState<NetClientState>>,
+    mod_server: ResMut<ModServer>,
     js_assets: Res<Assets<JsAsset>>,
 ) -> Result {
     let Some(connection) = client.get_connection_mut() else {
@@ -81,6 +85,7 @@ pub fn handle_server_messages(
     match message {
         ServerMessage::InitClient { client_id } => {
             client_data.self_id = client_id;
+            info!("Client initialized with ID: {}", client_id);
             connection.send_message(ClientMessage::VerifyMods)?;
             net_client_state.set(NetClientState::VerifyMods);
         }
@@ -88,7 +93,9 @@ pub fn handle_server_messages(
         ServerMessage::SpawnUnit {
             client_id,
             unit_str,
-        } => {}
+        } => {
+            mod_server.spawn_unit(&unit_str);
+        }
         ServerMessage::DisconnectClient { info } => {}
         ServerMessage::NewClient {
             client_id,
@@ -97,6 +104,7 @@ pub fn handle_server_messages(
             players.map.insert(client_id, player_info);
         }
         ServerMessage::VerifyMods { mod_js_crc32 } => {
+            info!("Received mod verification data: {:?}", mod_js_crc32);
             mod_js_crc32
                 .iter()
                 .try_for_each::<_, Result>(|(path, js_crc32)| {
@@ -108,6 +116,10 @@ pub fn handle_server_messages(
                             Some(js_asset) => {
                                 if js_asset.crc32 != *js_crc32 {
                                     //Js文件已加载但与服务器不一致
+                                    info!(
+                                        "JS asset {} loaded but CRC32 mismatch: expected {}, got {}",
+                                        path, js_asset.crc32, js_crc32
+                                    );
                                     client_data.fetch_mods.push(path.clone());
                                 }
                             }
@@ -134,12 +146,12 @@ pub fn check_fetch_mods(
     mut client: ResMut<QuinnetClient>,
     mut client_data: ResMut<ClientData>,
     mut net_client_state: ResMut<NextState<NetClientState>>,
-    mut mod_server: ResMut<ModServer>,
     asset_server: Res<AssetServer>,
     js_assets: Res<Assets<JsAsset>>,
 ) -> Result {
     if client_data.fetch_mods.is_empty() && client_data.wait_ready_mods_js.is_empty() {
         net_client_state.set(NetClientState::Ready);
+        info!("Client is ready, all mods are loaded.");
         return Ok(());
     }
 

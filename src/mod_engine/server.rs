@@ -23,9 +23,15 @@ impl ModServer {
             client_messages: Vec::new(),
         }
     }
-    pub fn spawn_unit(&mut self, unit_str: &str) {
+    pub fn want_spawn_unit(&mut self, unit_str: &str) {
         self.client_messages
             .push(ClientMessage::spawn_unit(unit_str.to_string()));
+    }
+
+    pub fn spawn_unit(&self, unit_str: &str) {
+        self.sender
+            .send(JsEngineRequestEvent::SpawnUnit(unit_str.to_string()))
+            .unwrap();
     }
 
     pub fn load_mod(&self, mod_asset: CustomModAsset) -> Result<()> {

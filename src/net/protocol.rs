@@ -74,6 +74,13 @@ impl ServerMessage {
     pub fn verify_mods(mod_js_crc32: Vec<(String, u32)>) -> Self {
         Self::VerifyMods { mod_js_crc32 }
     }
+
+    pub fn spawn_unit(client_id: ClientId, unit_str: String) -> Self {
+        Self::SpawnUnit {
+            client_id,
+            unit_str,
+        }
+    }
 }
 
 #[repr(u8)]

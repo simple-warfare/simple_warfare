@@ -35,7 +35,7 @@ fn setup(
         TiledMapHandle(asset_server.load(selected_map.0.get_path(&tiled_maps, &ldtk_maps))),
         TilemapAnchor::Center,
     ));
-    mod_server.spawn_unit("example:Tank");
-    mod_server.spawn_unit("example:Tank");
-    mod_server.spawn_unit("example:Tank");
+    mod_server.want_spawn_unit("example:Tank");
+    mod_server.want_spawn_unit("example:Tank");
+    mod_server.want_spawn_unit("example:Tank");
 }
