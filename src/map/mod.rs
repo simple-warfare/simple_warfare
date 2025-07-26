@@ -1,4 +1,3 @@
-use avian2d::prelude::Collider;
 use bevy::{prelude::*, render::primitives::Aabb};
 use bevy_ecs_tiled::prelude::*;
 use parry2d::{
@@ -20,9 +19,6 @@ impl Plugin for MapPlugin {
 #[derive(Default, Debug, Clone, Reflect)]
 #[reflect(Default, Debug)]
 struct SimpleWarfarePhysicsBackend;
-
-#[derive(Component)]
-pub struct SharedShapeStroge(pub SharedShape);
 
 impl TiledPhysicsBackend for SimpleWarfarePhysicsBackend {
     fn spawn_colliders(
@@ -60,9 +56,18 @@ impl TiledPhysicsBackend for SimpleWarfarePhysicsBackend {
                         );
                         if !composables.is_empty() {
                             let shared_shape = SharedShape::compound(composables);
+                            let shared_shape_aabb = shared_shape.compute_local_aabb();
+
+                            let mins = shared_shape_aabb.mins;
+                            let maxs = shared_shape_aabb.maxs;
+
+                            let aabb = Aabb::from_min_max(
+                                Vec3::new(mins.x, mins.y, 0.),
+                                Vec3::new(maxs.x, maxs.y, 0.),
+                            );
                             spawn_infos.push(TiledColliderSpawnInfos {
                                 name: "Avian[ComposedTile]".to_string(),
-                                entity: commands.spawn(SharedShapeStroge(shared_shape)).id(),
+                                entity: commands.spawn(aabb).id(),
                                 transform: Transform::default(),
                             });
                         }
@@ -72,9 +77,17 @@ impl TiledPhysicsBackend for SimpleWarfarePhysicsBackend {
                         let iso = Isometry3d::from_rotation(Quat::from_rotation_z(
                             f32::to_radians(-object.rotation),
                         )) * Isometry3d::from_xyz(pos.x, pos.y, 0.);
+                        let shared_shape_aabb = shared_shape.compute_local_aabb();
+                        let mins = shared_shape_aabb.mins;
+                        let maxs = shared_shape_aabb.maxs;
+
+                        let aabb = Aabb::from_min_max(
+                            Vec3::new(mins.x, mins.y, 0.),
+                            Vec3::new(maxs.x, maxs.y, 0.),
+                        );
                         vec![TiledColliderSpawnInfos {
                             name: format!("Avian[Object={}]", object.name),
-                            entity: commands.spawn(SharedShapeStroge(shared_shape)).id(),
+                            entity: commands.spawn(aabb).id(),
                             transform: Transform::from_isometry(iso),
                         }]
                     }),
@@ -100,9 +113,17 @@ impl TiledPhysicsBackend for SimpleWarfarePhysicsBackend {
                 }
                 if !composables.is_empty() {
                     let shared_shape = SharedShape::compound(composables);
+                    let shared_shape_aabb = shared_shape.compute_local_aabb();
+                    let mins = shared_shape_aabb.mins;
+                    let maxs = shared_shape_aabb.maxs;
+
+                    let aabb = Aabb::from_min_max(
+                        Vec3::new(mins.x, mins.y, 0.),
+                        Vec3::new(maxs.x, maxs.y, 0.),
+                    );
                     spawn_infos.push(TiledColliderSpawnInfos {
                         name: "Avian[ComposedTile]".to_string(),
-                        entity: commands.spawn(SharedShapeStroge(shared_shape)).id(),
+                        entity: commands.spawn(aabb).id(),
                         transform: Transform::default(),
                     });
                 }
@@ -147,9 +168,17 @@ fn compose_tiles(
                     * Isometry3d::from_rotation(Quat::from_rotation_z(f32::to_radians(
                         -object.rotation,
                     )));
+                let shared_shape_aabb = shared_shape.compute_local_aabb();
+                let mins = shared_shape_aabb.mins;
+                let maxs = shared_shape_aabb.maxs;
+
+                let aabb = Aabb::from_min_max(
+                    Vec3::new(mins.x, mins.y, 0.),
+                    Vec3::new(maxs.x, maxs.y, 0.),
+                );
                 spawn_infos.push(TiledColliderSpawnInfos {
                     name: "Avian[ComplexTile]".to_string(),
-                    entity: commands.spawn(SharedShapeStroge(shared_shape)).id(),
+                    entity: commands.spawn(aabb).id(),
                     transform: Transform::from_isometry(iso),
                 });
             }
