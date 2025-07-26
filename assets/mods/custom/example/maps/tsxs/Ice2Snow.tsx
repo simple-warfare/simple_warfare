@@ -3,7 +3,7 @@
  <image source="../tiles/Ice2Snow.png" trans="008a76" width="100" height="180"/>
  <tile id="12">
   <objectgroup draworder="index" id="2">
-   <object id="1" x="0" y="0" width="20" height="20"/>
+   <object id="1" name="collision" x="0" y="0" width="20" height="20"/>
   </objectgroup>
  </tile>
  <tile id="30" probability="0.02"/>

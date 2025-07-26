@@ -25,7 +25,6 @@ impl JsEntity {
         }
     }
     pub fn to_entity(&self) -> Entity {
-        info!("{:?}", serde_json::to_string(self).unwrap());
         serde_json::from_str::<Entity>(&self.inner).unwrap()
     }
 }

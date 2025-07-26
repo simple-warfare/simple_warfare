@@ -1,9 +1,9 @@
 {
-    "activeFile": "[p2]Small_Island (2p).tmx",
+    "activeFile": "/home/shishanyue/bevy_ecs_tiled-0.7.3/assets/tiles/orthogonal_1.tsx",
     "expandedProjectPaths": [
-        "tsxs",
+        "tiles",
         ".",
-        "tiles"
+        "tsxs"
     ],
     "file.lastUsedOpenFilter": "全部文件 (*)",
     "fileStates": {
@@ -95,6 +95,40 @@
         "/home/shishanyue/bevy_ecs_tiled-0.7.3/assets/Magic Market/Tilesets/Tileset water - 16x16.tsx": {
             "dynamicWrapping": false
         },
+        "/home/shishanyue/bevy_ecs_tiled-0.7.3/assets/maps/orthogonal/finite.tmx": {
+            "scale": 1.9415625,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 219.66843714791563,
+                "y": 184.6450989859971
+            }
+        },
+        "/home/shishanyue/bevy_ecs_tiled-0.7.3/assets/maps/orthogonal/multiple_layers_with_colliders.tmx": {
+            "scale": 1.304765625,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 348.3384228489312,
+                "y": 319.9808394706904
+            }
+        },
+        "/home/shishanyue/bevy_ecs_tiled-0.7.3/assets/tiles/orthogonal_1.tsx": {
+            "dynamicWrapping": true,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "/home/shishanyue/rust/bevy_ecs_tiled/assets/maps/orthogonal/multiple_layers_with_colliders.tmx": {
+            "scale": 1,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 187,
+                "y": 572.5
+            }
+        },
+        "/home/shishanyue/rust/bevy_ecs_tiled/assets/tiles/orthogonal_1.tsx": {
+            "dynamicWrapping": true,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
         "Cave.tsx": {
             "scaleInDock": 1,
             "scaleInEditor": 8
@@ -119,11 +153,11 @@
             "expandedGroupLayers": [
                 7
             ],
-            "scale": 0.75,
-            "selectedLayer": 0,
+            "scale": 0.5,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 1450,
-                "y": 1506
+                "x": 1621,
+                "y": 635
             }
         },
         "tsxs/Cave.tsx": {
@@ -207,6 +241,7 @@
             "scaleInEditor": 1
         },
         "tsxs/Ice2Snow.tsx": {
+            "dynamicWrapping": false,
             "scaleInDock": 1,
             "scaleInEditor": 3
         },
@@ -629,7 +664,8 @@
             "scaleInEditor": 1.5
         },
         "tsxs/WaterFlow2.tsx": {
-            "dynamicWrapping": false
+            "dynamicWrapping": false,
+            "scaleInDock": 1
         },
         "tsxs/WatrFlow.tsx": {
             "dynamicWrapping": false,
@@ -645,7 +681,8 @@
             "scaleInEditor": 3
         },
         "tsxs/units.tsx": {
-            "dynamicWrapping": true
+            "dynamicWrapping": true,
+            "scaleInDock": 1
         },
         "tsxs/水面动画.tsx": {
             "scaleInDock": 1,
@@ -662,23 +699,26 @@
     "map.width": 110,
     "openFiles": [
         "tsxs/Snow.tsx",
-        "[p2]Small_Island (2p).tmx"
+        "[p2]Small_Island (2p).tmx",
+        "tsxs/Ice2Snow.tsx",
+        "/home/shishanyue/bevy_ecs_tiled-0.7.3/assets/maps/orthogonal/multiple_layers_with_colliders.tmx",
+        "/home/shishanyue/bevy_ecs_tiled-0.7.3/assets/tiles/orthogonal_1.tsx"
     ],
     "project": "maps.tiled-project",
-    "property.type": "string",
+    "property.type": "object",
     "recentFiles": [
+        "tsxs/Snow.tsx",
+        "[p2]Small_Island (2p).tmx",
+        "tsxs/Ice2Snow.tsx",
+        "/home/shishanyue/bevy_ecs_tiled-0.7.3/assets/maps/orthogonal/multiple_layers_with_colliders.tmx",
+        "/home/shishanyue/bevy_ecs_tiled-0.7.3/assets/tiles/orthogonal_1.tsx",
+        "/home/shishanyue/bevy_ecs_tiled-0.7.3/assets/maps/orthogonal/finite.tmx",
+        "/home/shishanyue/rust/bevy_ecs_tiled/assets/maps/orthogonal/multiple_layers_with_colliders.tmx",
+        "/home/shishanyue/rust/bevy_ecs_tiled/assets/tiles/orthogonal_1.tsx",
         "tsxs/水面动画.tsx",
         "tsxs/Snw2-Ct2.tsx",
         "tsxs/Snw2-Lav.tsx",
-        "tsxs/Snw2-Rck2.tsx",
-        "tsxs/Snw2Crtb.tsx",
-        "tsxs/Snw2Mnt.tsx",
-        "tsxs/GrssMisc.tsx",
-        "tsxs/Cave.tsx",
-        "tsxs/IceRoad.tsx",
-        "tsxs/Ice2Snow.tsx",
-        "[p2]Small_Island (2p).tmx",
-        "tsxs/Snow.tsx"
+        "tsxs/Snw2-Rck2.tsx"
     ],
     "tileset.lastUsedFormat": "tsx",
     "tileset.tileSize": {
