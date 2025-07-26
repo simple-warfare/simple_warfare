@@ -1,14 +1,17 @@
 use std::sync::Arc;
 
 use bevy::prelude::*;
+use bevy_fly_camera::FlyCamera2d;
 
 use super::{Scene, SceneState};
 use crate::{
     assets::{
-        mods::{info::ModInfo, js::JsAsset, lua::LuaAsset}, GameAsset
+        GameAsset,
+        mods::{info::ModInfo, js::JsAsset, lua::LuaAsset},
     },
     bevy_ext::app::AppExt,
-    mod_engine::server::ModServer, statistics::AppState,
+    mod_engine::server::ModServer,
+    statistics::AppState,
 };
 use bevy_seedling::prelude::*;
 
@@ -29,7 +32,7 @@ impl Scene for LoadingScene {
 }
 
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>, game_asset: Res<GameAsset>) {
-    commands.spawn((Camera2d, Camera::default()));
+    commands.spawn((Camera2d, FlyCamera2d::default(), Camera::default()));
     let mut background_music = SamplePlayer::new(asset_server.load("music/background/war.mp3"));
     background_music.repeat_mode = RepeatMode::RepeatEndlessly;
     commands.spawn(background_music);

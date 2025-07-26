@@ -5,6 +5,7 @@ pub mod custom;
 pub mod debug;
 pub mod js_engine;
 pub mod lua_engine;
+pub mod map;
 pub mod mod_engine;
 pub mod net;
 pub mod panel;
@@ -20,6 +21,7 @@ use crate::{
     debug::DebugPlugin,
     js_engine::synchronize::SynchronizePlugin,
     lua_engine::LuaEnginePlugin,
+    map::MapPlugin,
     mod_engine::ModEnginePlugin,
     net::NetPlugin,
     panel::PanelPlugin,
@@ -68,7 +70,8 @@ impl PluginGroup for SimpleWarfarePlugins {
             .add(DebugPlugin)
             .add(CustomUiPlugin)
             .add(SynchronizePlugin)
-            .add(NetPlugin);
+            .add(NetPlugin)
+            .add(MapPlugin);
         group
     }
 }

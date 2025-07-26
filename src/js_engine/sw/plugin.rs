@@ -45,7 +45,6 @@ fn handle_sw_event(
     mut js_read_files: ResMut<JsReadTomlFiles>,
     sw_request_receiver: ResMut<SwRequestReceiver>,
     sw_response_sender: ResMut<SwResponseSender>,
-    js_engine_event_sender: Res<JsEngineRequestSender>,
 ) -> Result {
     if let Ok(event) = sw_request_receiver
         .0

@@ -270,7 +270,28 @@ pub(super) fn process_js_event(
                         context,
                     )?;
             }
-            SynchronizeData::Movement(movement) => {}
+            SynchronizeData::Movement(movement) => {
+                let movement_object = context
+                    .realm()
+                    .host_defined()
+                    .get::<JsObjectMap>()
+                    .unwrap()
+                    .map
+                    .borrow()
+                    .get(&movement.entity)
+                    .unwrap()
+                    .clone();
+
+                movement_object
+                    .get(js_string!("synchronize"), context)?
+                    .as_function()
+                    .unwrap()
+                    .call(
+                        &JsValue::Object(movement_object),
+                        &[movement.try_into_js(context)?],
+                        context,
+                    )?;
+            }
         },
     }
     Ok(())

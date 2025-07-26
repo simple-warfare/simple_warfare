@@ -6,7 +6,7 @@ use boa_engine::{
     value::TryFromJs,
 };
 
-use crate::js_engine::{global::class::entity::JsEntity, host_defined::*};
+use crate::js_engine::global::class::entity::JsEntity;
 
 pub fn vec2_try_from_js(value: &JsValue, context: &mut Context) -> JsResult<Vec2> {
     let vec2_array = JsTypedArray::from_object(value.to_object(context)?)?;

@@ -61,7 +61,7 @@ fn setup(
     let main_viewer_slicer = &chrome_texture_slicer.main_viewer;
     let gray_brick_rect = &chrome_texture_slicer.gray_brick_rect;
 
-    commands.spawn((SelectMapSceneMark, Camera2d));
+    //commands.spawn((SelectMapSceneMark, Camera2d));
     commands.spawn((
         SelectMapSceneMark,
         Node {

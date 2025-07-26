@@ -628,6 +628,9 @@
             "scaleInDock": 1,
             "scaleInEditor": 1.5
         },
+        "tsxs/WaterFlow2.tsx": {
+            "dynamicWrapping": false
+        },
         "tsxs/WatrFlow.tsx": {
             "dynamicWrapping": false,
             "scaleInDock": 1,
@@ -643,10 +646,14 @@
         },
         "tsxs/units.tsx": {
             "dynamicWrapping": true
+        },
+        "tsxs/水面动画.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 16
         }
     },
-    "frame.defaultDuration": 50,
-    "last.imagePath": "/home/shishanyue/simple_warfare/assets/mods/custom/example/maps/tiles/units",
+    "frame.defaultDuration": 300,
+    "last.imagePath": "/home/shishanyue/simple_warfare/assets/mods/custom/example/maps/tiles",
     "map.height": 110,
     "map.lastUsedFormat": "tmx",
     "map.layerDataFormat": null,
@@ -660,6 +667,7 @@
     "project": "maps.tiled-project",
     "property.type": "string",
     "recentFiles": [
+        "tsxs/水面动画.tsx",
         "tsxs/Snw2-Ct2.tsx",
         "tsxs/Snw2-Lav.tsx",
         "tsxs/Snw2-Rck2.tsx",
@@ -670,8 +678,7 @@
         "tsxs/IceRoad.tsx",
         "tsxs/Ice2Snow.tsx",
         "[p2]Small_Island (2p).tmx",
-        "tsxs/Snow.tsx",
-        "tsxs/Snow2.tsx"
+        "tsxs/Snow.tsx"
     ],
     "tileset.lastUsedFormat": "tsx",
     "tileset.tileSize": {
@@ -679,6 +686,6 @@
         "width": 20
     },
     "tileset.transparentColor": "#008a76",
-    "tileset.type": 1,
+    "tileset.type": 0,
     "tileset.useTransparentColor": true
 }
