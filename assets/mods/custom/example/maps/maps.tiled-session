@@ -1,9 +1,9 @@
 {
-    "activeFile": "/home/shishanyue/bevy_ecs_tiled-0.7.3/assets/tiles/orthogonal_1.tsx",
+    "activeFile": "[p2]Small_Island (2p).tmx",
     "expandedProjectPaths": [
+        "tsxs",
         "tiles",
-        ".",
-        "tsxs"
+        "."
     ],
     "file.lastUsedOpenFilter": "全部文件 (*)",
     "fileStates": {
@@ -153,11 +153,11 @@
             "expandedGroupLayers": [
                 7
             ],
-            "scale": 0.5,
-            "selectedLayer": 1,
+            "scale": 0.33,
+            "selectedLayer": 4,
             "viewCenter": {
-                "x": 1621,
-                "y": 635
+                "x": 774.2424242424242,
+                "y": 1168.181818181818
             }
         },
         "tsxs/Cave.tsx": {
@@ -700,18 +700,16 @@
     "openFiles": [
         "tsxs/Snow.tsx",
         "[p2]Small_Island (2p).tmx",
-        "tsxs/Ice2Snow.tsx",
-        "/home/shishanyue/bevy_ecs_tiled-0.7.3/assets/maps/orthogonal/multiple_layers_with_colliders.tmx",
-        "/home/shishanyue/bevy_ecs_tiled-0.7.3/assets/tiles/orthogonal_1.tsx"
+        "tsxs/Ice2Snow.tsx"
     ],
     "project": "maps.tiled-project",
     "property.type": "object",
     "recentFiles": [
         "tsxs/Snow.tsx",
-        "[p2]Small_Island (2p).tmx",
         "tsxs/Ice2Snow.tsx",
-        "/home/shishanyue/bevy_ecs_tiled-0.7.3/assets/maps/orthogonal/multiple_layers_with_colliders.tmx",
+        "[p2]Small_Island (2p).tmx",
         "/home/shishanyue/bevy_ecs_tiled-0.7.3/assets/tiles/orthogonal_1.tsx",
+        "/home/shishanyue/bevy_ecs_tiled-0.7.3/assets/maps/orthogonal/multiple_layers_with_colliders.tmx",
         "/home/shishanyue/bevy_ecs_tiled-0.7.3/assets/maps/orthogonal/finite.tmx",
         "/home/shishanyue/rust/bevy_ecs_tiled/assets/maps/orthogonal/multiple_layers_with_colliders.tmx",
         "/home/shishanyue/rust/bevy_ecs_tiled/assets/tiles/orthogonal_1.tsx",

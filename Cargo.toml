@@ -55,7 +55,9 @@ url = "2.5.4"
 image = "0.25.6"
 bevy_polyline = "0.12.0"
 tokio = { version = "1.46.1", features = ["rt", "rt-multi-thread", "time"] }
-vleue_navigator = "0.12.0"
+vleue_navigator = { git = "https://github.com/simple-warfare/vleue_navigator.git", features = [
+    "parry2d",
+] }
 bevy_seedling = { version = "0.4.3", features = ["mp3"] } #audio
 bevy_hanabi = { version = "0.16", default-features = false, features = [
     "2d",
