@@ -223,7 +223,7 @@ fn observer_click(
                 exit_event.write(AppExit::Success);
             }
             ButtonLabel::Skirmish => {
-                let default_map = game_asset.maps.get(0).unwrap().clone();
+                let default_map = game_asset.maps.first().unwrap().clone();
                 commands.insert_resource(SelectedMap(default_map.clone()));
                 main_menu_state.set(MainMenuState::Disable);
                 scene_state.set(SceneState::SkirmishGame);

@@ -46,12 +46,10 @@ pub(super) fn module_receiver_request(
     let file_handle = asset_server.load(path);
     if asset_server.is_loaded(file_handle.id()) {
         sender.send(js_assets.get(file_handle.id()).unwrap().clone())?;
+    } else if let Some(file_senders) = boa_load_js_asset.map.get_mut(&file_handle) {
+        file_senders.push(sender);
     } else {
-        if let Some(file_senders) = boa_load_js_asset.map.get_mut(&file_handle) {
-            file_senders.push(sender);
-        } else {
-            boa_load_js_asset.map.insert(file_handle, vec![sender]);
-        }
+        boa_load_js_asset.map.insert(file_handle, vec![sender]);
     }
 
     Ok(())
@@ -64,21 +62,20 @@ fn module_check_js_asset_ready(
     mut events: EventReader<AssetEvent<JsAsset>>,
 ) -> Result {
     for event in events.read() {
-        if let AssetEvent::LoadedWithDependencies { id } = *event {
-            if let Some(mut senders) = boa_load_js_asset
+        if let AssetEvent::LoadedWithDependencies { id } = *event
+            && let Some(mut senders) = boa_load_js_asset
                 .map
                 .remove(&asset_server.get_id_handle(id).unwrap())
-            {
-                senders.drain(..).try_for_each::<_, Result>(|sender| {
-                    sender.send(
-                        js_assets
-                            .get(id)
-                            .ok_or(BevyError::from("Could not get the js asset"))?
-                            .clone(),
-                    )?;
-                    Ok(())
-                })?;
-            }
+        {
+            senders.drain(..).try_for_each::<_, Result>(|sender| {
+                sender.send(
+                    js_assets
+                        .get(id)
+                        .ok_or(BevyError::from("Could not get the js asset"))?
+                        .clone(),
+                )?;
+                Ok(())
+            })?;
         }
     }
     Ok(())

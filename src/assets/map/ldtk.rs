@@ -40,7 +40,6 @@ impl AssetLoader for LdtkMapLoader {
         _settings: &Self::Settings,
         load_context: &mut LoadContext<'_>,
     ) -> Result<Self::Asset, Self::Error> {
-
         let asset_path = load_context.asset_path().clone();
 
         let file_name = load_context

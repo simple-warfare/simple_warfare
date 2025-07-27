@@ -3,10 +3,8 @@ use std::sync::{Arc, mpsc::Sender};
 use bevy::prelude::*;
 
 use crate::{
-    assets::mods::{info::ModInfo, js::JsAsset},
     custom::CustomModAsset,
     js_engine::event::JsEngineRequestEvent,
-    lua_engine::user_data::ModEnableClasses,
     net::{protocol::ClientMessage, shared::UnitId},
 };
 

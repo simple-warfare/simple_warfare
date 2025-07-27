@@ -110,11 +110,9 @@ fn quick_ui_comfirm_dialog_comfirm(
     js_engine_request_sender: Res<JsEngineRequestSender>,
 ) {
     let Some(node_entity) = button_tags.get(entity).ok().and_then(|tags| {
-        tags.get("node_entity").and_then(|node_entity_str| {
-            Some(
-                serde_json::from_str::<Entity>(&node_entity_str)
-                    .expect("couldn't parse the entity in html's tags"),
-            )
+        tags.get("node_entity").map(|node_entity_str| {
+            serde_json::from_str::<Entity>(node_entity_str)
+                .expect("couldn't parse the entity in html's tags")
         })
     }) else {
         return;
@@ -140,11 +138,9 @@ fn quick_ui_comfirm_dialog_cancel(
     js_engine_request_sender: Res<JsEngineRequestSender>,
 ) {
     let Some(node_entity) = button_tags.get(entity).ok().and_then(|tags| {
-        tags.get("node_entity").and_then(|node_entity_str| {
-            Some(
-                serde_json::from_str::<Entity>(&node_entity_str)
-                    .expect("couldn't parse the entity in html's tags"),
-            )
+        tags.get("node_entity").map(|node_entity_str| {
+            serde_json::from_str::<Entity>(node_entity_str)
+                .expect("couldn't parse the entity in html's tags")
         })
     }) else {
         return;

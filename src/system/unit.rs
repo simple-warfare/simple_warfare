@@ -72,7 +72,7 @@ fn check_new_unit(
                     let anchor = turret.image.anchor();
                     let sprite = Sprite {
                         image: asset_server.load(image_path),
-                        anchor: anchor,
+                        anchor,
                         ..Default::default()
                     };
                     commands

@@ -6,7 +6,6 @@ use crate::{
         unit::unit::Custom,
     },
     js_engine::{
-        JsEngineRequestSender,
         event::JsEngineResponseEvent,
         sw::{
             LookType, SwRequestEvent, SwRequestReceiver, SwResponseEvent, SwResponseSender,
@@ -78,12 +77,10 @@ fn handle_sw_event(
                 let file_handle = asset_server.load(file_path);
                 if asset_server.is_loaded(file_handle.id()) {
                     sender.send(js_files.get(file_handle.id()).unwrap().data.clone())?;
+                } else if let Some(file_senders) = js_read_files.map.get_mut(&file_handle) {
+                    file_senders.push(sender);
                 } else {
-                    if let Some(file_senders) = js_read_files.map.get_mut(&file_handle) {
-                        file_senders.push(sender);
-                    } else {
-                        js_read_files.map.insert(file_handle, vec![sender]);
-                    }
+                    js_read_files.map.insert(file_handle, vec![sender]);
                 }
 
                 //
@@ -100,15 +97,14 @@ fn check_js_read_file(
     mut js_read_files: ResMut<JsReadTomlFiles>,
 ) -> Result {
     for event in evnets.read() {
-        if let AssetEvent::LoadedWithDependencies { id } = *event {
-            if let Some(mut senders) = js_read_files
+        if let AssetEvent::LoadedWithDependencies { id } = *event
+            && let Some(mut senders) = js_read_files
                 .map
                 .remove(&asset_server.get_id_handle(id).unwrap())
-            {
-                senders.drain(..).for_each(|sender| {
-                    sender.send(js_files.get(id).unwrap().data.clone()).unwrap();
-                });
-            }
+        {
+            senders.drain(..).for_each(|sender| {
+                sender.send(js_files.get(id).unwrap().data.clone()).unwrap();
+            });
         }
     }
     Ok(())
@@ -126,7 +122,7 @@ fn finish_teleport(
                         Vec3::new(position.x, position.y, transform.translation.z);
                 }
                 TeleportType::Entity { this, target } => {
-                    let target_transform = customs.get(*target)?.clone();
+                    let target_transform = *customs.get(*target)?;
                     let mut this_transform = customs.get_mut(*this)?;
                     *this_transform = target_transform;
                 }

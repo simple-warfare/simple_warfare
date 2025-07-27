@@ -36,9 +36,7 @@ impl Plugin for SimpleWarfareWebAssetPlugin {
     }
 }
 
-pub fn fetch_file(Path(file_path): Path<String>) -> impl IntoResponse {
-    
-}
+pub fn fetch_file(Path(file_path): Path<String>) -> impl IntoResponse {}
 
 pub(super) async fn get_thumbnail_from_this() -> impl IntoResponse {
     let mut headers = HeaderMap::new();
@@ -51,7 +49,7 @@ pub(super) async fn get_thumbnail_from_this() -> impl IntoResponse {
 
     let get_thumbnail_id = AsyncWorld
         .resource::<GetThumbnailSystemId>()
-        .get(|id| id.0.clone())
+        .get(|id| id.0)
         .unwrap();
 
     let contexts = AsyncWorld

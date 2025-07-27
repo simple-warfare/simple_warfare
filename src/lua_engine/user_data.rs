@@ -61,7 +61,7 @@ impl UserData for ModManager {
         // Constructor
         methods.add_meta_function(MetaMethod::Call, |_, ()| Ok(ModInfo::default()));
         methods.add_meta_method(MetaMethod::ToString, |lua, this, ()| {
-            lua.create_string(format!("{:#?}", this))
+            lua.create_string(format!("{this:#?}"))
         });
     }
 }
@@ -84,7 +84,7 @@ impl UserData for MapManager {
         // Constructor
         methods.add_meta_function(MetaMethod::Call, |_, ()| Ok(ModInfo::default()));
         methods.add_meta_method(MetaMethod::ToString, |lua, this, ()| {
-            lua.create_string(format!("{:#?}", this))
+            lua.create_string(format!("{this:#?}"))
         });
     }
 }

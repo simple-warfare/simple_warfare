@@ -11,7 +11,6 @@ use crate::{
         },
     },
     bevy_ext::app::AppExt,
-    statistics::SelectedMap,
 };
 use bevy::{color::palettes::css::WHITE, prelude::*};
 use serde::{Deserialize, Serialize};
@@ -57,7 +56,7 @@ fn setup(
     let dark_gray_rect_slicer = &dialog_texture_slicer.dark_gray_rect;
 
     let gray_rect_slicer = &dialog_texture_slicer.gray_rect;
-    
+
     let create_text = |text: &str, font_size: f32| {
         (
             Text::new(text),

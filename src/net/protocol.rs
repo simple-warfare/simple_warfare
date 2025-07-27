@@ -1,4 +1,3 @@
-use bevy::platform::collections::HashMap;
 use bevy_quinnet::shared::{
     ClientId,
     channels::{ChannelId, ChannelKind, ChannelsConfiguration, DEFAULT_MAX_RELIABLE_FRAME_LEN},
@@ -93,9 +92,9 @@ pub enum ClientChannel {
     GameSetup,
     GameEvents,
 }
-impl Into<ChannelId> for ClientChannel {
-    fn into(self) -> ChannelId {
-        self as ChannelId
+impl From<ClientChannel> for ChannelId {
+    fn from(val: ClientChannel) -> Self {
+        val as ChannelId
     }
 }
 impl ClientChannel {
@@ -109,9 +108,9 @@ pub enum ServerChannel {
     GameSetup,
     GameEvents,
 }
-impl Into<ChannelId> for ServerChannel {
-    fn into(self) -> ChannelId {
-        self as ChannelId
+impl From<ServerChannel> for ChannelId {
+    fn from(val: ServerChannel) -> Self {
+        val as ChannelId
     }
 }
 impl ServerChannel {

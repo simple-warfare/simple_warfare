@@ -1,6 +1,6 @@
 use crate::bevy_ext::{try_from_js::*, try_into_js::*};
 use avian2d::math::Scalar;
-use bevy::{ecs::entity, prelude::*};
+use bevy::prelude::*;
 use boa_engine::{
     JsResult, js_string,
     prelude::*,

@@ -3,7 +3,6 @@ use avian2d::prelude::Collider;
 use bevy::prelude::*;
 use boa_engine::value::TryFromJs;
 
-
 /// mod单位拥有一个Array来存储碰撞体,在rust中我们将使用Vec
 #[derive(Debug, Default, Clone, Component, Reflect, TryFromJs)]
 pub struct JsColliders {

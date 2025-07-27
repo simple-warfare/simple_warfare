@@ -51,7 +51,11 @@ impl Section {
 
     pub fn try_from_proxy(proxy: &JsProxy, context: &mut Context) -> JsResult<Section> {
         Ok(Self {
-            core: Core::try_from_js(&proxy.get(js_string!("core"), context).expect("get error"), context).expect("parse error"),
+            core: Core::try_from_js(
+                &proxy.get(js_string!("core"), context).expect("get error"),
+                context,
+            )
+            .expect("parse error"),
             colliders: JsColliders::new(Vec::<JsCollider>::try_from_js(
                 &JsValue::Object(
                     proxy

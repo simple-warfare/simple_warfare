@@ -10,7 +10,10 @@ impl Plugin for DebugPlugin {
     }
 }
 
-fn draw_turret_attack_range(mut gizmos: Gizmos, turret_query: Query<(&JsTurret, &GlobalTransform)>) {
+fn draw_turret_attack_range(
+    mut gizmos: Gizmos,
+    turret_query: Query<(&JsTurret, &GlobalTransform)>,
+) {
     for (turret, global_transform) in turret_query {
         gizmos.circle_2d(
             Isometry2d::from_translation(global_transform.translation().xy()),

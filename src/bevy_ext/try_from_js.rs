@@ -43,7 +43,7 @@ pub fn vec3_try_from_js(value: &JsValue, context: &mut Context) -> JsResult<Vec3
 }
 
 pub fn f32_try_from_js(value: &JsValue, context: &mut Context) -> JsResult<f32> {
-    Ok(value.to_f32(context)?)
+    value.to_f32(context)
 }
 
 pub fn entity_try_from_js(value: &JsValue, context: &mut Context) -> JsResult<Entity> {

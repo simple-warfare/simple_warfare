@@ -1,4 +1,4 @@
-use bevy::{ecs::entity::Entity, log::info, reflect::Reflect};
+use bevy::{ecs::entity::Entity, reflect::Reflect};
 use boa_engine::{
     JsData,
     value::{TryFromJs, TryIntoJs},

@@ -5,7 +5,7 @@ use bevy::prelude::*;
 #[derive(Debug, Clone, Reflect, Copy)]
 pub enum WayPoint {
     Move(Vec2),
-    Attack()
+    Attack(),
 }
 
 #[derive(Debug, Default, Component, Reflect, Clone)]

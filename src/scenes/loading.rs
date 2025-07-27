@@ -93,7 +93,7 @@ fn check_js_and_map(
             .custom_mod_handles
             .mod_handles
             .iter()
-            .flat_map(|custom_mod| custom_mod.maps.iter().cloned().map(|map| Arc::new(map)))
+            .flat_map(|custom_mod| custom_mod.maps.iter().cloned().map(Arc::new))
             .collect();
         game_asset.maps.append(&mut all_maps);
 

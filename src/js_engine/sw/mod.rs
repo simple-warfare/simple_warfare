@@ -391,7 +391,7 @@ impl Sw {
         let fs = Fs::init(context, sw_request_sender.clone());
 
         ObjectInitializer::with_native_data_and_proto(
-            Self::default(),
+            Self,
             JsObject::with_object_proto(context.realm().intrinsics()),
             context,
         )

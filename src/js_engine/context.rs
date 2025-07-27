@@ -55,7 +55,7 @@ pub(super) fn process_js_event(
                 let module = Module::parse(
                     Source::from_reader(
                         js_asset.context.as_bytes(),
-                        Some(&Path::new(&js_asset.path)),
+                        Some(Path::new(&js_asset.path)),
                     ),
                     None,
                     context,
@@ -174,7 +174,7 @@ pub(super) fn process_js_event(
                 .map
                 .clone();
             selected_signal_map.borrow().iter().for_each(|(_, signal)| {
-                emit_signal(&signal, &[], context).unwrap();
+                emit_signal(signal, &[], context).unwrap();
             });
         }
         JsEngineRequestEvent::ToLook(look_type) => match look_type {

@@ -43,7 +43,11 @@ impl CustomModEnableJsHandle {
     }
 }
 impl CustomModAsset {
-    pub fn new(info: ModInfo, main_lua: LuaAsset, custom_mod_enable_js: Vec<CustomModEnableJs>) -> Self {
+    pub fn new(
+        info: ModInfo,
+        main_lua: LuaAsset,
+        custom_mod_enable_js: Vec<CustomModEnableJs>,
+    ) -> Self {
         Self {
             info,
             main_lua,

@@ -29,14 +29,14 @@ fn unit_enter(
         let units_in_range: Vec<Entity> = treeaccess
             .within_distance(turret_pos.translation().xy(), turret.attack_radius)
             .iter()
-            .filter_map(|(_, entity)| Some((*entity)?))
+            .filter_map(|(_, entity)| *entity)
             .collect();
 
         let mut new_units_in_range = Vec::new();
         let mut current_units_set = HashSet::new();
 
         for entity in &units_in_range {
-            if let Ok(_) = unit_query.get(*entity) {
+            if unit_query.get(*entity).is_ok() {
                 let js_entity = JsEntity::from_entity(entity);
                 current_units_set.insert(js_entity.clone());
 

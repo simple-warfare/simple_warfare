@@ -128,12 +128,7 @@ fn load_assets(mut game_assets: ResMut<GameAsset>, asset_server: Res<AssetServer
     game_assets.enable_mod_set.conf_handle = mod_set_conf_handle.clone();
 
     // 收集所有资源句柄
-    game_assets.assets_untyped_handle = game_assets
-        .interface
-        .all_untyped()
-        .iter()
-        .cloned()
-        .collect();
+    game_assets.assets_untyped_handle = game_assets.interface.all_untyped().to_vec();
 
     game_assets
         .assets_untyped_handle

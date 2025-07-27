@@ -7,7 +7,7 @@ pub enum JsDefaultSignalType {
     Created,
     Selected,
     OnUnitEnter,
-    OnUnitExit
+    OnUnitExit,
 }
 
 impl TryFromJs for JsDefaultSignalType {

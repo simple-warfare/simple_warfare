@@ -11,7 +11,9 @@ pub struct JsPointLights2d {
 
 impl JsPointLights2d {
     pub fn new(js_point_light2d: Vec<JsPointLight2d>) -> Self {
-        Self { data: js_point_light2d }
+        Self {
+            data: js_point_light2d,
+        }
     }
     /// 将所有点光源收集到一起
     pub fn to_point_light2d(&self) -> Vec<impl Bundle> {

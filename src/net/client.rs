@@ -1,6 +1,6 @@
 use std::path::Path;
 
-use bevy::{asset::AssetPath, prelude::*};
+use bevy::prelude::*;
 use bevy_quinnet::{
     client::{
         QuinnetClient, certificate::CertificateVerificationMode,
@@ -10,7 +10,7 @@ use bevy_quinnet::{
 };
 
 use crate::{
-    assets::mods::js::{self, JsAsset},
+    assets::mods::js::JsAsset,
     mod_engine::server::ModServer,
     net::{
         protocol::{ClientChannel, ClientMessage, ServerMessage},
@@ -75,7 +75,7 @@ pub fn handle_server_messages(
     mut net_client_state: ResMut<NextState<NetClientState>>,
     mod_server: ResMut<ModServer>,
     js_assets: Res<Assets<JsAsset>>,
-    mut unit_mapping: ResMut<UnitMapping>,
+    unit_mapping: ResMut<UnitMapping>,
 ) -> Result {
     let Some(connection) = client.get_connection_mut() else {
         return Ok(());
@@ -194,5 +194,3 @@ pub fn check_fetch_mods(
 
     Ok(())
 }
-
-

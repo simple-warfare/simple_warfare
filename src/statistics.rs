@@ -49,14 +49,14 @@ pub enum NetClientState {
     None,
     VerifyMods,
     FetchMods,
-    Ready
+    Ready,
 }
 
 #[derive(States, Debug, Hash, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Default, Reflect)]
 pub enum NetServerState {
     #[default]
     None,
-    Ready
+    Ready,
 }
 
 #[derive(Debug, Resource)]

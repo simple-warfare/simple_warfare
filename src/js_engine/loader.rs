@@ -36,7 +36,7 @@ impl SimpleWarfareModuleLoader {
         root: P,
         request_sender: Arc<Sender<SwModuleLoaderRequestEvent>>,
     ) -> JsResult<Self> {
-        let _timer = Profiler::global().start_event("Loader::new", "Loader");
+        Profiler::global().start_event("Loader::new", "Loader");
         if cfg!(target_family = "wasm") {
             return Err(JsNativeError::typ()
                 .with_message("cannot resolve a relative path in WASM targets")

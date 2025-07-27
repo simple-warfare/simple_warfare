@@ -1,11 +1,11 @@
+pub mod graphic;
+pub mod light2d;
 pub mod physics;
 pub mod section;
-pub mod unit;
-pub mod way_point;
-pub mod light2d;
-pub mod graphic;
 pub mod transform;
 pub mod turret;
+pub mod unit;
+pub mod way_point;
 
 use bevy::prelude::*;
 

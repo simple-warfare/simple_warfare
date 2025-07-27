@@ -12,7 +12,6 @@ use crate::{
         GameAsset,
         mods::{info::ModInfo, js::JsAsset, lua::LuaAsset},
     },
-    custom::unit,
     net::{
         protocol::{ClientMessage, ServerChannel, ServerMessage},
         shared::{LOCAL_BIND_IP, Player, SERVER_HOST, SERVER_PORT, UnitMapping},

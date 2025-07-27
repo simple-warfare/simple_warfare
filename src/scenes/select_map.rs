@@ -145,12 +145,12 @@ fn setup(
                                 TextColor(Color::Srgba(BLACK),)
                             )]
                         ),
-                        (Node {
+                        Node {
                             display: Display::Grid,
                             width: Val::Percent(100.),
                             height: Val::Percent(100.),
                             ..Default::default()
-                        }),
+                        },
                         (
                             Node {
                                 display: Display::Grid,
@@ -297,9 +297,7 @@ fn observer_click(
         }
     } else if let Ok(lable) = buttons.get(click.target()) {
         match lable {
-            ButtonLabel::Ok => {
-                scene_state.set(SceneState::GameScene)
-            },
+            ButtonLabel::Ok => scene_state.set(SceneState::GameScene),
         }
     }
 }

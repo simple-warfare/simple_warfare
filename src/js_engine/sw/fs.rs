@@ -38,7 +38,7 @@ impl Fs {
 
         //创建fs这个Object
         ObjectInitializer::with_native_data_and_proto(
-            Self::default(),
+            Self,
             JsObject::with_object_proto(context.realm().intrinsics()),
             context,
         )
