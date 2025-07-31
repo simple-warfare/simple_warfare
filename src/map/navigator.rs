@@ -69,7 +69,7 @@ fn setup(
             // Small geometry can make navmesh generation fail due to rounding errors.
             // This example has round obstacles which can create small details.
             simplify: 0.2,
-            merge_steps: 4,
+            merge_steps: 2,
             ..default()
         },
         // Mark it for update as soon as obstacles are changed.
@@ -130,28 +130,34 @@ fn new_obstacle(commands: &mut Commands, rng: &mut ThreadRng, transform: Transfo
     commands
         .spawn((
             match rng.random_range(0..6) {
-                0 => SharedShapeStorage::rectangle(
+                0 => CachedObstacle::<SharedShapeStorage>::new(SharedShapeStorage::rectangle(
                     rng.random_range(1.0..5.0) * FACTOR,
                     rng.random_range(1.0..5.0) * FACTOR,
-                ),
-                1 => SharedShapeStorage::circle(rng.random_range(1.0..5.0) * FACTOR),
-                2 => SharedShapeStorage::ellipse(
+                )),
+                1 => CachedObstacle::<SharedShapeStorage>::new(SharedShapeStorage::circle(
+                    rng.random_range(1.0..5.0) * FACTOR,
+                )),
+                2 => CachedObstacle::<SharedShapeStorage>::new(SharedShapeStorage::ellipse(
                     rng.random_range(1.0..5.0) * FACTOR,
                     rng.random_range(1.0..5.0) * FACTOR,
-                ),
-                3 => SharedShapeStorage::capsule(
+                )),
+                3 => CachedObstacle::<SharedShapeStorage>::new(SharedShapeStorage::capsule(
                     rng.random_range(1.0..3.0) * FACTOR,
                     rng.random_range(1.5..5.0) * FACTOR,
-                ),
-                4 => SharedShapeStorage::round_rectangle(
-                    rng.random_range(1.0..3.0) * FACTOR,
-                    rng.random_range(1.5..5.0) * FACTOR,
-                    rng.random_range(1.0..2.0) * FACTOR,
-                ),
-                5 => SharedShapeStorage::regular_polygon(
-                    rng.random_range(1.0..5.0) * FACTOR,
-                    rng.random_range(3..8),
-                ),
+                )),
+                4 => {
+                    CachedObstacle::<SharedShapeStorage>::new(SharedShapeStorage::round_rectangle(
+                        rng.random_range(1.0..3.0) * FACTOR,
+                        rng.random_range(1.5..5.0) * FACTOR,
+                        rng.random_range(1.0..2.0) * FACTOR,
+                    ))
+                }
+                5 => {
+                    CachedObstacle::<SharedShapeStorage>::new(SharedShapeStorage::regular_polygon(
+                        rng.random_range(1.0..5.0) * FACTOR,
+                        rng.random_range(3..8),
+                    ))
+                }
                 _ => unreachable!(),
             },
             transform,

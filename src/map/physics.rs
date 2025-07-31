@@ -51,7 +51,7 @@ impl TiledPhysicsBackend for SimpleWarfarePhysicsBackend {
                                 let shared_shape = SharedShape::compound(composables.to_vec());
 
                                 spawn_infos.push(TiledColliderSpawnInfos {
-                                    name: format!("{user_type}[ComposedTile]"),
+                                    name: format!("{}[ComposedTile]", user_type),
                                     entity: commands
                                         .spawn((
                                             CachedObstacle::<SharedShapeStorage>::new(
@@ -109,7 +109,7 @@ impl TiledPhysicsBackend for SimpleWarfarePhysicsBackend {
                         let shared_shape = SharedShape::compound(composables.to_vec());
 
                         spawn_infos.push(TiledColliderSpawnInfos {
-                            name: format!("{user_type}[ComposedTile]"),
+                            name: format!("{}[ComposedTile]", user_type),
                             entity: commands
                                 .spawn((
                                     CachedObstacle::<SharedShapeStorage>::new(
@@ -158,7 +158,7 @@ fn compose_tiles(
                 );
                 composables
                     .entry_ref(&object.user_type)
-                    .or_default()
+                    .or_insert(vec![])
                     .push(iso_and_shape);
             } else {
                 let iso = Isometry3d::from_xyz(position.x, position.y, 0.)

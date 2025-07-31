@@ -2670,7 +2670,8 @@ checksum = "46c5e41b57b8bba42a04676d81cb89e9ee8e859a1a66f80a5a72e1cb76b34d43"
 [[package]]
 name = "bvh2d"
 version = "0.6.0"
-source = "git+https://github.com/mockersf/bvh2d#e0f2e1b7ccabf25726524b6c011de1a4f565bf70"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a9ee0a309eb56478856a9adc57323d1abc3455be416341e6017f7d9c96ee326b"
 dependencies = [
  "glam",
 ]
@@ -3438,6 +3439,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "earcutr"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "afc28d89ac6cb489f679fcf51aaa62b4667bb0fb73a30f1d4d23949069707c07"
+dependencies = [
+ "itertools 0.14.0",
+ "num-traits",
+]
+
+[[package]]
 name = "ecolor"
 version = "0.31.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4160,7 +4171,7 @@ version = "0.30.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4416397671d8997e9a3e7ad99714f4f00a22e9eaa9b966a5985d2194fc9e02e1"
 dependencies = [
- "earcutr",
+ "earcutr 0.4.3",
  "float_next_after",
  "geo-types",
  "geographiclib-rs",
@@ -6816,7 +6827,8 @@ checksum = "2f3a9f18d041e6d0e102a0a46750538147e5e8992d3b4873aaafee2520b00ce3"
 [[package]]
 name = "polyanya"
 version = "0.13.0"
-source = "git+https://github.com/simple-warfare/polyanya.git#9ac027db0dfe1c3f6489ab8c5b7661a8293078dc"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "eff6f7cac108118db477f38e6c93df45b8e78e8f6ef417139f3b6994b897c8f3"
 dependencies = [
  "bvh2d",
  "geo",
@@ -6824,7 +6836,6 @@ dependencies = [
  "hashbrown 0.15.4",
  "log",
  "num-traits",
- "rayon",
  "robust",
  "smallvec",
  "spade",
@@ -8126,6 +8137,7 @@ dependencies = [
  "boa_runtime",
  "crc32fast",
  "dashmap 6.1.0",
+ "earcutr 0.5.0",
  "fluent",
  "image",
  "mlua",
@@ -9506,7 +9518,7 @@ checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
 [[package]]
 name = "vleue_navigator2d"
 version = "0.12.0"
-source = "git+https://github.com/simple-warfare/vleue_navigator2d.git#c2cdf07cc946e63248c6c0a4c98f316e62823a35"
+source = "git+https://github.com/simple-warfare/vleue_navigator2d.git#2e8d6cf35eba1d45250eb4f39c16e675129acc19"
 dependencies = [
  "bevy",
  "bitflags 2.9.1",

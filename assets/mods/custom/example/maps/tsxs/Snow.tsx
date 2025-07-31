@@ -7,11 +7,7 @@
  <tile id="1"/>
  <tile id="3"/>
  <tile id="10"/>
- <tile id="12">
-  <objectgroup draworder="index" id="2">
-   <object id="1" x="0" y="0" width="20" height="20"/>
-  </objectgroup>
- </tile>
+ <tile id="12"/>
  <tile id="14"/>
  <tile id="5"/>
  <tile id="6"/>
