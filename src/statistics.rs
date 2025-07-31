@@ -33,6 +33,15 @@ pub enum AppState {
     ModLoaded,
     FetchMods,
 }
+#[derive(States, Debug, Hash, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Default, Reflect)]
+pub enum MapState {
+    #[default]
+    None,
+    CreatingMap,
+    BuildingNavMesh,
+    BuildingNorthStar,
+    BuildingFlowField,
+}
 
 #[derive(States, Debug, Hash, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Default, Reflect)]
 pub enum NetState {
@@ -124,6 +133,7 @@ impl Plugin for StatistcsPlugin {
             .init_state::<NetState>()
             .init_state::<AppState>()
             .init_state::<NetClientState>()
-            .init_state::<NetServerState>();
+            .init_state::<NetServerState>()
+            .init_state::<MapState>();
     }
 }

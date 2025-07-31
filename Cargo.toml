@@ -55,7 +55,7 @@ url = "2.5.4"
 image = "0.25.6"
 bevy_polyline = "0.12.0"
 tokio = { version = "1.46.1", features = ["rt", "rt-multi-thread", "time"] }
-vleue_navigator = { git = "https://github.com/simple-warfare/vleue_navigator.git", features = [
+vleue_navigator2d = { git = "https://github.com/simple-warfare/vleue_navigator2d.git", features = [
     "parry2d",
 ] }
 bevy_seedling = { version = "0.4.3", features = ["mp3"] } #audio
@@ -83,6 +83,12 @@ uuid-simd = "0.8.0"
 #bevy_window_utils = "0.16.0"
 bevy_async_task = "0.8.1"
 new_mime_guess = "4.0.4"
+
+bevy_northstar = "0.3.2"
+
+rayon = "1.10.0"
+dashmap = { version = "6.1.0", features = ["rayon"] }
+
 [dependencies.bevy]
 version = "0.16.1"
 features = [
@@ -116,7 +122,7 @@ features = [
     "sysinfo_plugin",
     "tonemapping_luts",
     "webgl2",
-    "x11",
+    "wayland",
     "jpeg",
     "serialize",
 ]
@@ -154,7 +160,7 @@ features = [
     "sysinfo_plugin",
     "tonemapping_luts",
     "webgl2",
-    "x11",
+    "wayland",
     "jpeg",
     "dynamic_linking",
 ]

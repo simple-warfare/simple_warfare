@@ -1,11 +1,11 @@
-use bevy::prelude::*;
+use bevy::{platform::collections::HashMap, prelude::*};
 use bevy_ecs_tiled::prelude::*;
 use parry2d::{
     math::{Isometry, Real},
     shape::SharedShape,
 };
 use tiled::{ObjectLayerData, ObjectShape};
-use vleue_navigator::prelude::SharedShapeStorage;
+use vleue_navigator2d::prelude::{CachableObstacle, CachedObstacle, SharedShapeStorage};
 
 #[derive(Default, Debug, Clone, Reflect)]
 #[reflect(Default, Debug)]
@@ -27,17 +27,15 @@ impl TiledPhysicsBackend for SimpleWarfarePhysicsBackend {
                 object_id: _,
             } => {
                 let Some(object) = collider.get_object(tiled_map) else {
-                    info!("No object found for collider: {:?}", collider);
                     return vec![];
                 };
 
                 match object.get_tile() {
                     Some(object_tile) => object_tile.get_tile().and_then(|tile| {
                         let Some(object_layer_data) = &tile.collision else {
-                            info!("No collision data found for tile: {:?}", tile);
                             return None;
                         };
-                        let mut composables = vec![];
+                        let mut composables = HashMap::new();
                         let mut spawn_infos = vec![];
                         compose_tiles(
                             commands,
@@ -49,18 +47,23 @@ impl TiledPhysicsBackend for SimpleWarfarePhysicsBackend {
                             &mut spawn_infos,
                         );
                         if !composables.is_empty() {
-                            let shared_shape = SharedShape::compound(composables);
-                            spawn_infos.push(TiledColliderSpawnInfos {
-                                name: "Custom[TilesLayer]".to_string(),
-                                entity: commands
-                                    .spawn((
-                                        Name::new("CustomCollider"),
-                                        SharedShapeStorage::from(shared_shape),
-                                    ))
-                                    .id(),
-                                transform: Transform::default(),
+                            composables.iter().for_each(|(user_type, composables)| {
+                                let shared_shape = SharedShape::compound(composables.to_vec());
+
+                                spawn_infos.push(TiledColliderSpawnInfos {
+                                    name: format!("{}[ComposedTile]", user_type),
+                                    entity: commands
+                                        .spawn((
+                                            CachedObstacle::<SharedShapeStorage>::new(
+                                                SharedShapeStorage::from(shared_shape),
+                                            ),
+                                            CachableObstacle,
+                                        ))
+                                        .id(),
+                                    transform: Transform::default(),
+                                });
                             });
-                        }
+                        };
                         Some(spawn_infos)
                     }),
                     None => get_position_and_shape(&object.shape).map(|(pos, shared_shape, _)| {
@@ -72,8 +75,10 @@ impl TiledPhysicsBackend for SimpleWarfarePhysicsBackend {
                             name: format!("Custom[Object={}]", object.name),
                             entity: commands
                                 .spawn((
-                                    Name::new("CustomCollider"),
-                                    SharedShapeStorage::from(shared_shape),
+                                    CachedObstacle::<SharedShapeStorage>::new(
+                                        SharedShapeStorage::from(shared_shape),
+                                    ),
+                                    CachableObstacle,
                                 ))
                                 .id(),
                             transform: Transform::from_isometry(iso),
@@ -84,7 +89,7 @@ impl TiledPhysicsBackend for SimpleWarfarePhysicsBackend {
             }
 
             TiledCollider::TilesLayer { layer_id: _ } => {
-                let mut composables = vec![];
+                let mut composables = HashMap::new();
                 let mut spawn_infos = vec![];
                 for (tile_position, tile) in collider.get_tiles(tiled_map, anchor) {
                     if let Some(collision) = &tile.collision {
@@ -100,20 +105,23 @@ impl TiledPhysicsBackend for SimpleWarfarePhysicsBackend {
                     }
                 }
                 if !composables.is_empty() {
-                    let shared_shape = SharedShape::compound(composables);
+                    composables.iter().for_each(|(user_type, composables)| {
+                        let shared_shape = SharedShape::compound(composables.to_vec());
 
-                    spawn_infos.push(TiledColliderSpawnInfos {
-                        name: "Custom[ComposedTile]".to_string(),
-                        entity: commands
-                            .spawn((
-                                Name::new("CustomCollider"),
-                                SharedShapeStorage::from(shared_shape),
-                            ))
-                            .id(),
-                        transform: Transform::default(),
+                        spawn_infos.push(TiledColliderSpawnInfos {
+                            name: format!("{}[ComposedTile]", user_type),
+                            entity: commands
+                                .spawn((
+                                    CachedObstacle::<SharedShapeStorage>::new(
+                                        SharedShapeStorage::from(shared_shape),
+                                    ),
+                                    CachableObstacle,
+                                ))
+                                .id(),
+                            transform: Transform::default(),
+                        });
                     });
                 }
-                info!("Spawned Infos: {:?} ", spawn_infos);
                 spawn_infos
             }
         }
@@ -126,7 +134,7 @@ fn compose_tiles(
     object_layer_data: &ObjectLayerData,
     tile_offset: Vec2,
     grid_size: TilemapGridSize,
-    composables: &mut Vec<(Isometry<Real>, SharedShape)>,
+    composables: &mut HashMap<String, Vec<(Isometry<Real>, SharedShape)>>,
     spawn_infos: &mut Vec<TiledColliderSpawnInfos>,
 ) {
     for object in object_layer_data.object_data() {
@@ -143,13 +151,16 @@ fn compose_tiles(
             get_position_and_shape(&object.shape)
         {
             if is_composable {
-                composables.push((
+                let iso_and_shape = (
                     Isometry::<Real>::new(position.into(), f32::to_radians(-object.rotation))
                         * Isometry::<Real>::new(shape_offset.into(), 0.),
                     shared_shape,
-                ));
+                );
+                composables
+                    .entry_ref(&object.user_type)
+                    .or_insert(vec![])
+                    .push(iso_and_shape);
             } else {
-                let shared_shape = SharedShape::compound(composables.clone());
                 let iso = Isometry3d::from_xyz(position.x, position.y, 0.)
                     * Isometry3d::from_rotation(Quat::from_rotation_z(f32::to_radians(
                         -object.rotation,
@@ -159,8 +170,10 @@ fn compose_tiles(
                     name: "Custom[ComplexTile]".to_string(),
                     entity: commands
                         .spawn((
-                            Name::new("CustomCollider"),
-                            SharedShapeStorage::from(shared_shape),
+                            CachedObstacle::<SharedShapeStorage>::new(SharedShapeStorage::from(
+                                shared_shape,
+                            )),
+                            CachableObstacle,
                         ))
                         .id(),
                     transform: Transform::from_isometry(iso),

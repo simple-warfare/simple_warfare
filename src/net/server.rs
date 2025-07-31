@@ -132,7 +132,9 @@ pub fn handle_client_messages(
                         ServerMessage::verify_mods(server_data.mod_js_crc32.clone()),
                     )?;
                 }
-                ClientMessage::FetchMods { mods } => todo!(),
+                ClientMessage::FetchMods { mods } => {
+                    info!("Client {} requested mods: {:?}", client_id, mods);
+                }
             }
         }
     }
