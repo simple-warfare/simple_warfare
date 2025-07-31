@@ -3,6 +3,7 @@ pub mod bevy_ext;
 pub mod consts;
 pub mod custom;
 pub mod debug;
+pub mod helpers;
 pub mod js_engine;
 pub mod lua_engine;
 pub mod map;
@@ -14,7 +15,6 @@ pub mod spatial;
 pub mod statistics;
 pub mod system;
 pub mod utils;
-pub mod helpers;
 
 use crate::{
     assets::AssetsPlugin,

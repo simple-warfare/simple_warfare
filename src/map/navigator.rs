@@ -20,8 +20,7 @@ impl Plugin for SimpleWarfareNavigatorPlugin {
             // Auto update the navmesh.
             // Obstacles will be entities with the `Obstacle` marker component,
             // and use the `Aabb` component as the obstacle data source.
-            NavmeshUpdaterPlugin::<CachedObstacle<SharedShapeStorage>>::default(
-            ),
+            NavmeshUpdaterPlugin::<CachedObstacle<SharedShapeStorage>>::default(),
         ))
         .add_observer(setup)
         .add_systems(Update, display_mesh)
