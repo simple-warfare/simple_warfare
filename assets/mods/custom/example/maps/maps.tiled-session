@@ -1,8 +1,8 @@
 {
-    "activeFile": "tsxs/Snow.tsx",
+    "activeFile": "tsxs/WaterFlow2.tsx",
     "expandedProjectPaths": [
-        ".",
         "tiles",
+        ".",
         "tsxs"
     ],
     "file.lastUsedOpenFilter": "全部文件 (*)",
@@ -153,11 +153,11 @@
             "expandedGroupLayers": [
                 7
             ],
-            "scale": 0.25,
-            "selectedLayer": 2,
+            "scale": 5.5,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 1424,
-                "y": 874
+                "x": 1622.0909090909092,
+                "y": 2017.3636363636365
             }
         },
         "tsxs/Cave.tsx": {
@@ -707,10 +707,10 @@
     "project": "maps.tiled-project",
     "property.type": "object",
     "recentFiles": [
-        "tsxs/WaterFlow2.tsx",
-        "tsxs/Ice2Snow.tsx",
-        "[p2]Small_Island (2p).tmx",
         "tsxs/Snow.tsx",
+        "[p2]Small_Island (2p).tmx",
+        "tsxs/Ice2Snow.tsx",
+        "tsxs/WaterFlow2.tsx",
         "/home/shishanyue/bevy_ecs_tiled-0.7.3/assets/tiles/orthogonal_1.tsx",
         "/home/shishanyue/bevy_ecs_tiled-0.7.3/assets/maps/orthogonal/multiple_layers_with_colliders.tmx",
         "/home/shishanyue/bevy_ecs_tiled-0.7.3/assets/maps/orthogonal/finite.tmx",

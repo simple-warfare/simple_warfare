@@ -1639,8 +1639,7 @@ dependencies = [
 [[package]]
 name = "bevy_northstar"
 version = "0.3.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "966dfce0f87df997e7408587776569b156e4116fb8be0643c06cc38087030715"
+source = "git+https://github.com/simple-warfare/bevy_northstar.git#95024d9bf60d56202f3979c6b0e483677304d380"
 dependencies = [
  "bevy",
  "indexmap",
