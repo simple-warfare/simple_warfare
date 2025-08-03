@@ -13,7 +13,7 @@ use crate::{
     },
     consts::CUSTOM_MOD_PATH,
     custom::{CustomModEnableJsHandle, CustomModHandle},
-    lua_engine::user_data::{MapManager, ModManager},
+    lua_engine::user_data::{MapManager, ModManager, NavigatorLayerManager},
     statistics::AppState,
 };
 
@@ -130,6 +130,7 @@ fn exec_mod_main_lua(
             ) {
                 let mod_name = &mod_info.name;
 
+                info!("{mod_name}");
                 add_global_value(context, global, mod_info).expect("add global value error");
                 context.load(lua_asset.context.clone()).exec()?;
 
@@ -191,8 +192,10 @@ fn add_global_value(context: &Lua, global: &Table, mod_info: &ModInfo) -> Result
     let mod_info = context.create_ser_userdata(mod_info.clone())?;
     let mod_manager = context.create_ser_userdata(ModManager::default())?;
     let map_manager = context.create_ser_userdata(MapManager::default())?;
+    let navigator_layer_manager = context.create_ser_userdata(NavigatorLayerManager::default())?;
     global.set("mod_info", mod_info)?;
     global.set("mod_manager", mod_manager)?;
     global.set("map_manager", map_manager)?;
+    global.set("navigator_layer_manager", navigator_layer_manager)?;
     Ok(())
 }

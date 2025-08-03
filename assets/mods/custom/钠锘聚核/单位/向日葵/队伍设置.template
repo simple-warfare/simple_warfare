@@ -1,0 +1,57 @@
+[action_队伍设置]
+text:队伍设置
+description: 打开生命的设置,再次点击以关闭
+price:0
+buildSpeed:0s
+displayType:action
+isVisible: if memory.队伍设置==false
+setUnitMemory: 队伍设置=true
+pos: 3
+alwaysSinglePress: true
+[action_队伍设置2]
+@copyFromSection: action_队伍设置
+description: 关闭生命的设置,再次点击以开启
+setUnitMemory: 队伍设置=false
+isVisible: if memory.队伍设置==true
+isGuiBlinking: true
+[action_更改队伍_1]
+@define team: 1
+text:更换至队伍${team}
+buildSpeed:0s
+displayType:action
+description: -将自身队伍切换至${team},若不存在该队伍会切换失败
+switchToTeam: ${team-1}
+isGuiBlinking: if self.teamId==${team-1}
+isVisible: if memory.队伍设置==true
+alwaysSinglePress: true
+
+[action_更改队伍_2]
+@copyFromSection: action_更改队伍_1
+@define team: 2
+[action_更改队伍_3]
+@copyFromSection: action_更改队伍_1
+@define team: 3
+[action_更改队伍_4]
+@copyFromSection: action_更改队伍_1
+@define team: 4
+[action_更改队伍_5]
+@copyFromSection: action_更改队伍_1
+@define team: 5
+[action_更改队伍_6]
+@copyFromSection: action_更改队伍_1
+@define team: 6
+[action_更改队伍_7]
+@copyFromSection: action_更改队伍_1
+@define team: 7
+[action_更改队伍_8]
+@copyFromSection: action_更改队伍_1
+@define team: 8
+[action_更改队伍_9]
+@copyFromSection: action_更改队伍_1
+@define team: 9
+[action_更改队伍_0]
+@copyFromSection: action_更改队伍_1
+@define team: 0
+[action_更改队伍_-1]
+@copyFromSection: action_更改队伍_1
+@define team: -1

@@ -1,0 +1,45 @@
+[global_resource_资源倍率]
+displayName: 资源倍率
+hidden: true
+[global_resource_基地等级]
+displayName: 基地等级
+hidden: true
+[global_resource_权限]
+displayName: 权限
+hidden: true
+[resource_高温]
+displayName: 高温
+[resource_低温]
+displayName: 低温
+[resource_屏障]
+displayName: 屏障
+[resource_屏障记录]
+hidden: true
+[resource_最大屏障]
+hidden: true
+[resource_护盾记录]
+hidden: true
+[resource_护盾伤害]
+hidden: true
+[resource_高温记录]
+hidden: true
+[resource_低温记录]
+hidden: true
+[resource_电荷]
+displayName: 电荷
+[resource_衰化]
+displayName: 衰化
+[resource_价格]
+displayName: 价格
+[resource_造成伤害]
+hidden: true
+[resource_血量]
+displayName: 血量
+[resource_受击伤害]
+hidden: true
+[resource_始基速度]
+hidden: true
+[resource_分身]
+hidden: true
+[resource_特殊能量]
+hidden: true

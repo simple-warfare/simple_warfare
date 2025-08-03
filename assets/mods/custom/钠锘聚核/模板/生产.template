@@ -1,0 +1,24 @@
+[core]
+@memory 纳米产速: float
+
+[hiddenAction_纳米产速_初始化]
+autoTriggerOnEvent: completeAndActive
+autoTrigger: if self.readUnitMemory("纳米产速",type="float")==0 and ${template_core.NanoV}!=0
+setUnitMemory: 纳米产速=${template_core.NanoV}
+[hiddenAction_生产资源_纳米物质]
+autoTrigger: true
+addResourcesWithLogic: 纳米物质=self.readUnitMemory("纳米产速",type="float")/10*self.resource.资源倍率
+[hiddenAction_纳米物质_增加显示_增加]
+autoTrigger: if self.resource.纳米物质_增加显示_本地<self.readUnitMemory("纳米产速",type="float")*self.resource.资源倍率 and self.readUnitMemory("纳米产速",type="float")!=0
+addResourcesWithLogic: 纳米物质_增加显示_本地=1*self.resource.资源倍率,纳米物质_增加显示=1*self.resource.资源倍率
+[hiddenAction_纳米物质_增加显示_清空]
+autoTriggerOnEvent: destroyed
+addResourcesWithLogic: 纳米物质_增加显示=self.resource.纳米物质_增加显示_本地*(-1),纳米物质_增加显示_本地=self.resource.纳米物质_增加显示_本地*(-1)
+[resource_纳米物质_本地]
+displayName: 纳米
+iconImage: ROOT:数据/贴图/图标/纳米物质.png
+[resource_纳米物质_增加显示_本地]
+displayName: 纳米物质+
+displayTextPostfix: /s
+[resource_纳米物质_产量]
+displayName: +

@@ -1,9 +1,13 @@
-use crate::assets::{
-    map::SimpleWarfareMap,
-    mods::{info::ModInfo, js::JsAsset, lua::LuaAsset},
+use crate::{
+    assets::{
+        map::SimpleWarfareMap,
+        mods::{info::ModInfo, js::JsAsset, lua::LuaAsset},
+    },
+    custom::map::navigator_layer::northstar::CustomGridLayers,
 };
 use bevy::prelude::*;
 
+pub mod map;
 pub mod ui;
 pub mod unit;
 
@@ -96,5 +100,13 @@ impl CustomModHandle {
                 .map(|custom_mod_enable_js_handle| custom_mod_enable_js_handle.to_asset(js_assets))
                 .collect(),
         )
+    }
+}
+
+pub struct CustomPlugin;
+
+impl Plugin for CustomPlugin {
+    fn build(&self, app: &mut App) {
+        app.init_resource::<CustomGridLayers>();
     }
 }

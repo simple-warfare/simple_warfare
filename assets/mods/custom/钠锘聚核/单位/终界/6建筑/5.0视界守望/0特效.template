@@ -1,0 +1,45 @@
+
+[effect_B层淬炼]
+@copyFromSection:effect_A层迭代
+@define tech: B层淬炼
+[effect_A层奇械]
+@copyFromSection:effect_A层迭代
+@define tech: A层奇械
+[effect_B层引擎]
+@copyFromSection:effect_A层迭代
+@define tech: B层引擎
+[effect_B层奇械]
+@copyFromSection:effect_A层迭代
+@define tech: B层奇械
+[effect_B层分型]
+@copyFromSection:effect_A层迭代
+@define tech: B层分型
+[effect_B层迭代]
+@copyFromSection:effect_A层迭代
+@define tech:B层迭代
+[effect_A层迭代]
+@define tech:A层迭代
+life:30
+fadeOut:true
+image:${tech}.png
+createWhenOffscreen: true
+alpha:0.99
+priority: veryhigh
+scaleFrom:1
+scaleTo:1.8
+fadeOut:true
+fadeInTime:15
+alwayStartDirAtZero: true
+alsoPlaySound: ROOT:数据/音效/点击完毕.ogg
+[effect_科研升级]
+life:60
+fadeOut:true
+image:科研.png
+createWhenOffscreen: true
+alpha:0.99
+priority: veryhigh
+scaleFrom:1.15
+scaleTo:1.1
+fadeInTime:15
+alwayStartDirAtZero: true
+alsoPlaySound: ROOT:数据/音效/点击完毕.ogg

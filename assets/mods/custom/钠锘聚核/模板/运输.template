@@ -1,0 +1,31 @@
+[core]
+transportUnitsUnloadDelayBetweenEachUnit:20
+transportUnitsBlockOtherTransports: false
+transportUnitsRequireTag: 可运输
+@memory 运输槽占用: float
+[decal_运输条]
+@copyFromSection: decal_绿色生命条
+yOffsetAbsolute: ${core.radius}+8
+alpha: 1
+onlyTeam: ally
+imageScaleY: 1
+imageScaleX: memory.运输槽占用/${core.maxTransportingUnits}*20*${core.radius/10}/52
+isVisible: if memory.运输槽占用>0 and not self.tags(includes="隐藏单位")
+color: #0000FF
+order: 1
+layer: shadow
+[decal_运输条底]
+@copyFromSection: decal_运输条
+alpha: 0.2
+imageScaleX: 20*${core.radius/10}/52
+color: #0000FF
+order: 0.9
+isVisible: true
+
+[hiddenAction_运输单位]
+autoTriggerOnEvent: newMessage(withTag="进入载具")
+setUnitMemory: 运输槽占用=memory.运输槽占用+eventData("运输槽",type="float")
+[hiddenAction_卸载单位]
+autoTriggerOnEvent: newMessage(withTag="离开载具")
+setUnitMemory: 运输槽占用=memory.运输槽占用-eventData("运输槽",type="float")
+

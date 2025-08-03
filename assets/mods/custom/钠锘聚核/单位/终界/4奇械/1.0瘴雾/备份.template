@@ -1,0 +1,19 @@
+[hiddenAction_生命流失]
+addResourcesWithLogic: hp=-100
+[hiddenAction_汇报血量]
+autoTriggerOnEvent: enteredTransport
+sendMessageTo: self.parent
+sendMessageWithData: 瘴雾血量=self.hp
+sendMessageWithTags: 瘴雾
+[hiddenAction_抬升血量上限]
+autoTriggerOnEvent: newMessage(withTag="瘴雾")
+setUnitStats: maxHp=max(min(self.maxHp,self.hp),200)+self.transporting(slot=0).hp
+alsoTriggerAction: 提升血量
+[hiddenAction_提升血量]
+setResourcesWithLogic: hp=self.hp+self.transporting(slot=0).hp
+alsoTriggerAction: 移除子单位
+[hiddenAction_移除子单位]
+deleteNumUnitsFromTransport: 1
+[hiddenAction_修正血量上限]
+autoTrigger: if self.hp<self.maxHp and self.maxHp>200
+setUnitStats: maxHp=self.hp

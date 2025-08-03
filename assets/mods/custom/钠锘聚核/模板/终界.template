@@ -1,0 +1,22 @@
+[core]
+soundOnNewSelection:ROOT:数据/语音/选中1.wav,ROOT:数据/语音/选中2.wav,ROOT:数据/语音/选中3.wav,ROOT:数据/语音/选中4.wav,ROOT:数据/语音/选中5.wav,ROOT:数据/语音/选中6.wav
+soundOnAttackOrder:ROOT:数据/语音/攻击1.wav,ROOT:数据/语音/攻击2.wav,ROOT:数据/语音/攻击3.wav,ROOT:数据/语音/攻击4.wav,ROOT:数据/语音/攻击5.wav,ROOT:数据/语音/攻击6.wav
+soundOnMoveOrder:ROOT:数据/语音/移动1.wav,ROOT:数据/语音/移动2.wav,ROOT:数据/语音/移动3.wav,ROOT:数据/语音/移动4.wav,ROOT:数据/语音/移动5.wav,ROOT:数据/语音/移动6.wav
+[template_core]
+typeTags:终界
+
+[template_科技锁]
+isLockedAlt:if not self.globalTeamTags(includes="${lock}tech")
+isLockedAltMessage:-锁定-\n需要科技[${lock}]
+iconExtraImage:ROOT:数据/贴图/图标/锘钢.png
+iconExtraIsVisible:if not self.globalTeamTags(includes="${lock}tech") or not self.globalTeamTags(includes="${lock_2}tech")
+isLockedAlt2:if not self.globalTeamTags(includes="${lock_2}tech")
+isLockedAlt2Message:-锁定-\n需要科技[${lock_2}]
+iconExtraImage:ROOT:数据/贴图/图标/锘钢.png
+iconExtraColor: #44FFFFFF
+iconExtraIsVisible: if not self.globalTeamTags(includes="${lock}tech")
+@define lock_2:NONE
+[template_科技锁2]
+isLocked: if not self.globalTeamTags(includes="${lock}tech")
+isLockedMessage:-锁定-\n需要科技[${lock}]
+@define lock:NONE

@@ -84,7 +84,9 @@ uuid-simd = "0.8.0"
 bevy_async_task = "0.8.1"
 new_mime_guess = "4.0.4"
 
-bevy_northstar = {git = "https://github.com/simple-warfare/bevy_northstar.git"}
+bevy_northstar = { git = "https://github.com/simple-warfare/bevy_northstar.git", features = [
+    "serde",
+] }
 
 rayon = "1.10.0"
 dashmap = { version = "6.1.0", features = ["rayon"] }

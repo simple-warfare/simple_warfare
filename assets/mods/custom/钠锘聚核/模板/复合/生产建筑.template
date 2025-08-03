@@ -1,0 +1,2 @@
+[core]
+copyFrom: ROOT:模板/生产.template, ROOT:模板/建筑.template

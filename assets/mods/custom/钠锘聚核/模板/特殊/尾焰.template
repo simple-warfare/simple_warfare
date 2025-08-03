@@ -1,0 +1,98 @@
+[core]
+@memory processing:boolean
+@memory trailPositions:unit[]
+@memory trailSize:float[]
+@memory trailAlpha:float[]
+@memory updateIndex:number
+
+#尾迹的生成间隔(秒)
+@global trailRate: 0.1
+#最大特效数(你需要增加相应的decal数)
+@global maxTrailNumber: 10
+#初始透明度&大小
+@global startSize: 4
+@global startAlpha: 1
+#透明度&大小衰减速度(每0.1秒)
+@global sizeDecreaseRate: 0.15
+@global alphaDecreaseRate: 0.1
+#图像文件
+@global png: SHARED:blank.png
+#颜色文件
+@global color: #FFFFFF
+
+[hiddenAction_shutDown]
+autoTrigger: if not self.isMoving()
+setUnitMemory: processing=false
+
+[hiddenAction_updatePosition]
+autoTrigger: if self.isMoving() and memory.processing==false
+requireConditional: if self.isMoving()
+buildSpeed: ${trailRate}s
+setUnitMemory:"""
+  processing=true,
+  trailPositions[memory.updateIndex]=getOffsetRelative,
+  trailSize[memory.updateIndex]=${startSize},
+  trailAlpha[memory.updateIndex]=${startAlpha},
+  updateIndex=select(
+    memory.updateIndex>=${maxTrailNumber-1},
+    0,
+    memory.updateIndex+1
+  )
+"""
+alsoQueueAction: updatePosition
+@define i=1
+
+[hiddenAction_updateSize]
+autoTrigger: true
+alsoTriggerAction: updateSizeForEach
+alsoTriggerActionRepeat: ${maxTrailNumber}
+[hiddenAction_updateSizeForEach]
+setUnitMemory:"""
+  trailSize[index]=select(
+    memory.trailSize[index]>=0,
+    memory.trailSize[index]-${sizeDecreaseRate},
+    0
+  ),
+  trailAlpha[index]=select(
+    memory.trailAlpha[index]>=0,
+    memory.trailAlpha[index]-${alphaDecreaseRate},
+    0
+  )
+"""
+
+[decal_trail_0]
+@define i=0
+layer: beforeBody
+yOffsetRelative: -10
+image: ${png}
+imageScale: memory.trailSize[${i}]
+alpha: memory.trailAlpha[${i}]
+basePosition: memory.trailPositions[${i}]
+color: ${color}
+[decal_trail_1]
+@copyFromSection: decal_trail_0
+@define i=1
+[decal_trail_2]
+@copyFromSection: decal_trail_0
+@define i=2
+[decal_trail_3]
+@copyFromSection: decal_trail_0
+@define i=3
+[decal_trail_4]
+@copyFromSection: decal_trail_0
+@define i=4
+[decal_trail_5]
+@copyFromSection: decal_trail_0
+@define i=5
+[decal_trail_6]
+@copyFromSection: decal_trail_0
+@define i=6
+[decal_trail_7]
+@copyFromSection: decal_trail_0
+@define i=7
+[decal_trail_8]
+@copyFromSection: decal_trail_0
+@define i=8
+[decal_trail_9]
+@copyFromSection: decal_trail_0
+@define i=9

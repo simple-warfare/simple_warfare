@@ -13,7 +13,8 @@ pub struct ModInfo {
     pub name: String,
     pub version: String,
     pub game_version: String,
-    pub author: String,
+    pub author: Vec<String>,
+    pub description: String,
     pub uuid: Uuid,
 }
 
@@ -70,7 +71,7 @@ impl AssetLoader for ModInfoLoader {
     ) -> Result<Self::Asset, Self::Error> {
         let mut context = String::new();
         reader.read_to_string(&mut context).await?;
-        Ok(toml::from_str(&context).unwrap_or_default())
+        Ok(toml::from_str(&context).expect("parse mod info error"))
     }
 
     fn extensions(&self) -> &[&str] {

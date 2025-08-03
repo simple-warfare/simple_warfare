@@ -1,0 +1,227 @@
+[effect_红温左]
+image:红温左.png
+priority: veryhigh
+life:240
+lifeRandom: 30
+fadeOut:true
+attachedToUnit:true
+xOffsetRelative: 8
+yOffsetRelative: -42
+fadeInTime:12
+scaleFrom:1
+scaleTo:0.96
+alpha:0.6
+drawUnderUnits:false
+
+[effect_红温右]
+@copyFromSection: effect_红温左
+image:红温右.png
+xOffsetRelative: -8
+[effect_雾气左]
+image:ROOT:数据/贴图/特效/雾气1.png
+priority: veryhigh
+life:60
+lifeRandom: 30
+fadeOut:true
+attachedToUnit:true
+color: #7000FF
+fadeInTime:24
+scaleFrom:0.3
+scaleTo:0.6
+alpha:0.6
+drawUnderUnits:false
+atmospheric:true
+dirOffsetRandom:180
+xSpeedAbsoluteRandom:0.2
+ySpeedAbsoluteRandom:0.2
+xSpeedRelative:-0.4
+delayedStartTimer: 60
+delayedStartTimerRandom: 20
+xOffsetRelative: -8
+yOffsetRelative: -46
+[effect_雾气右]
+@copyFromSection: effect_雾气左
+image:ROOT:数据/贴图/特效/雾气1.png
+xSpeedRelative:0.4
+xOffsetRelative: 8
+[effect_光圈]
+image:ROOT:数据/贴图/特效/光圈.png
+life: 30
+priority: high
+dirOffsetRandom:40
+dirSpeed: 2
+dirSpeedRandom: 1
+scaleFrom: 0.4
+scaleTo: 0
+fadeInTime: 20
+fadeOut: true
+attachedToUnit: true
+color: #AABBFFEE
+alpha:2
+alsoPlaySound: ROOT:数据/音效/缓冲.ogg
+alsoEmitEffects: 涟漪位移,涟漪,光晕1,光晕2,粒子1,粒子2,粒子3,爆炸粒子*36,光爆,击中闪光,扭曲,震荡波
+[effect_涟漪位移]
+priority: high
+drawType: displacement
+image: SHARED:ripple_normal_128.png
+life: 40
+fadeOut: true
+fadeInTime: 3
+attachedToUnit: false
+color: #FFFFFF
+scaleFrom: 1.5
+scaleTo: 0
+alpha: 0.2
+drawUnderUnits:false
+dirOffsetRandom: 180
+dirSpeed: 1
+delayedStartTimer: 10
+[effect_涟漪]
+priority: high
+image: ROOT:数据/贴图/特效/涟漪紫.png
+life: 55
+fadeOut: true
+fadeInTime: 8
+attachedToUnit: false
+scaleFrom: 1.2
+scaleTo: 0
+alpha: 0.5
+drawUnderUnits:false
+dirOffsetRandom: 180
+dirSpeed: 1
+delayedStartTimer: 20
+alsoEmitEffectsOnDeath: 超级爆炸
+[effect_光晕1]
+priority: high
+image: ROOT:数据/贴图/特效/光晕.png
+life: 40
+fadeOut: true
+fadeInTime: 6
+attachedToUnit: false
+scaleFrom: 1.8
+scaleTo: 0
+alpha: 0.8
+drawUnderUnits:false
+dirOffsetRandom: 180
+dirSpeed: 1
+delayedStartTimer: 10
+[effect_光晕2]
+@copyFromSection: effect_光晕1
+life: 20
+delayedStartTimer: 30
+[effect_粒子1]
+image: ROOT:数据/贴图/特效/粒子紫.png
+life: 40
+fadeOut: true
+attachedToUnit: false
+alpha: 0.2
+drawUnderUnits:false
+delayedStartTimer: 0
+scaleFrom: 1
+scaleTo: 0
+fadeInTime: 20
+fadeOut: false
+priority: high
+dirOffsetRandom: 180
+[effect_粒子2]
+@copyFromSection: effect_粒子1
+life: 30
+scaleFrom: 1.5
+scaleTo: 0
+fadeInTime: 12
+delayedStartTimer: 20
+[effect_粒子3]
+@copyFromSection: effect_粒子1
+life: 30
+scaleFrom: 1.25
+scaleTo: 0
+fadeInTime: 16
+delayedStartTimer: 40
+[effect_爆炸粒子]
+image: ROOT:数据/贴图/特效/光粒.png
+life: 30
+lifeRandom: 30
+fadeOut:true
+color:#FFFFFF
+fadeInTime:2
+scaleFrom:0.6
+scaleTo:0.6
+alpha:1
+drawUnderUnits:false
+liveAfterAttachedDies:false
+xSpeedRelativeRandom: 4.8
+ySpeedRelativeRandom: 4.8
+delayedStartTimer: 40
+atmospheric: true
+dirOffsetRandom: 180
+dirSpeedRandom: 32
+[effect_超级爆炸]
+life:180
+hOffset:0
+dirOffset:0
+fadeInTime:0
+fadeOut:false
+image: ROOT:数据/贴图/特效/超级爆炸紫.png
+total_frames:30
+animateFrameStart:0
+animateFrameEnd:30
+animateFramePingPong:false
+animateFrameSpeed:0.4
+scaleTo:1.8
+scaleFrom:1.8
+priority:veryhigh
+attachedToUnit:false
+dirOffsetRandom: 180
+alsoPlaySound: ROOT:数据/音效/超级爆炸.ogg: 0.6
+[effect_光爆]
+priority:critical
+life:60
+image: ROOT:数据/贴图/特效/光爆.png
+fadeOut:true
+attachedToUnit:false
+scaleFrom:2.4
+scaleTo:1
+alpha:0.4
+drawUnderUnits:false
+alwayStartDirAtZero: true
+delayedStartTimer: 40
+[effect_击中闪光]
+priority:high
+image:SHARED:light_50.png
+
+life:90
+fadeOut:true
+attachedToUnit:false
+color:#F9E3FF
+scaleFrom:8
+scaleTo:7
+alpha:0.4
+drawUnderUnits:false
+fadeOut:true
+delayedStartTimer: 40
+[effect_扭曲]
+drawType: displacement
+image: SHARED:shockwave_normal_128.png
+fadeInTime: 6
+fadeOut: true
+life: 90
+scaleFrom: 2
+scaleTo: 2
+alpha: 0.4
+drawUnderUnits:false
+dirSpeed: 10
+dirOffsetRandom: 180
+delayedStartTimer: 40
+[effect_震荡波]
+drawType: displacement
+image: SHARED:shockwave_normal_128.png
+life: 30
+fadeOut: true
+fadeInTime: 12
+attachedToUnit: false
+color: #FFFFFF
+scaleFrom: 0
+scaleTo: 1.56
+alpha: 0.05
+alwayStartDirAtZero: true
+delayedStartTimer: 40

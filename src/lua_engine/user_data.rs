@@ -1,6 +1,6 @@
 use crate::{
     add_field_function_fields, add_field_method_fields,
-    assets::mods::{info::ModInfo, js::JsAsset},
+    assets::mods::js::JsAsset,
 };
 use bevy::ecs::resource::Resource;
 use mlua::{FromLua, MetaMethod, UserData, UserDataFields, UserDataMethods};
@@ -59,7 +59,7 @@ impl UserData for ModManager {
             },
         );
         // Constructor
-        methods.add_meta_function(MetaMethod::Call, |_, ()| Ok(ModInfo::default()));
+        methods.add_meta_function(MetaMethod::Call, |_, ()| Ok(ModManager::default()));
         methods.add_meta_method(MetaMethod::ToString, |lua, this, ()| {
             lua.create_string(format!("{this:#?}"))
         });
@@ -82,7 +82,30 @@ impl UserData for MapManager {
             Ok(())
         });
         // Constructor
-        methods.add_meta_function(MetaMethod::Call, |_, ()| Ok(ModInfo::default()));
+        methods.add_meta_function(MetaMethod::Call, |_, ()| Ok(MapManager::default()));
+        methods.add_meta_method(MetaMethod::ToString, |lua, this, ()| {
+            lua.create_string(format!("{this:#?}"))
+        });
+    }
+}
+
+#[derive(Debug, Resource, Default, Deserialize, Serialize, Clone, FromLua)]
+pub struct NavigatorLayerManager {
+    pub layers_path: Vec<String>,
+}
+
+impl UserData for NavigatorLayerManager {
+    fn add_fields<F: UserDataFields<Self>>(fields: &mut F) {
+        add_field_method_fields!(fields { layers_path });
+        add_field_function_fields!(fields { layers_path });
+    }
+    fn add_methods<M: UserDataMethods<Self>>(methods: &mut M) {
+        methods.add_method_mut("add_layers", |_, ud, path: String| {
+            ud.layers_path.push(path);
+            Ok(())
+        });
+        // Constructor
+        methods.add_meta_function(MetaMethod::Call, |_, ()| Ok(NavigatorLayerManager::default()));
         methods.add_meta_method(MetaMethod::ToString, |lua, this, ()| {
             lua.create_string(format!("{this:#?}"))
         });

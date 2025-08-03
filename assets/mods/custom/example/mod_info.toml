@@ -1,5 +1,6 @@
 name = "example"
 version = "0.1"
 game_version = "0.1"
-author = "shishanyue"
+description = "example"
+author = ["十山月"]
 uuid = "1813a358-ca4c-4996-b92e-be1d0e17937f"

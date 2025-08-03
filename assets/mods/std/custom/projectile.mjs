@@ -1,5 +1,3 @@
-export class Projectile{
-    constructor(){
-        
-    }
+export class Projectile {
+  constructor() {}
 }

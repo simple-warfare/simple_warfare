@@ -1,0 +1,61 @@
+[core]
+copyFrom: ROOT:模板/建造单位.template
+[canBuild_基地]
+name: [T2]指挥中心
+pos: 5.1
+isVisible: if numberOfUnitsInTeam(withTag="基地",lessThan=1,incompleteBuildings=true)
+[canBuild_基础]
+name: [T1]资源抽取器, [T1]科研基地, [T1]脉石熔炉, [T1]炮塔, [T1]防空塔, [T1]陆军工厂, [T1]空军工厂, [T1]海军工厂, [T1]激光防御, [T1]修复湾, [T1]补给站, [T1]资源制造仪, [T1]立方合成仪
+pos: 5.1
+isLocked: if not self.globalTeamTags(includes="锘钢阵营")
+isLockedMessage:-锁定-\n需要阵营为[锘钢]
+[canBuild_1阶核心]
+name: [T1]机甲工厂
+pos: 5.1
+
+[canBuild_T2]
+@copyFromSection: template_科技锁2
+name: [T2]资源制造仪
+pos: 5.2
+@define lock:2阶资源
+isVisible: if self.tags(includes="T2") or self.tags(includes="T3")
+[canBuild_2阶炮塔]
+@copyFromSection: template_科技锁2
+name: [T2]防空导弹, [T2]机枪炮塔, [T2]火炮塔
+pos: 5.2
+@define lock:2阶核心
+isVisible: if self.tags(includes="T2") or self.tags(includes="T3")
+[canBuild_2阶核心]
+@copyFromSection: template_科技锁2
+name: [T2]资源抽取器, [T2]陆军工厂, [T2]空军工厂
+pos: 5.2
+@define lock:2阶核心
+isVisible: if self.tags(includes="T2") or self.tags(includes="T3")
+[canBuild_2阶机甲工厂]
+@copyFromSection: template_科技锁2
+name: [T2]机甲工厂
+pos: 5.2
+@define lock:2阶核心
+isVisible: if self.tags(includes="T2") or self.tags(includes="T3")
+[canBuild_2阶海军工厂]
+@copyFromSection: template_科技锁2
+name: [T2]海军工厂
+pos: 5.2
+[canBuild_战争工厂]
+@copyFromSection: template_科技锁2
+name: [T3]战争工厂
+pos: 5.3
+@define lock:3阶战争工厂
+isVisible: if self.tags(includes="T2") or self.tags(includes="T3")
+[canBuild_核能防御装置]
+@copyFromSection: template_科技锁2
+name: [T3]核能防御装置, [T3]铁幕防御装置
+pos: 5.3
+@define lock:3阶战略防御
+isVisible: if self.tags(includes="T2") or self.tags(includes="T3")
+[canBuild_核弹发射井]
+@copyFromSection: template_科技锁2
+name: [T3]核弹发射井
+pos: 5.3
+@define lock:3阶战略核武
+isVisible: if self.tags(includes="T2") or self.tags(includes="T3")
