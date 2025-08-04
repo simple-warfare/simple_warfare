@@ -11,11 +11,11 @@ export class Sunflower extends CustomUnit {
   constructor() {
     super();
 
-    let core = sw.fs.readFile("mods/custom/example/tank/core.toml");
+    let core = sw.fs.readFile(this,"mods/custom/example/tank/core.toml");
     let main_graphic = sw.fs.readFile(
       "mods/custom/example/tank/graphics/main.toml"
     );
-    let movement = sw.fs.readFile("mods/custom/example/tank/movement.toml");
+    let movement = sw.fs.readFile(this,"mods/custom/example/tank/movement.toml");
 
     this.core = manyFromTomls.core(core);
     this.graphics.push(manyFromTomls.graphic(main_graphic));

@@ -44,8 +44,13 @@ pub(super) fn process_js_event(
 ) -> JsResult<()> {
     let context = &mut engine.context;
     let module_map = &mut engine.module_map;
+    let custom_typed_id_generator = &mut engine.custom_typed_id_generator;
+
     match event {
         JsEngineRequestEvent::LoadMod(custom_mod_asset) => {
+            let custom_typed_id = *custom_typed_id_generator;
+            *custom_typed_id_generator += 1;
+
             let mod_info = custom_mod_asset.info.clone();
             for CustomModEnableJs {
                 js_asset,
@@ -75,33 +80,69 @@ pub(super) fn process_js_event(
                     }
                 }
                 // 将模块添加到模块映射中
-                if let Some(modules) = module_map.get_mut(&mod_info.name) {
-                    modules.push(ModModule::new(module.clone(), enable_class));
-                } else {
-                    module_map.insert(
-                        mod_info.name.clone(),
-                        vec![ModModule::new(module.clone(), enable_class)],
-                    );
-                }
+                module_map
+                    .entry_ref(&mod_info.name)
+                    .or_insert(vec![])
+                    .push(ModModule::new(module.clone(), enable_class));
+                let module_path = module.path().unwrap().to_string_lossy().into_owned();
+                context
+                    .realm()
+                    .host_defined_mut()
+                    .get_mut::<ModulePathToCustomTypedIdMap>()
+                    .unwrap()
+                    .map
+                    .borrow_mut()
+                    .insert(module_path, custom_typed_id);
             }
         }
         JsEngineRequestEvent::SpawnUnit { unit_id, unit_str } => {
             let unit_from: Vec<&str> = unit_str.split(':').collect();
             if let Some(modules) = module_map.get(unit_from[0]) {
-                for module in modules {
+                for mod_module in modules {
                     let target_class = unit_from[1].to_string();
-                    if module.classes.contains(&target_class) {
-                        let module_path =
-                            module.module.path().unwrap().to_string_lossy().into_owned();
-                        let class = module
+                    if mod_module.classes.contains(&target_class) {
+                        let module_path = mod_module
+                            .module
+                            .path()
+                            .unwrap()
+                            .to_string_lossy()
+                            .into_owned();
+
+                        let custom_typed_id = *context
+                            .realm()
+                            .host_defined()
+                            .get::<ModulePathToCustomTypedIdMap>()
+                            .unwrap()
+                            .map
+                            .borrow()
+                            .get(&module_path)
+                            .unwrap();
+
+                        let class = mod_module
                             .module
                             .namespace(context)
                             .get(js_string!(unit_from[1]), context)?;
 
+                        let module_parent_path = Path::new(&module_path)
+                            .parent()
+                            .unwrap()
+                            .to_string_lossy()
+                            .to_string();
                         let class_obj = class
                             .to_object(context)?
-                            .construct(&[], None, context)
+                            .construct(
+                                &[JsValue::String(js_string!(module_parent_path))],
+                                None,
+                                context,
+                            )
                             .expect("construct error");
+
+                        class_obj.set(
+                            js_string!("typedId"),
+                            JsValue::Integer(custom_typed_id),
+                            false,
+                            context,
+                        )?;
 
                         let unit_proxy = JsProxy::from_object(
                             class_obj
@@ -143,6 +184,7 @@ pub(super) fn process_js_event(
                                 unit_id,
                                 entity,
                                 module_path,
+                                custom_typed_id,
                             )))
                             .unwrap();
                     }
@@ -294,9 +336,22 @@ pub(super) fn process_js_event(
             }
         },
         JsEngineRequestEvent::InsertCustomInnerInfo {
+            custom_typed_id,
             entity,
             custom_inner_info,
-        } => todo!(),
+        } => {
+            context
+                .realm()
+                .host_defined_mut()
+                .get_mut::<CustomInnerInfoMap>()
+                .unwrap()
+                .map
+                .borrow_mut()
+                .entry(custom_typed_id)
+                .or_insert((vec![entity], Arc::new(custom_inner_info)))
+                .0
+                .push(entity);
+        }
     }
     Ok(())
 }

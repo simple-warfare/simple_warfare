@@ -11,6 +11,11 @@ pub mod map;
 pub mod ui;
 pub mod unit;
 
+pub type CustomTypedId = i32;
+
+#[derive(Debug, Component)]
+pub struct CustomTypedIdStorage(pub CustomTypedId);
+
 #[derive(Debug, Default, Clone)]
 pub struct CustomModHandle {
     pub info: Handle<ModInfo>,

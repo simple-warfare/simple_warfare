@@ -22,8 +22,6 @@ fn setup(
     map_assets: Res<Assets<TiledMapAsset>>,
     custom_grid_layers_server: Res<CustomGridLayersServer>,
 ) {
-    info!("TiledMapCreated");
-    info!("custom gird:{:?}", custom_grid_layers_server.layer);
 
     let map = trigger.get_map_asset(&map_assets).unwrap();
     let tilemap_size = map.tilemap_size;

@@ -16,14 +16,15 @@ use crate::custom::unit::way_point::WayPointQueue;
 #[derive(Event)]
 pub struct NewSpawnedUnit(pub Entity);
 
-#[derive(Debug, Component)]
+#[derive(Debug, Component, Clone)]
 pub struct CustomInnerInfo {
     pub module_parent_path: String,
     pub module_path: String,
 }
 
 impl CustomInnerInfo {
-    pub fn new(module_path: String) -> Self {
+    pub fn new(module_path: impl Into<String>) -> Self {
+        let module_path = module_path.into();
         Self {
             module_parent_path: Path::new(&module_path)
                 .parent()

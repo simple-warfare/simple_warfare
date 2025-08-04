@@ -11,17 +11,21 @@ use bevy::{platform::collections::HashMap, prelude::*};
 use boa_engine::{js_string, prelude::*, property::Attribute};
 use boa_runtime::Console;
 
-use crate::js_engine::{
-    event::{JsEngineRequestEvent, JsEngineResponseEvent},
-    host_defined::*,
-    loader::SimpleWarfareModuleLoader,
-    module::ModModule,
-    sw::{Sw, SwRequestEvent, SwResponseEvent},
+use crate::{
+    custom::CustomTypedId,
+    js_engine::{
+        event::{JsEngineRequestEvent, JsEngineResponseEvent},
+        host_defined::*,
+        loader::SimpleWarfareModuleLoader,
+        module::ModModule,
+        sw::{Sw, SwRequestEvent, SwResponseEvent},
+    },
 };
 
 pub struct JsEngine {
     pub(super) context: Context,
     pub(super) module_map: HashMap<String, Vec<ModModule>>,
+    pub(super) custom_typed_id_generator: CustomTypedId,
 }
 
 impl JsEngine {
@@ -56,6 +60,7 @@ impl JsEngine {
         Self {
             context,
             module_map: HashMap::new(),
+            custom_typed_id_generator: 0,
         }
     }
 }
@@ -123,4 +128,7 @@ fn insert_host_defined_data(ctx: &mut Context) {
     ctx.realm()
         .host_defined_mut()
         .insert(CustomInnerInfoMap::default());
+    ctx.realm()
+        .host_defined_mut()
+        .insert(ModulePathToCustomTypedIdMap::default());
 }

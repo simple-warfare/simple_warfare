@@ -4,7 +4,7 @@ use bevy::{platform::collections::HashMap, prelude::Entity};
 use boa_engine::{object::builtins::JsProxy, prelude::*};
 use rustc_hash::FxHashMap;
 
-use crate::custom::unit::CustomInnerInfo;
+use crate::custom::{CustomTypedId, unit::CustomInnerInfo};
 
 #[derive(Default, Trace, Finalize, JsData)]
 pub struct UnitMap {
@@ -46,5 +46,11 @@ pub struct SignalEntityMap {
 #[derive(Default, Trace, Finalize, JsData)]
 pub struct CustomInnerInfoMap {
     #[unsafe_ignore_trace]
-    pub map: Rc<RefCell<FxHashMap<Entity, Arc<CustomInnerInfo>>>>,
+    pub map: Rc<RefCell<FxHashMap<CustomTypedId, (Vec<Entity>, Arc<CustomInnerInfo>)>>>,
+}
+
+#[derive(Default, Trace, Finalize, JsData)]
+pub struct ModulePathToCustomTypedIdMap {
+    #[unsafe_ignore_trace]
+    pub map: Rc<RefCell<FxHashMap<String, CustomTypedId>>>,
 }

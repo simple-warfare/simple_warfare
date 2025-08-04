@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use crate::{
     assets::mods::js::JsAsset,
     custom::{
-        CustomModAsset,
+        CustomModAsset, CustomTypedId,
         unit::{CustomInnerInfo, section::core::Core, unit::SpawnedUnitData},
     },
     js_engine::{
@@ -40,6 +40,7 @@ pub enum JsEngineRequestEvent {
     SynchronizeData(SynchronizeData), //RemoteJsProxy(Box<dyn Fn(JsProxy) -> String + Send + Sync + 'static>),
 
     InsertCustomInnerInfo {
+        custom_typed_id: CustomTypedId,
         entity: Entity,
         custom_inner_info: CustomInnerInfo,
     },

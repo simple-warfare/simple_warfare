@@ -9,8 +9,9 @@ export const UnitType = {
 };
 
 export class CustomUnit extends Synchronize {
-  constructor() {
+  constructor(moduleParentPath) {
     super();
+    this.moduleParentPath = moduleParentPath;
     //this.entity = sw.registerEntity(this)
     this.graphics = new Array();
     this.colliders = new Array();

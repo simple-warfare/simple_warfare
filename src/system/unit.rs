@@ -1,20 +1,24 @@
-use std::path::Path;
-
 use crate::{
-    custom::unit::{
-        CustomUnitInnerInfo, NewSpawnedUnit,
-        physics::EnablePhysics,
-        section::{
-            Section,
-            core::Core,
-            graphic::{Graphic, Graphics},
-            movement::Movement,
+    custom::{
+        CustomTypedIdStorage,
+        unit::{
+            CustomInnerInfo, NewSpawnedUnit,
+            physics::EnablePhysics,
+            section::{
+                Section,
+                core::Core,
+                graphic::{Graphic, Graphics},
+                movement::Movement,
+            },
+            turret::JsTurret,
+            unit::{Custom, CustomUnit},
+            way_point::WayPointQueue,
         },
-        turret::JsTurret,
-        unit::{Custom, CustomUnit},
-        way_point::WayPointQueue,
     },
-    js_engine::event::JsEngineResponseEvent,
+    js_engine::{
+        JsEngineRequestSender,
+        event::{JsEngineRequestEvent, JsEngineResponseEvent},
+    },
     net::shared::UnitMapping,
     spatial::Spatial,
     statistics::*,
@@ -45,12 +49,14 @@ fn check_new_unit(
     mut reader: EventReader<JsEngineResponseEvent>,
     mut writer: EventWriter<NewSpawnedUnit>,
     mut unit_mapping: ResMut<UnitMapping>,
+    js_engine_request_sender: Res<JsEngineRequestSender>,
 ) -> Result {
     for event in reader.read() {
         if let JsEngineResponseEvent::SpawnedUnit { data } = event {
             unit_mapping.add_entity(data.unit_id, data.entity);
 
-            let custom_unit_inner_info = CustomUnitInnerInfo::new(data.module_path);
+            let custom_unit_inner_info = CustomInnerInfo::new(&data.module_path);
+            let custom_typed_id = data.custom_typed_id;
 
             let unit_entity = data.entity;
             let core = &data.section.core;
@@ -59,13 +65,21 @@ fn check_new_unit(
             let point_lights = &data.section.point_lights;
             let turrets = &data.section.turrets;
 
+            js_engine_request_sender
+                .0
+                .send(JsEngineRequestEvent::InsertCustomInnerInfo {
+                    entity: unit_entity,
+                    custom_inner_info: custom_unit_inner_info.clone(),
+                    custom_typed_id,
+                })?;
+
             let turret_entities: Vec<Entity> = turrets
                 .data
                 .iter()
                 .map(|turret| {
-                    let turret_image = turret.image;
+                    let turret_image = &turret.image;
 
-                    let image_path = custom_unit_inner_info.get_real_path(turret_image.path);
+                    let image_path = custom_unit_inner_info.get_real_path(&turret_image.path);
 
                     let anchor = turret.image.anchor();
                     let sprite = Sprite {
@@ -89,7 +103,13 @@ fn check_new_unit(
 
             commands
                 .entity(unit_entity)
-                .insert((Name::new(&core.name), CustomUnit, Custom, EnablePhysics))
+                .insert((
+                    Name::new(core.name.clone()),
+                    CustomTypedIdStorage(custom_typed_id),
+                    CustomUnit,
+                    Custom,
+                    EnablePhysics,
+                ))
                 .insert((
                     data.section.clone(),
                     EnablePhysics,
@@ -102,15 +122,6 @@ fn check_new_unit(
                     LinearDamping(0.8),
                     ExternalForce::default().with_persistence(false),
                     ComputedMass::new(core.mass),
-                    Sprite {
-                        image: asset_server.load(
-                            Path::new(module_path)
-                                .parent()
-                                .unwrap()
-                                .join(graphics.data[0].path.clone()),
-                        ),
-                        ..Default::default()
-                    },
                 ))
                 .add_children(&turret_entities)
                 .with_children(|parent| {

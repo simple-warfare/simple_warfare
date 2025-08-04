@@ -48,7 +48,6 @@ fn check_custom_layers_ready(
         };
 
         if let Some(custom_grid_layers) = custom_grid_layers_assets.get(id) {
-            info!("{:?}", custom_grid_layers);
             *laod_ready_calculator += 1;
             custom_grid_layers_server.add_layer(custom_grid_layers.clone());
         } else {

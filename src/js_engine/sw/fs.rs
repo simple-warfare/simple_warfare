@@ -1,4 +1,7 @@
-use std::sync::{Arc, mpsc::Sender};
+use std::{
+    path::Path,
+    sync::{Arc, mpsc::Sender},
+};
 
 use boa_engine::{js_string, object::ObjectInitializer, prelude::*, property::Attribute};
 
@@ -16,17 +19,28 @@ impl Fs {
         let read_file = unsafe {
             let sw_request_sender = sw_request_sender.clone();
             NativeFunction::from_closure(move |_referrer, args, ctx| {
-                // Js入参中第一个应该为文件路径
-                let Some(path_str) = args.first() else {
-                    return Ok(JsValue::undefined());
+                // Js入参中第二个应该为文件路径
+                let Some(this) = args.first() else {
+                    return Ok(JsValue::Boolean(false));
                 };
+                let Some(small_path) = args.get(1) else {
+                    return Ok(JsValue::Boolean(false));
+                };
+
+                let this_object = this.to_object(ctx)?;
+                let module_path = this_object
+                    .get(js_string!("moduleParentPath"), ctx)?
+                    .to_string(ctx)?
+                    .to_std_string_lossy();
+
+                let module_path = Path::new(&module_path);
+
+                let real_path = module_path.join(small_path.to_string(ctx)?.to_std_string_lossy());
+
                 // 一次性管道用于接受加载好的文件
                 let (sender, receiver) = oneshot::channel();
                 sw_request_sender
-                    .send(SwRequestEvent::ReadFile(
-                        Box::new(sender),
-                        path_str.to_string(ctx)?.to_std_string_lossy(),
-                    ))
+                    .send(SwRequestEvent::ReadFile(Box::new(sender), real_path))
                     .unwrap();
                 if let Ok(string) = receiver.recv() {
                     Ok(JsValue::String(js_string!(string)))

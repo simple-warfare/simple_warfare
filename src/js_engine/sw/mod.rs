@@ -11,9 +11,12 @@ use boa_engine::{
     property::Attribute,
     value::{TryFromJs, TryIntoJs},
 };
-use std::sync::{
-    Arc, Mutex,
-    mpsc::{Receiver, Sender},
+use std::{
+    path::PathBuf,
+    sync::{
+        Arc, Mutex,
+        mpsc::{Receiver, Sender},
+    },
 };
 
 use crate::{
@@ -42,7 +45,7 @@ pub struct Sw;
 #[derive(Event)]
 pub enum SwRequestEvent {
     RegisterEntity,
-    ReadFile(Box<oneshot::Sender<String>>, String),
+    ReadFile(Box<oneshot::Sender<String>>, PathBuf),
     CreateQuickUi(QuickUi),
 }
 
@@ -395,23 +398,7 @@ impl Sw {
                     let entity =
                         JsEntity::try_from_js(&object.get(js_string!("entity"), ctx)?, ctx)?
                             .to_entity();
-                    let custom_inner_info = ctx
-                        .realm()
-                        .host_defined()
-                        .get::<CustomInnerInfoMap>()
-                        .unwrap()
-                        .map
-                        .borrow()
-                        .get(&entity)
-                        .unwrap()
-                        .clone();
 
-                    object.set(
-                        js_string!("moduleParentPath"),
-                        JsValue::String(js_string!(custom_inner_info.module_parent_path.as_str())),
-                        false,
-                        ctx,
-                    )?;
                     Ok(JsValue::Boolean(true))
                 } else {
                     Ok(JsValue::Boolean(false))
@@ -447,6 +434,7 @@ impl Sw {
         .function(get_proxy, js_string!("getProxy"), 1)
         .function(alter_target_state, js_string!("alterTargetState"), 3)
         .function(synchronize, js_string!("synchronize"), 2)
+        .function(bind_inner_info, js_string!("bindInnerInfo"), 1)
         .property(js_string!("fs"), fs, Attribute::CONFIGURABLE)
         .build()
     }

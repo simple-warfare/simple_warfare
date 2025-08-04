@@ -8,14 +8,12 @@ import { ComfirmDialog } from "std:ui/quick/dialog/comfirm.mjs";
 import { stringify } from "package:smol-toml/index.js";
 
 export class Tank extends CustomUnit {
-  constructor() {
-    super();
+  constructor(moduleParentPath) {
+    super(moduleParentPath);
 
-    let core = sw.fs.readFile("mods/custom/example/tank/core.toml");
-    let main_graphic = sw.fs.readFile(
-      "mods/custom/example/tank/graphics/main.toml"
-    );
-    let movement = sw.fs.readFile("mods/custom/example/tank/movement.toml");
+    let core = sw.fs.readFile(this, "core.toml");
+    let main_graphic = sw.fs.readFile(this, "graphics/main.toml");
+    let movement = sw.fs.readFile(this, "movement.toml");
 
     this.core = manyFromTomls.core(core);
     this.graphics.push(manyFromTomls.graphic(main_graphic));
