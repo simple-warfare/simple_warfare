@@ -1,238 +1,134 @@
-use bevy::{platform::collections::HashMap, prelude::*};
-use bevy_ecs_tiled::prelude::*;
+//! Avian physics backend for bevy_ecs_tiled.
+//!
+//! This module provides an implementation of the [`TiledPhysicsBackend`] trait using the Avian 2D physics engine.
+//! This backend is only available when the `avian` feature is enabled.
+//!
+//! # Example
+//!
+//! ```rust,no_run
+//! use bevy::prelude::*;
+//! use bevy_ecs_tiled::prelude::*;
+//!
+//! App::new()
+//!     .add_plugins(TiledPhysicsPlugin::<TiledPhysicsAvianBackend>::default());
+//! ```
+//!
+use bevy::prelude::*;
+use bevy_ecs_tiled::prelude::{
+    ColliderCreated, MultiPolygon, TiledEvent, TiledPhysicsBackend, multi_polygon_as_line_strings,
+    multi_polygon_as_triangles,
+};
 use parry2d::{
-    math::{Isometry, Real},
+    math::{Isometry, Point, Real},
     shape::SharedShape,
 };
-use tiled::{ObjectLayerData, ObjectShape};
-use vleue_navigator2d::prelude::{CachableObstacle, CachedObstacle, SharedShapeStorage};
+use vleue_navigator2d::prelude::*;
 
-#[derive(Default, Debug, Clone, Reflect)]
+/// The [`TiledPhysicsBackend`] to use for Parry 2D integration.
+///
+/// This enum allows you to select how colliders are generated from Tiled shapes:
+/// - [`TiledPhysicsParryBackend::Polyline`]: Aggregates all line strings into a single polyline collider.
+/// - [`TiledPhysicsParryBackend::Triangulation`]: Triangulates polygons and aggregates triangles into a compound collider.
+/// - [`TiledPhysicsParryBackend::LineStrip`]: Creates a separate linestrip collider for each line string.
+#[derive(Default, Reflect, Copy, Clone, Debug)]
 #[reflect(Default, Debug)]
-pub struct SimpleWarfarePhysicsBackend;
+pub enum TiledPhysicsParryBackend {
+    #[default]
+    /// Aggregates all [`LineString`]s into a single collider using [`SharedShape::polyline`].
+    Polyline,
+    /// Performs triangulation and produces a single collider by aggregating multiple [`SharedShape::triangle`]s.
+    Triangulation,
+    /// Produces several linestrip colliders, one for each line string.
+    LineStrip,
+}
 
-impl TiledPhysicsBackend for SimpleWarfarePhysicsBackend {
+impl TiledPhysicsBackend for TiledPhysicsParryBackend {
     fn spawn_colliders(
         &self,
         commands: &mut Commands,
-        tiled_map: &TiledMap,
-        filter: &TiledNameFilter,
-        collider: &TiledCollider,
-        anchor: &TilemapAnchor,
-    ) -> Vec<TiledColliderSpawnInfos> {
-        info!("Spawning colliders for: {:?}", collider);
-        match collider {
-            TiledCollider::Object {
-                layer_id: _,
-                object_id: _,
-            } => {
-                let Some(object) = collider.get_object(tiled_map) else {
-                    return vec![];
-                };
+        _source: &TiledEvent<ColliderCreated>,
+        multi_polygon: &MultiPolygon<f32>,
+    ) -> Vec<Entity> {
+        let mut out = vec![];
+        match self {
+            TiledPhysicsParryBackend::Triangulation => {
+                let shared_shapes = multi_polygon_as_triangles(multi_polygon)
+                    .iter()
+                    .map(|([a, b, c], centroid)| {
+                        (
+                            Isometry::<Real>::new((*centroid).into(), 0.),
+                            SharedShape::triangle((*a).into(), (*b).into(), (*c).into()),
+                        )
+                    })
+                    .collect::<Vec<_>>();
 
-                match object.get_tile() {
-                    Some(object_tile) => object_tile.get_tile().and_then(|tile| {
-                        let Some(object_layer_data) = &tile.collision else {
-                            return None;
-                        };
-                        let mut composables = HashMap::new();
-                        let mut spawn_infos = vec![];
-                        compose_tiles(
-                            commands,
-                            filter,
-                            object_layer_data,
-                            Vec2::ZERO,
-                            get_grid_size(&tiled_map.map),
-                            &mut composables,
-                            &mut spawn_infos,
-                        );
-                        if !composables.is_empty() {
-                            composables.iter().for_each(|(user_type, composables)| {
-                                let shared_shape = SharedShape::compound(composables.to_vec());
-
-                                spawn_infos.push(TiledColliderSpawnInfos {
-                                    name: format!("{}[ComposedTile]", user_type),
-                                    entity: commands
-                                        .spawn((
-                                            CachedObstacle::<SharedShapeStorage>::new(
-                                                SharedShapeStorage::from(shared_shape),
-                                            ),
-                                            CachableObstacle,
-                                        ))
-                                        .id(),
-                                    transform: Transform::default(),
-                                });
-                            });
-                        };
-                        Some(spawn_infos)
-                    }),
-                    None => get_position_and_shape(&object.shape).map(|(pos, shared_shape, _)| {
-                        let iso = Isometry3d::from_rotation(Quat::from_rotation_z(
-                            f32::to_radians(-object.rotation),
-                        )) * Isometry3d::from_xyz(pos.x, pos.y, 0.);
-
-                        vec![TiledColliderSpawnInfos {
-                            name: format!("Custom[Object={}]", object.name),
-                            entity: commands
-                                .spawn((
-                                    CachedObstacle::<SharedShapeStorage>::new(
-                                        SharedShapeStorage::from(shared_shape),
-                                    ),
-                                    CachableObstacle,
-                                ))
-                                .id(),
-                            transform: Transform::from_isometry(iso),
-                        }]
-                    }),
+                if !shared_shapes.is_empty() {
+                    let shared_shape = SharedShape::compound(shared_shapes);
+                    out.push(
+                        commands
+                            .spawn((
+                                Name::from("Avian[Triangulation]"),
+                                CachedObstacle::<SharedShapeStorage>::new(
+                                    SharedShapeStorage::from(shared_shape),
+                                ),
+                                CachableObstacle,
+                            ))
+                            .id(),
+                    );
                 }
-                .unwrap_or_default()
             }
-
-            TiledCollider::TilesLayer { layer_id: _ } => {
-                let mut composables = HashMap::new();
-                let mut spawn_infos = vec![];
-                for (tile_position, tile) in collider.get_tiles(tiled_map, anchor) {
-                    if let Some(collision) = &tile.collision {
-                        compose_tiles(
-                            commands,
-                            filter,
-                            collision,
-                            tile_position,
-                            get_grid_size(&tiled_map.map),
-                            &mut composables,
-                            &mut spawn_infos,
+            TiledPhysicsParryBackend::LineStrip => {
+                multi_polygon_as_line_strings(multi_polygon)
+                    .iter()
+                    .enumerate()
+                    .for_each(|(i, ls)| {
+                        let shared_shape = SharedShape::polyline(
+                            ls.points().map(|v| Point::new(v.x(), v.y())).collect(),
+                            None,
                         );
-                    }
-                }
-                if !composables.is_empty() {
-                    composables.iter().for_each(|(user_type, composables)| {
-                        let shared_shape = SharedShape::compound(composables.to_vec());
-
-                        spawn_infos.push(TiledColliderSpawnInfos {
-                            name: format!("{}[ComposedTile]", user_type),
-                            entity: commands
+                        out.push(
+                            commands
                                 .spawn((
+                                    Name::from(format!("Avian[LineStrip {i}]")),
                                     CachedObstacle::<SharedShapeStorage>::new(
                                         SharedShapeStorage::from(shared_shape),
                                     ),
                                     CachableObstacle,
                                 ))
                                 .id(),
-                            transform: Transform::default(),
+                        );
+                    });
+            }
+            TiledPhysicsParryBackend::Polyline => {
+                let mut vertices = vec![];
+                let mut indices = vec![];
+                multi_polygon_as_line_strings(multi_polygon)
+                    .iter()
+                    .for_each(|ls| {
+                        ls.lines().for_each(|l| {
+                            let points = l.points();
+                            let len = vertices.len();
+                            vertices.push(Point::new(points.0.x(), points.0.y()));
+                            vertices.push(Point::new(points.1.x(), points.1.y()));
+                            indices.push([len as u32, (len + 1) as u32]);
                         });
                     });
+                if !vertices.is_empty() {
+                    let shared_shape = SharedShape::polyline(vertices, Some(indices));
+                    out.push(
+                        commands
+                            .spawn((
+                                Name::from("Avian[Polyline]"),
+                                CachedObstacle::<SharedShapeStorage>::new(
+                                    SharedShapeStorage::from(shared_shape),
+                                ),
+                                CachableObstacle,
+                            ))
+                            .id(),
+                    );
                 }
-                spawn_infos
             }
         }
-    }
-}
-
-fn compose_tiles(
-    commands: &mut Commands,
-    filter: &TiledNameFilter,
-    object_layer_data: &ObjectLayerData,
-    tile_offset: Vec2,
-    grid_size: TilemapGridSize,
-    composables: &mut HashMap<String, Vec<(Isometry<Real>, SharedShape)>>,
-    spawn_infos: &mut Vec<TiledColliderSpawnInfos>,
-) {
-    for object in object_layer_data.object_data() {
-        if !filter.contains(&object.name) {
-            continue;
-        }
-        let position = tile_offset
-            // Object position
-            + Vec2 {
-                x: object.x - grid_size.x / 2.,
-                y: (grid_size.y - object.y) - grid_size.y / 2.,
-            };
-        if let Some((shape_offset, shared_shape, is_composable)) =
-            get_position_and_shape(&object.shape)
-        {
-            if is_composable {
-                let iso_and_shape = (
-                    Isometry::<Real>::new(position.into(), f32::to_radians(-object.rotation))
-                        * Isometry::<Real>::new(shape_offset.into(), 0.),
-                    shared_shape,
-                );
-                composables
-                    .entry_ref(&object.user_type)
-                    .or_insert(vec![])
-                    .push(iso_and_shape);
-            } else {
-                let iso = Isometry3d::from_xyz(position.x, position.y, 0.)
-                    * Isometry3d::from_rotation(Quat::from_rotation_z(f32::to_radians(
-                        -object.rotation,
-                    )));
-
-                spawn_infos.push(TiledColliderSpawnInfos {
-                    name: "Custom[ComplexTile]".to_string(),
-                    entity: commands
-                        .spawn((
-                            CachedObstacle::<SharedShapeStorage>::new(SharedShapeStorage::from(
-                                shared_shape,
-                            )),
-                            CachableObstacle,
-                        ))
-                        .id(),
-                    transform: Transform::from_isometry(iso),
-                });
-            }
-        }
-    }
-}
-
-fn get_position_and_shape(shape: &ObjectShape) -> Option<(Vec2, SharedShape, bool)> {
-    match shape {
-        ObjectShape::Rect { width, height } => {
-            let shape = SharedShape::cuboid(width / 2., height / 2.);
-            let pos = Vec2::new(width / 2., -height / 2.);
-            Some((pos, shape, true))
-        }
-        ObjectShape::Ellipse { width, height } => {
-            let shape = if width > height {
-                SharedShape::capsule(
-                    Vec2::new((-width + height) / 2., 0.).into(),
-                    Vec2::new((width - height) / 2., 0.).into(),
-                    height / 2.,
-                )
-            } else {
-                SharedShape::capsule(
-                    Vec2::new(0., (-height + width) / 2.).into(),
-                    Vec2::new(0., (height - width) / 2.).into(),
-                    width / 2.,
-                )
-            };
-            let pos = Vec2::new(width / 2., -height / 2.);
-            Some((pos, shape, true))
-        }
-        ObjectShape::Polyline { points } => {
-            let vertices = points
-                .iter()
-                .map(|(x, y)| Vec2::new(*x, -*y))
-                .map(|v| v.into())
-                .collect();
-            let shape = SharedShape::polyline(vertices, None);
-            Some((Vec2::ZERO, shape, false))
-        }
-        ObjectShape::Polygon { points } => {
-            if points.len() < 3 {
-                return None;
-            }
-
-            let vertices = points
-                .iter()
-                .map(|(x, y)| Vec2::new(*x, -*y))
-                .map(|v| v.into())
-                .collect();
-            let indices = (0..points.len() as u32 - 1)
-                .map(|i| [i, i + 1])
-                .chain([[points.len() as u32 - 1, 0]])
-                .collect();
-            let shape = SharedShape::polyline(vertices, Some(indices));
-            Some((Vec2::ZERO, shape, false))
-        }
-        _ => None,
+        out
     }
 }

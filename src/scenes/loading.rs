@@ -1,4 +1,4 @@
-use std::sync::{Arc, atomic::Ordering};
+use std::sync::atomic::Ordering;
 
 use bevy::prelude::*;
 use bevy_fly_camera::FlyCamera2d;
@@ -92,12 +92,14 @@ fn check_js_and_map(
                 mod_server.load_mod(custom_mod_asset)?;
                 Ok(())
             })?;
-        let mut all_maps = game_asset
+        let mut all_maps: Vec<_> = game_asset
             .custom_mod_handles
             .mod_handles
             .iter()
-            .flat_map(|custom_mod| custom_mod.maps.iter().cloned().map(Arc::new))
+            .flat_map(|custom_mod| custom_mod.maps.iter())
+            .cloned()
             .collect();
+        
         game_asset.maps.append(&mut all_maps);
 
         app_state.set(AppState::SomeAsyncWork);

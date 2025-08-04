@@ -1216,6 +1216,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "bevy_ecs_tiled"
+version = "0.8.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a392dfe0f266e09addc2f5c3c8d361c81b8a1eaa3a51c88cacb231cf50bebc73"
+dependencies = [
+ "bevy",
+ "bevy_ecs_tilemap",
+ "futures-lite 2.6.0",
+ "geo",
+ "log",
+ "regex",
+ "thiserror 2.0.12",
+ "tiled",
+]
+
+[[package]]
 name = "bevy_ecs_tilemap"
 version = "0.16.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2166,6 +2182,31 @@ checksum = "72c7c6c4e6a3d5415b3a29a17bd20c17cd0e2f068b96b24e263316d58d5346ea"
 dependencies = [
  "bevy",
  "serde",
+]
+
+[[package]]
+name = "bevy_trickfilm"
+version = "0.11.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "99c4f40d911ffa8555a6fa9e2c7bfd5a7c2237bb6d843bb8d8ac82d5391939c8"
+dependencies = [
+ "bevy",
+ "bevy_trickfilm_derive",
+ "ron",
+ "serde",
+ "thiserror 1.0.69",
+]
+
+[[package]]
+name = "bevy_trickfilm_derive"
+version = "0.10.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6559f8392b309e0b25bf7f63b715cffa12ebeb4e43500959495ea3730564527b"
+dependencies = [
+ "bevy_macro_utils",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.104",
 ]
 
 [[package]]
@@ -8113,7 +8154,7 @@ dependencies = [
  "bevy_async_task",
  "bevy_defer",
  "bevy_ecs_ldtk",
- "bevy_ecs_tiled",
+ "bevy_ecs_tiled 0.8.0",
  "bevy_ecs_tilemap",
  "bevy_fly_camera",
  "bevy_hanabi",
@@ -8128,6 +8169,7 @@ dependencies = [
  "bevy_seedling",
  "bevy_spatial",
  "bevy_spritesheet_animation",
+ "bevy_trickfilm",
  "bevy_tween",
  "bevy_web_asset",
  "bevy_webgate",
@@ -9521,7 +9563,7 @@ version = "0.12.0"
 source = "git+https://github.com/simple-warfare/vleue_navigator2d.git#eaf0e47126df14e92e29fd949bf7f96912ad3c6b"
 dependencies = [
  "bevy",
- "bevy_ecs_tiled",
+ "bevy_ecs_tiled 0.7.5",
  "bevy_ecs_tilemap",
  "bitflags 2.9.1",
  "itertools 0.14.0",

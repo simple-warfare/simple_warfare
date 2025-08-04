@@ -1,11 +1,11 @@
 use crate::{
-    assets::map::{ldtk::LdtkMap, tiled::TiledMap},
+    assets::map::tiled::SimpleWarfareMap,
     bevy_ext::app::AppExt,
     mod_engine::server::ModServer,
     statistics::{MapState, NetState, SelectedMap},
 };
 use bevy::prelude::*;
-use bevy_ecs_tiled::{map::TiledMapHandle, prelude::TilemapAnchor};
+use bevy_ecs_tiled::prelude::*;
 
 use super::{Scene, SceneState};
 
@@ -23,8 +23,7 @@ impl Scene for GameScene {
 
 fn setup(
     mut commands: Commands,
-    ldtk_maps: Res<Assets<LdtkMap>>,
-    tiled_maps: Res<Assets<TiledMap>>,
+    simple_warfare_maps: Res<Assets<SimpleWarfareMap>>,
     asset_server: Res<AssetServer>,
     selected_map: Res<SelectedMap>,
     mut mod_server: ResMut<ModServer>,
@@ -34,7 +33,15 @@ fn setup(
     net_state.set(NetState::HostServer);
     map_state.set(MapState::CreatingMap);
     commands.spawn((
-        TiledMapHandle(asset_server.load(selected_map.0.get_path(&tiled_maps, &ldtk_maps))),
+        TiledMap(
+            asset_server.load(
+                simple_warfare_maps
+                    .get(selected_map.0.id())
+                    .unwrap()
+                    .map_path
+                    .as_path(),
+            ),
+        ),
         TilemapAnchor::Center,
     ));
     mod_server.want_spawn_unit("example:Tank");

@@ -1,10 +1,7 @@
 use crate::{
     assets::{
         GameAsset,
-        map::{
-            ldtk::LdtkMap,
-            tiled::{TiledMap, TiledMapInfo},
-        },
+        map::tiled::{SimpleWarfareMap, SimpleWarfareMapInfo},
         texture::{
             TextureAtlasLayoutHandles,
             dialog::{DialogAtlasKind, DialogTextureSlicer},
@@ -42,13 +39,17 @@ enum ButtonLabel {
 fn setup(
     mut commands: Commands,
     game_asset: Res<GameAsset>,
-    tiled_maps: Res<Assets<TiledMap>>,
-    ldtk_maps: Res<Assets<LdtkMap>>,
-    tiled_map_infos: Res<Assets<TiledMapInfo>>,
+    simple_warfare_maps: Res<Assets<SimpleWarfareMap>>,
+    simple_warfare_map_infos: Res<Assets<SimpleWarfareMapInfo>>,
     texture_atlas_layout_handles: Res<TextureAtlasLayoutHandles>,
     dialog_texture_slicer: Res<DialogTextureSlicer>,
     selected_map: Res<SelectedMap>,
 ) {
+    let simple_warfare_map = simple_warfare_maps.get(selected_map.0.id()).unwrap();
+    let simple_warfare_info = simple_warfare_map
+        .get_map_info(&simple_warfare_map_infos)
+        .unwrap();
+
     let main_menu_slicer = &dialog_texture_slicer.main_menu;
     let dialog_layout = &texture_atlas_layout_handles.dialog;
     let dialog = &game_asset.interface.dialog;
@@ -214,12 +215,7 @@ fn setup(
                                 justify_self: JustifySelf::Center,
                                 ..Default::default()
                             },
-                            ImageNode::new(
-                                selected_map
-                                    .0
-                                    .get_thumbnail(&tiled_maps, &ldtk_maps)
-                                    .clone()
-                            ),
+                            ImageNode::new(simple_warfare_map.map_thumbnail_handle.clone()),
                         )]
                     ),
                     (
@@ -230,12 +226,7 @@ fn setup(
                             justify_self: JustifySelf::Center,
                             ..Default::default()
                         },
-                        create_text(
-                            &selected_map
-                                .0
-                                .get_title(&tiled_maps, &ldtk_maps, &tiled_map_infos),
-                            10.
-                        )
+                        create_text(&simple_warfare_info.title, 10.)
                     ),
                     create_button("Change Map", 15., ButtonLabel::ChangeMap)
                 ]

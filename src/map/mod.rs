@@ -7,14 +7,14 @@ use bevy_ecs_tiled::prelude::*;
 
 use crate::map::{
     navigator::SimpleWarfareNavigatorPlugin, northstar::SimpleWarfareNorthStarPlugin,
-    physics::SimpleWarfarePhysicsBackend,
+    physics::TiledPhysicsParryBackend,
 };
 
 pub struct MapPlugin;
 
 impl Plugin for MapPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins(TiledPhysicsPlugin::<SimpleWarfarePhysicsBackend>::default())
+        app.add_plugins(TiledPhysicsPlugin::<TiledPhysicsParryBackend>::default())
             .add_plugins(SimpleWarfareNorthStarPlugin);
     }
 }

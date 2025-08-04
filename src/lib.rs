@@ -39,7 +39,7 @@ use bevy::{
 };
 use bevy_aseprite_ultra::AsepriteUltraPlugin;
 use bevy_ecs_ldtk::prelude::*;
-use bevy_ecs_tiled::TiledMapPlugin;
+use bevy_ecs_tiled::tiled::TiledPlugin;
 use bevy_fly_camera::FlyCameraPlugin;
 use bevy_hui::prelude::*;
 use bevy_inspector_egui::{
@@ -99,16 +99,8 @@ impl Plugin for SimpleWarfarePlugin {
             .add_plugins(StateInspectorPlugin::<SceneState>::default())
             .add_plugins(FlyCameraPlugin)
             //.add_plugins(PanicHandler::new().build())
-            .add_plugins(LdtkPlugin)
             .add_plugins(AsepriteUltraPlugin)
-            .insert_resource(LevelSelection::default())
-            .insert_resource(LdtkSettings {
-                level_spawn_behavior: LevelSpawnBehavior::UseWorldTranslation {
-                    load_level_neighbors: true,
-                },
-                ..Default::default()
-            })
-            .add_plugins(TiledMapPlugin::default())
+            .add_plugins(TiledPlugin::default())
             .add_plugins(Light2dPlugin)
             .add_plugins(SeedlingPlugin::default())
             .add_plugins(SimpleWarfarePlugins)

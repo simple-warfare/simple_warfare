@@ -8,7 +8,6 @@ use mlua::{Lua, ObjectLike, Table};
 use crate::{
     assets::{
         GameAsset,
-        map::SimpleWarfareMap,
         mods::{ModSet, info::*, lua::*},
     },
     consts::CUSTOM_MOD_PATH,
@@ -172,11 +171,7 @@ fn exec_mod_main_lua(
                         let (map, untyped) = match ext.to_string_lossy().trim() {
                             "tmx" => {
                                 let map = asset_server.load(real_map_path);
-                                (SimpleWarfareMap::Tiled(map.clone()), map.untyped())
-                            }
-                            "ldtk" => {
-                                let map = asset_server.load(real_map_path);
-                                (SimpleWarfareMap::Ldtk(map.clone()), map.untyped())
+                                (map.clone(), map.untyped())
                             }
                             _ => return Err(BevyError::from("undefine map type")),
                         };

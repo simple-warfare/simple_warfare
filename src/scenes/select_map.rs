@@ -1,16 +1,10 @@
-use std::sync::Arc;
-
 use bevy::{color::palettes::css::*, prelude::*};
 use serde::{Deserialize, Serialize};
 
 use crate::{
     assets::{
         GameAsset,
-        map::{
-            SimpleWarfareMap,
-            ldtk::LdtkMap,
-            tiled::{TiledMap, TiledMapInfo},
-        },
+        map::tiled::{SimpleWarfareMap, SimpleWarfareMapInfo},
         texture::{
             TextureAtlasLayoutHandles,
             chrome::{ChromeAtlasKind, ChromeTextureSlicer},
@@ -180,13 +174,12 @@ fn setup(
 }
 
 #[derive(Debug, Component, Clone)]
-pub struct MapPointer(Arc<SimpleWarfareMap>);
+pub struct MapPointer(Handle<SimpleWarfareMap>);
 
 fn show_map(
     mut commands: Commands,
-    ldtk_maps: Res<Assets<LdtkMap>>,
-    tiled_maps: Res<Assets<TiledMap>>,
-    tiled_map_infos: Res<Assets<TiledMapInfo>>,
+    simple_warfare_maps: Res<Assets<SimpleWarfareMap>>,
+    simple_warfare_map_infos: Res<Assets<SimpleWarfareMapInfo>>,
     game_asset: Res<GameAsset>,
     texture_atlas_layout_handles: Res<TextureAtlasLayoutHandles>,
     dialog_texture_slicer: Res<DialogTextureSlicer>,
@@ -197,70 +190,70 @@ fn show_map(
     let light_blue_rect_slicer = &dialog_texture_slicer.light_blue_rect;
     let text_style = TextFont::from_font_size(10.);
 
-    let create_map = |map: Arc<SimpleWarfareMap>| match map.as_ref() {
-        SimpleWarfareMap::Ldtk(map_handle) => todo!(),
-        SimpleWarfareMap::Tiled(map_handle) => {
-            let tiled_map = tiled_maps.get(map_handle.id()).unwrap();
-            let tiled_map_info = tiled_map_infos.get(tiled_map.info.id()).unwrap();
+    let create_map = |map: Handle<SimpleWarfareMap>| {
+        let simple_warfare_map = simple_warfare_maps.get(map.id()).unwrap();
 
-            let thumbnail = tiled_map.thumbnail.clone();
-            (
-                Node {
-                    display: Display::Grid,
-                    width: Val::Percent(100.),
-                    height: Val::Percent(100.),
-                    padding: UiRect::all(Val::Px(6.)),
-                    align_content: AlignContent::Center,
-                    justify_content: JustifyContent::SpaceAround,
-                    align_items: AlignItems::Center,
-                    flex_direction: FlexDirection::Column,
-                    ..Default::default()
+        let tiled_map_info = simple_warfare_map
+            .get_map_info(&simple_warfare_map_infos)
+            .unwrap();
+
+        let thumbnail = simple_warfare_map.map_thumbnail_handle.clone();
+        (
+            Node {
+                display: Display::Grid,
+                width: Val::Percent(100.),
+                height: Val::Percent(100.),
+                padding: UiRect::all(Val::Px(6.)),
+                align_content: AlignContent::Center,
+                justify_content: JustifyContent::SpaceAround,
+                align_items: AlignItems::Center,
+                flex_direction: FlexDirection::Column,
+                ..Default::default()
+            },
+            Button,
+            MapPointer(map.clone()),
+            ImageNode::from_atlas_image(
+                dialog.clone(),
+                TextureAtlas {
+                    layout: dialog_layout.clone(),
+                    index: DialogAtlasKind::LightBlueRect as usize,
                 },
-                Button,
-                MapPointer(map.clone()),
-                ImageNode::from_atlas_image(
-                    dialog.clone(),
-                    TextureAtlas {
-                        layout: dialog_layout.clone(),
-                        index: DialogAtlasKind::LightBlueRect as usize,
-                    },
-                )
-                .with_mode(NodeImageMode::Sliced(light_blue_rect_slicer.clone())),
-                children![
-                    (
-                        Node {
-                            display: Display::Grid,
-                            width: Val::Percent(90.),
-                            max_height: Val::Percent(80.),
-                            aspect_ratio: Some(1.),
-                            border: UiRect::all(Val::Px(10.)),
-                            align_content: AlignContent::Center,
-                            justify_content: JustifyContent::Center,
-                            ..Default::default()
-                        },
-                        ImageNode::new(thumbnail.clone()),
-                    ),
-                    (
-                        Node {
-                            display: Display::Grid,
-                            width: Val::Percent(90.),
-                            max_height: Val::Percent(20.),
-                            padding: UiRect::all(Val::Px(10.)),
-                            align_content: AlignContent::Center,
-                            justify_content: JustifyContent::Center,
-                            ..Default::default()
-                        },
-                        Text::new(&tiled_map_info.title),
-                        text_style.clone(),
-                        TextLayout {
-                            justify: JustifyText::Center,
-                            linebreak: LineBreak::AnyCharacter
-                        },
-                        TextColor(Color::Srgba(WHITE),)
-                    )
-                ],
             )
-        }
+            .with_mode(NodeImageMode::Sliced(light_blue_rect_slicer.clone())),
+            children![
+                (
+                    Node {
+                        display: Display::Grid,
+                        width: Val::Percent(90.),
+                        max_height: Val::Percent(80.),
+                        aspect_ratio: Some(1.),
+                        border: UiRect::all(Val::Px(10.)),
+                        align_content: AlignContent::Center,
+                        justify_content: JustifyContent::Center,
+                        ..Default::default()
+                    },
+                    ImageNode::new(thumbnail.clone()),
+                ),
+                (
+                    Node {
+                        display: Display::Grid,
+                        width: Val::Percent(90.),
+                        max_height: Val::Percent(20.),
+                        padding: UiRect::all(Val::Px(10.)),
+                        align_content: AlignContent::Center,
+                        justify_content: JustifyContent::Center,
+                        ..Default::default()
+                    },
+                    Text::new(&tiled_map_info.title),
+                    text_style.clone(),
+                    TextLayout {
+                        justify: JustifyText::Center,
+                        linebreak: LineBreak::AnyCharacter
+                    },
+                    TextColor(Color::Srgba(WHITE),)
+                )
+            ],
+        )
     };
 
     commands
@@ -278,23 +271,25 @@ fn show_map(
 fn observer_click(
     click: Trigger<Pointer<Click>>,
     mut commands: Commands,
-    tiled_maps: Res<Assets<TiledMap>>,
-    tiled_map_infos: Res<Assets<TiledMapInfo>>,
+    simple_warfare_maps: Res<Assets<SimpleWarfareMap>>,
+    simple_warfare_map_infos: Res<Assets<SimpleWarfareMapInfo>>,
     map_pointers: Query<&MapPointer>,
     mut map_title_viewer: Single<&mut Text, With<MapTitleViewer>>,
     buttons: Query<&ButtonLabel, With<Button>>,
     mut scene_state: ResMut<NextState<SceneState>>,
 ) {
     if let Ok(map_pointer) = map_pointers.get(click.target()) {
-        commands.insert_resource(SelectedMap(map_pointer.0.clone()));
-        match map_pointer.0.as_ref() {
-            SimpleWarfareMap::Ldtk(handle) => todo!(),
-            SimpleWarfareMap::Tiled(map_handle) => {
-                let tiled_map = tiled_maps.get(map_handle.id()).unwrap();
-                let tiled_map_info = tiled_map_infos.get(tiled_map.info.id()).unwrap();
-                *map_title_viewer.as_deref_mut() = tiled_map_info.title.clone();
-            }
-        }
+        let simple_warfare_map_handle = &map_pointer.0;
+        commands.insert_resource(SelectedMap(simple_warfare_map_handle.clone()));
+        let simple_warfare_map = simple_warfare_maps
+            .get(simple_warfare_map_handle.id())
+            .unwrap();
+
+        let tiled_map_info = simple_warfare_map
+            .get_map_info(&simple_warfare_map_infos)
+            .unwrap();
+
+        *map_title_viewer.as_deref_mut() = tiled_map_info.title.clone();
     } else if let Ok(lable) = buttons.get(click.target()) {
         match lable {
             ButtonLabel::Ok => scene_state.set(SceneState::GameScene),

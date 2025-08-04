@@ -1,6 +1,6 @@
 use crate::{
     assets::{
-        map::SimpleWarfareMap,
+        map::tiled::SimpleWarfareMap,
         mods::{info::ModInfo, js::JsAsset, lua::LuaAsset},
     },
     custom::map::navigator_layer::{NavigatorLayerPlugin, northstar::CustomGridLayersServer},
@@ -15,7 +15,7 @@ pub mod unit;
 pub struct CustomModHandle {
     pub info: Handle<ModInfo>,
     pub main_lua: Handle<LuaAsset>,
-    pub maps: Vec<SimpleWarfareMap>,
+    pub maps: Vec<Handle<SimpleWarfareMap>>,
     pub custom_mod_enable_js_handles: Vec<CustomModEnableJsHandle>,
 }
 

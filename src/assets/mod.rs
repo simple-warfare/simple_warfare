@@ -5,7 +5,7 @@ pub mod map;
 pub mod mods;
 pub mod texture;
 
-use std::{path::Path, sync::Arc};
+use std::path::Path;
 
 use bevy::prelude::*;
 
@@ -14,10 +14,9 @@ use crate::{
         byte::{ByteFile, ByteFileLoader},
         custom::map::grid_layers::{CustomGridLayers, CustomGridLayersLoader},
         js_file::{JsTomlFile, JsTomlFileLoader},
-        map::{
-            SimpleWarfareMap,
-            ldtk::{LdtkMap, LdtkMapLoader},
-            tiled::{TiledMap, TiledMapInfo, TiledMapInfoLoader, TiledMapLoader},
+        map::tiled::{
+            SimpleWarfareMap, SimpleWarfareMapInfo, SimpleWarfareMapInfoLoader,
+            SimpleWarfareMapLoader,
         },
         mods::{
             ModSet, ModSetLoader, ModSetNowUseConf, ModSetNowUseConfLoader, info::*, js::*, lua::*,
@@ -70,7 +69,7 @@ define_asset_group!(Interfaces<Image>{
 #[derive(Debug, Default, Resource)]
 pub struct GameAsset {
     pub interface: Interfaces,
-    pub maps: Vec<Arc<SimpleWarfareMap>>,
+    pub maps: Vec<Handle<SimpleWarfareMap>>,
     pub enable_mod_set: EnableModSet,
     pub custom_mod_handles: CustomModHandles,
     pub custom_mods: Option<Vec<CustomModAsset>>,
@@ -99,12 +98,10 @@ impl Plugin for AssetsPlugin {
             .init_asset_loader::<LuaAssetLoader>()
             .init_asset::<JsAsset>()
             .init_asset_loader::<JsAssetLoader>()
-            .init_asset::<LdtkMap>()
-            .init_asset_loader::<LdtkMapLoader>()
-            .init_asset::<TiledMap>()
-            .init_asset_loader::<TiledMapLoader>()
-            .init_asset::<TiledMapInfo>()
-            .init_asset_loader::<TiledMapInfoLoader>()
+            .init_asset::<SimpleWarfareMap>()
+            .init_asset_loader::<SimpleWarfareMapLoader>()
+            .init_asset::<SimpleWarfareMapInfo>()
+            .init_asset_loader::<SimpleWarfareMapInfoLoader>()
             .init_asset::<ModSetNowUseConf>()
             .init_asset_loader::<ModSetNowUseConfLoader>()
             .init_asset::<ModSet>()

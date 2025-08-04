@@ -8,10 +8,7 @@ use bevy_defer::{AsyncAccess, AsyncWorld};
 use bevy_webgate::{BevyWebServerPlugin, RouterAppExt};
 
 use crate::{
-    assets::{
-        byte::ByteFile,
-        map::{ldtk::LdtkMap, tiled::TiledMap},
-    },
+    assets::{byte::ByteFile, map::tiled::SimpleWarfareMap},
     statistics::SelectedMap,
 };
 
@@ -70,15 +67,15 @@ pub(super) async fn get_thumbnail_from_this() -> impl IntoResponse {
 }
 
 fn get_thumbnail(
-    tiled_maps: Res<Assets<TiledMap>>,
-    ldtk_maps: Res<Assets<LdtkMap>>,
+    simple_warfare_maps: Res<Assets<SimpleWarfareMap>>,
     selected_map: Res<SelectedMap>,
     asset_server: Res<AssetServer>,
 ) -> Handle<ByteFile> {
     asset_server.load::<ByteFile>(
-        selected_map
-            .0
-            .get_thumbnail(&tiled_maps, &ldtk_maps)
+        simple_warfare_maps
+            .get(selected_map.0.id())
+            .unwrap()
+            .map_thumbnail_handle
             .path()
             .unwrap(),
     )

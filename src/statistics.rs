@@ -4,7 +4,7 @@ use bevy::prelude::*;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    assets::map::SimpleWarfareMap,
+    assets::map::tiled::SimpleWarfareMap,
     consts::{GAME_VERSION, GAME_VERSION_TYPE},
 };
 
@@ -75,7 +75,7 @@ pub enum NetServerState {
 }
 
 #[derive(Debug, Resource)]
-pub struct SelectedMap(pub Arc<SimpleWarfareMap>);
+pub struct SelectedMap(pub Handle<SimpleWarfareMap>);
 
 #[derive(Resource, Default, Debug)]
 pub struct SelectionState {

@@ -48,6 +48,10 @@ avian2d = { version = "0.3.0", features = [
 bevy_spritesheet_animation = { git = "https://github.com/merwaaan/bevy_spritesheet_animation", features = [
     "custom_cursor",
 ] }
+
+bevy_trickfilm = "0.11.0"
+
+
 bevy_tween = "0.9.0"
 serde_json = "1.0.140"
 rustc-hash = "2.1.1"
@@ -63,12 +67,13 @@ bevy_hanabi = { version = "0.16", default-features = false, features = [
     "2d",
     "serde",
 ] }
+
 bevy_hui = { git = "https://github.com/shishanyue/bevy_hui.git" }
 bevy_hui_widgets = "0.3.0"
 bevy_spatial = "0.11.0"
 bevy_aseprite_ultra = "0.6.1"
 fluent = "0.17.0"
-bevy_ecs_tiled = { version = "0.7.4", features = ["atlas", "physics"] }
+bevy_ecs_tiled = { version = "0.8.0", features = ["atlas", "physics"] }
 bevy_ecs_tilemap = "0.16.0"
 tiled = { version = "0.14.0", features = ["world"] }
 parry2d = { version = "0.22.0" }

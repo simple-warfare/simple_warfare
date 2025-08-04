@@ -43,14 +43,14 @@ impl Plugin for SimpleWarfareNavigatorPlugin {
     }
 }
 fn setup(
-    trigger: Trigger<TiledMapCreated>,
+    trigger: Trigger<TiledEvent<MapCreated>>,
     mut commands: Commands,
-    map_asset: Res<Assets<TiledMap>>,
+    map_assets: Res<Assets<TiledMapAsset>>,
 ) {
-    let map = &map_asset.get(trigger.asset_id).unwrap().map;
-    let tiled_width = map.tile_width as f32;
-    let tiled_height = map.tile_height as f32;
-    let tilemap_size = map_asset.get(trigger.asset_id).unwrap().tilemap_size;
+    let map_asset = trigger.get_map_asset(&map_assets).unwrap();
+    let tiled_width = map_asset.map.tile_width as f32;
+    let tiled_height = map_asset.map.tile_height as f32;
+    let tilemap_size = map_asset.tilemap_size;
     // Spawn a new navmesh that will be automatically updated.
     commands.spawn((
         NavMeshSettings {

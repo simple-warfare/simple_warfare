@@ -1,10 +1,6 @@
 use crate::{
     assets::{
         GameAsset,
-        map::{
-            ldtk::LdtkMap,
-            tiled::{TiledMap, TiledMapInfo},
-        },
         texture::{
             TextureAtlasLayoutHandles,
             dialog::{DialogAtlasKind, DialogTextureSlicer},
@@ -44,9 +40,6 @@ enum ButtonLabel {
 fn setup(
     mut commands: Commands,
     game_asset: Res<GameAsset>,
-    tiled_maps: Res<Assets<TiledMap>>,
-    ldtk_maps: Res<Assets<LdtkMap>>,
-    tiled_map_infos: Res<Assets<TiledMapInfo>>,
     texture_atlas_layout_handles: Res<TextureAtlasLayoutHandles>,
     dialog_texture_slicer: Res<DialogTextureSlicer>,
 ) {
