@@ -1,6 +1,6 @@
 mod module;
 pub mod user_data;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use bevy::prelude::*;
 use mlua::{Lua, ObjectLike, Table};
@@ -12,7 +12,10 @@ use crate::{
         mods::{ModSet, info::*, lua::*},
     },
     consts::CUSTOM_MOD_PATH,
-    custom::{CustomModEnableJsHandle, CustomModHandle},
+    custom::{
+        CustomModEnableJsHandle, CustomModHandle,
+        map::navigator_layer::northstar::CustomGridLayersServer,
+    },
     lua_engine::user_data::{MapManager, ModManager, NavigatorLayerManager},
     statistics::AppState,
 };
@@ -114,6 +117,7 @@ fn exec_mod_main_lua(
     mut game_asset: ResMut<GameAsset>,
     mut next_state: ResMut<NextState<AppState>>,
     lua_runtime: Res<LuaRuntime>,
+    mut custom_grid_layers_server: ResMut<CustomGridLayersServer>,
 ) -> Result {
     //获取lua环境
     let global = &lua_runtime.global;
@@ -137,7 +141,7 @@ fn exec_mod_main_lua(
                 global.call_function::<()>("Main", ())?;
 
                 //mod初始化完毕
-                let mod_manager = global.get::<ModManager>("mod_manager")?;
+                let mod_manager = global.get::<ModManager>(ModManager::LUA_GLOBAL_NAME)?;
 
                 mod_manager
                     .enables
@@ -159,9 +163,9 @@ fn exec_mod_main_lua(
                         custom_mods.untyped_handles.push(js_handle.untyped());
                     });
 
-                let map_manager = global.get::<MapManager>("map_manager")?;
+                let map_manager = global.get::<MapManager>(MapManager::LUA_GLOBAL_NAME)?;
                 map_manager.map_paths.iter().try_for_each(|map_path| {
-                    let binding = Path::new(CUSTOM_MOD_PATH).join(mod_name).join(map_path);
+                    let binding = get_real_path(mod_name, map_path);
                     let real_map_path = binding.as_path();
 
                     if let Some(ext) = real_map_path.extension() {
@@ -181,6 +185,12 @@ fn exec_mod_main_lua(
                     }
                     Ok(())
                 })?;
+
+                let navigator_layer_manager =
+                    global.get::<NavigatorLayerManager>(NavigatorLayerManager::LUA_GLOBAL_NAME)?;
+                navigator_layer_manager.layers_path.iter().for_each(|path| {
+                    custom_grid_layers_server.new_layer(get_real_path(mod_name, path))
+                });
             }
             Ok(())
         })?;
@@ -194,8 +204,18 @@ fn add_global_value(context: &Lua, global: &Table, mod_info: &ModInfo) -> Result
     let map_manager = context.create_ser_userdata(MapManager::default())?;
     let navigator_layer_manager = context.create_ser_userdata(NavigatorLayerManager::default())?;
     global.set("mod_info", mod_info)?;
-    global.set("mod_manager", mod_manager)?;
-    global.set("map_manager", map_manager)?;
-    global.set("navigator_layer_manager", navigator_layer_manager)?;
+    global.set(ModManager::LUA_GLOBAL_NAME, mod_manager)?;
+    global.set(MapManager::LUA_GLOBAL_NAME, map_manager)?;
+    global.set(
+        NavigatorLayerManager::LUA_GLOBAL_NAME,
+        navigator_layer_manager,
+    )?;
     Ok(())
+}
+
+pub fn get_real_path<P>(mod_name: P, small_path: P) -> PathBuf
+where
+    P: AsRef<Path>,
+{
+    Path::new(CUSTOM_MOD_PATH).join(mod_name).join(small_path)
 }

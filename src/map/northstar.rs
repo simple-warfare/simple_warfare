@@ -3,6 +3,8 @@ use bevy_ecs_tiled::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 use bevy_northstar::prelude::*;
 
+use crate::custom::map::navigator_layer::northstar::CustomGridLayersServer;
+
 pub struct SimpleWarfareNorthStarPlugin;
 
 impl Plugin for SimpleWarfareNorthStarPlugin {
@@ -19,8 +21,10 @@ fn setup(
     trigger: Trigger<TiledMapCreated>,
     mut commands: Commands,
     map_asset: Res<Assets<TiledMap>>,
+    custom_grid_layers_server: Res<CustomGridLayersServer>,
 ) {
     info!("TiledMapCreated");
+    info!("custom gird:{:?}", custom_grid_layers_server.layer);
 
     let map = &map_asset.get(trigger.asset_id).unwrap().map;
     let tilemap_size = map_asset.get(trigger.asset_id).unwrap().tilemap_size;

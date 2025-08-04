@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::sync::{Arc, atomic::Ordering};
 
 use bevy::prelude::*;
 use bevy_fly_camera::FlyCamera2d;
@@ -11,7 +11,7 @@ use crate::{
     },
     bevy_ext::app::AppExt,
     mod_engine::server::ModServer,
-    statistics::AppState,
+    statistics::{AppState, SOME_ASYNC_WORK_NUM, SomeAsyncWorkCalculator},
 };
 use bevy_seedling::prelude::*;
 
@@ -27,6 +27,10 @@ impl Scene for LoadingScene {
             .add_systems(
                 Update,
                 check_js_and_map.run_if(in_state(AppState::JsLoading)),
+            )
+            .add_systems(
+                Update,
+                check_some_async_works_completed.run_if(in_state(AppState::SomeAsyncWork)),
             );
     }
 }
@@ -65,7 +69,6 @@ fn check_js_and_map(
     mut game_asset: ResMut<GameAsset>,
     asset_server: Res<AssetServer>,
     mut app_state: ResMut<NextState<AppState>>,
-    mut scene_state: ResMut<NextState<SceneState>>,
     mod_server: Res<ModServer>,
     js_assets: Res<Assets<JsAsset>>,
     lua_assets: Res<Assets<LuaAsset>>,
@@ -97,8 +100,19 @@ fn check_js_and_map(
             .collect();
         game_asset.maps.append(&mut all_maps);
 
-        app_state.set(AppState::ModLoaded);
-        scene_state.set(SceneState::MainScene);
+        app_state.set(AppState::SomeAsyncWork);
+        //scene_state.set(SceneState::MainScene);
     }
     Ok(())
+}
+
+fn check_some_async_works_completed(
+    some_async_work_calculator: Res<SomeAsyncWorkCalculator>,
+    mut app_state: ResMut<NextState<AppState>>,
+    mut scene_state: ResMut<NextState<SceneState>>,
+) {
+    if some_async_work_calculator.0.load(Ordering::Relaxed) == SOME_ASYNC_WORK_NUM {
+        app_state.set(AppState::AllReady);
+        scene_state.set(SceneState::MainScene);
+    }
 }

@@ -18,7 +18,7 @@ pub mod utils;
 
 use crate::{
     assets::AssetsPlugin,
-    custom::{ui::CustomUiPlugin, unit::CustomUnitPlugin},
+    custom::{CustomPlugin, ui::CustomUiPlugin, unit::CustomUnitPlugin},
     debug::DebugPlugin,
     js_engine::synchronize::SynchronizePlugin,
     lua_engine::LuaEnginePlugin,
@@ -72,7 +72,8 @@ impl PluginGroup for SimpleWarfarePlugins {
             .add(CustomUiPlugin)
             .add(SynchronizePlugin)
             .add(NetPlugin)
-            .add(MapPlugin);
+            .add(MapPlugin)
+            .add(CustomPlugin);
         group
     }
 }

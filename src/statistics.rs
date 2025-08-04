@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::sync::{Arc, atomic::AtomicU8};
 
 use bevy::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -19,6 +19,11 @@ pub enum GameType {
     SandBox,
 }
 
+pub const SOME_ASYNC_WORK_NUM: u8 = 1;
+
+#[derive(Debug, Default, Resource)]
+pub struct SomeAsyncWorkCalculator(pub Arc<AtomicU8>);
+
 #[derive(States, Debug, Hash, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Default, Reflect)]
 pub enum AppState {
     #[default]
@@ -31,7 +36,8 @@ pub enum AppState {
     JsLoading,
     ModLoading,
     ModLoaded,
-    FetchMods,
+    SomeAsyncWork,
+    AllReady,
 }
 #[derive(States, Debug, Hash, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Default, Reflect)]
 pub enum MapState {
@@ -129,6 +135,7 @@ impl Plugin for StatistcsPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<Statistics>()
             .init_resource::<GameInfo>()
+            .init_resource::<SomeAsyncWorkCalculator>()
             .init_state::<MouseState>()
             .init_state::<NetState>()
             .init_state::<AppState>()

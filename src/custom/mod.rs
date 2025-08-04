@@ -3,7 +3,7 @@ use crate::{
         map::SimpleWarfareMap,
         mods::{info::ModInfo, js::JsAsset, lua::LuaAsset},
     },
-    custom::map::navigator_layer::northstar::CustomGridLayers,
+    custom::map::navigator_layer::{NavigatorLayerPlugin, northstar::CustomGridLayersServer},
 };
 use bevy::prelude::*;
 
@@ -107,6 +107,7 @@ pub struct CustomPlugin;
 
 impl Plugin for CustomPlugin {
     fn build(&self, app: &mut App) {
-        app.init_resource::<CustomGridLayers>();
+        app.add_plugins(NavigatorLayerPlugin)
+            .init_resource::<CustomGridLayersServer>();
     }
 }

@@ -1,7 +1,4 @@
-use crate::{
-    add_field_function_fields, add_field_method_fields,
-    assets::mods::js::JsAsset,
-};
+use crate::{add_field_function_fields, add_field_method_fields, assets::mods::js::JsAsset};
 use bevy::ecs::resource::Resource;
 use mlua::{FromLua, MetaMethod, UserData, UserDataFields, UserDataMethods};
 use serde::{Deserialize, Serialize};
@@ -9,6 +6,10 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Deserialize, Serialize, Default, Clone, FromLua)]
 pub struct ModManager {
     pub enables: Vec<ModEnableClassesDefine>,
+}
+
+impl ModManager {
+    pub const LUA_GLOBAL_NAME: &'static str = "mod_manager";
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, FromLua)]
@@ -71,6 +72,10 @@ pub struct MapManager {
     pub map_paths: Vec<String>,
 }
 
+impl MapManager {
+    pub const LUA_GLOBAL_NAME: &'static str = "map_manager";
+}
+
 impl UserData for MapManager {
     fn add_fields<F: UserDataFields<Self>>(fields: &mut F) {
         add_field_method_fields!(fields { map_paths });
@@ -94,6 +99,10 @@ pub struct NavigatorLayerManager {
     pub layers_path: Vec<String>,
 }
 
+impl NavigatorLayerManager {
+    pub const LUA_GLOBAL_NAME: &'static str = "navigator_layer_manager";
+}
+
 impl UserData for NavigatorLayerManager {
     fn add_fields<F: UserDataFields<Self>>(fields: &mut F) {
         add_field_method_fields!(fields { layers_path });
@@ -105,7 +114,9 @@ impl UserData for NavigatorLayerManager {
             Ok(())
         });
         // Constructor
-        methods.add_meta_function(MetaMethod::Call, |_, ()| Ok(NavigatorLayerManager::default()));
+        methods.add_meta_function(MetaMethod::Call, |_, ()| {
+            Ok(NavigatorLayerManager::default())
+        });
         methods.add_meta_method(MetaMethod::ToString, |lua, this, ()| {
             lua.create_string(format!("{this:#?}"))
         });

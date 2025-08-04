@@ -1,4 +1,5 @@
 pub mod byte;
+pub mod custom;
 pub mod js_file;
 pub mod map;
 pub mod mods;
@@ -11,6 +12,7 @@ use bevy::prelude::*;
 use crate::{
     assets::{
         byte::{ByteFile, ByteFileLoader},
+        custom::map::grid_layers::{CustomGridLayers, CustomGridLayersLoader},
         js_file::{JsTomlFile, JsTomlFileLoader},
         map::{
             SimpleWarfareMap,
@@ -109,6 +111,8 @@ impl Plugin for AssetsPlugin {
             .init_asset_loader::<ModSetLoader>()
             .init_asset::<ByteFile>()
             .init_asset_loader::<ByteFileLoader>()
+            .init_asset::<CustomGridLayers>()
+            .init_asset_loader::<CustomGridLayersLoader>()
             .init_resource::<GameAsset>()
             .init_resource::<DialogTextureSlicer>()
             .init_resource::<ChromeTextureSlicer>()
