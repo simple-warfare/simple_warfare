@@ -7,7 +7,10 @@ pub mod turret;
 pub mod unit;
 pub mod way_point;
 
-use std::path::{Path, PathBuf};
+use std::{
+    path::{Path, PathBuf},
+    sync::Arc,
+};
 
 use bevy::prelude::*;
 
@@ -20,6 +23,17 @@ pub struct NewSpawnedUnit(pub Entity);
 pub struct CustomInnerInfo {
     pub module_parent_path: String,
     pub module_path: String,
+}
+
+#[derive(Debug, Component, Clone)]
+pub struct CustomInnerInfoStorage {
+    inner: Arc<CustomInnerInfo>,
+}
+
+impl CustomInnerInfoStorage {
+    pub fn new(inner: Arc<CustomInnerInfo>) -> Self {
+        Self { inner }
+    }
 }
 
 impl CustomInnerInfo {

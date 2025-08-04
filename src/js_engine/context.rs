@@ -348,7 +348,7 @@ pub(super) fn process_js_event(
                 .map
                 .borrow_mut()
                 .entry(custom_typed_id)
-                .or_insert((vec![entity], Arc::new(custom_inner_info)))
+                .or_insert((vec![entity], custom_inner_info))
                 .0
                 .push(entity);
         }

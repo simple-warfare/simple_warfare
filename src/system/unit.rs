@@ -1,8 +1,10 @@
+use std::sync::Arc;
+
 use crate::{
     custom::{
         CustomTypedIdStorage,
         unit::{
-            CustomInnerInfo, NewSpawnedUnit,
+            CustomInnerInfo, CustomInnerInfoStorage, NewSpawnedUnit,
             physics::EnablePhysics,
             section::{
                 Section,
@@ -20,11 +22,13 @@ use crate::{
         event::{JsEngineRequestEvent, JsEngineResponseEvent},
     },
     net::shared::UnitMapping,
+    shared::SharedCutomHandleMapping,
     spatial::Spatial,
     statistics::*,
 };
 use avian2d::prelude::*;
 use bevy::prelude::*;
+use bevy_trickfilm::prelude::*;
 
 pub struct UnitSystemPlugin;
 impl Plugin for UnitSystemPlugin {
@@ -40,6 +44,10 @@ impl Plugin for UnitSystemPlugin {
             .add_systems(
                 FixedUpdate,
                 check_new_unit.run_if(on_event::<JsEngineResponseEvent>),
+            )
+            .add_systems(
+                Update,
+                check_new_graphic.run_if(any_with_component::<Graphic>),
             );
     }
 }
@@ -55,10 +63,13 @@ fn check_new_unit(
         if let JsEngineResponseEvent::SpawnedUnit { data } = event {
             unit_mapping.add_entity(data.unit_id, data.entity);
 
-            let custom_unit_inner_info = CustomInnerInfo::new(&data.module_path);
+            let custom_unit_inner_info = Arc::new(CustomInnerInfo::new(&data.module_path));
+            let custom_inner_info_storage =
+                CustomInnerInfoStorage::new(custom_unit_inner_info.clone());
             let custom_typed_id = data.custom_typed_id;
 
             let unit_entity = data.entity;
+
             let core = &data.section.core;
             let graphics = &data.section.graphics;
             let colliders = &data.section.colliders;
@@ -125,6 +136,9 @@ fn check_new_unit(
                 ))
                 .add_children(&turret_entities)
                 .with_children(|parent| {
+                    for graphic in graphics.data.clone().into_iter() {
+                        parent.spawn((graphic, custom_inner_info_storage.clone()));
+                    }
                     for collider in colliders.to_avian2d().drain(..) {
                         parent.spawn(collider);
                     }
@@ -137,4 +151,47 @@ fn check_new_unit(
         }
     }
     Ok(())
+}
+
+fn check_new_graphic(
+    mut commands: Commands,
+    graphic_query: Query<(Entity, &Graphic, &CustomInnerInfoStorage)>,
+    asset_server: Res<AssetServer>,
+    mut shared_cutom_handle_mapping: ResMut<SharedCutomHandleMapping>,
+    mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
+) {
+    for (entity, graphic, custom_inner_info) in graphic_query {
+        let mut entity_commands = commands.entity(entity);
+        let sprite = if let (Some(frame_width), Some(frame_height)) =
+            (graphic.frame_width, graphic.frame_height)
+        {
+            let layout = TextureAtlasLayout::from_grid(
+                UVec2::new(frame_width, frame_height),
+                graphic.width / frame_width,
+                graphic.height / frame_height,
+                None,
+                None,
+            );
+            let texture_atlas_layout = texture_atlas_layouts.add(layout);
+            Sprite {
+                image: asset_server.load(&graphic.path),
+                texture_atlas: Some(TextureAtlas {
+                    layout: texture_atlas_layout.clone(),
+                    ..Default::default()
+                }),
+                ..Default::default()
+            }
+        } else {
+            Sprite {
+                image: asset_server.load(&graphic.path),
+                ..Default::default()
+            }
+        };
+
+        entity_commands.insert(sprite);
+
+        if graphic.easy_animation_path.is_some() {
+            entity_commands.insert(AnimationPlayer2D::default());
+        }
+    }
 }

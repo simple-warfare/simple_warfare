@@ -22,6 +22,10 @@ export class Graphic extends Synchronize {
     this.textureAtlasLayout = textureAtlasLayout;
     this.offset = offset;
   }
+
+  setEasyAnimation(easyAnimation) {
+    this.easyAnimation = easyAnimation;
+  }
 }
 
 export function fromValues(
@@ -50,20 +54,24 @@ export function fromValues(
 }
 
 export function fromToml(tomlString) {
-  let graphic = parse(tomlString);
+  let t = parse(tomlString);
 
-  graphic.path = typeof graphic.path !== "undefined" ? graphic.path : "";
-  graphic.layer = typeof graphic.layer !== "undefined" ? graphic.layer : 0;
-  graphic.offset =
-    typeof graphic.offset !== "undefined" ? graphic.offset : create.vec2();
-  return new Graphic(
-    graphic.width,
-    graphic.height,
-    graphic.path,
-    graphic.layer,
-    graphic.frameWidth,
-    graphic.frameHeight,
-    graphic.textureAtlasLayout,
-    graphic.offset
+  t.path = typeof t.path !== "undefined" ? t.path : "";
+  t.layer = typeof t.layer !== "undefined" ? t.layer : 0;
+  t.offset = typeof t.offset !== "undefined" ? t.offset : create.vec2();
+
+  let graphic = new Graphic(
+    t.width,
+    t.height,
+    t.path,
+    t.layer,
+    t.frameWidth,
+    t.frameHeight,
+    t.textureAtlasLayout,
+    t.offset
   );
+
+  graphic.setEasyAnimation(t.easyAnimation);
+
+  return graphic;
 }

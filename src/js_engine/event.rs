@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use bevy::prelude::*;
 
 use crate::{
@@ -42,7 +44,7 @@ pub enum JsEngineRequestEvent {
     InsertCustomInnerInfo {
         custom_typed_id: CustomTypedId,
         entity: Entity,
-        custom_inner_info: CustomInnerInfo,
+        custom_inner_info: Arc<CustomInnerInfo>,
     },
 }
 

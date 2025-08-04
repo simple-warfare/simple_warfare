@@ -11,6 +11,7 @@ pub mod mod_engine;
 pub mod net;
 pub mod panel;
 pub mod scenes;
+pub mod shared;
 pub mod spatial;
 pub mod statistics;
 pub mod system;
@@ -27,6 +28,7 @@ use crate::{
     net::NetPlugin,
     panel::PanelPlugin,
     scenes::{ScenePlugin, SceneState},
+    shared::SharedCustomPlugin,
     spatial::SpatialPlugin,
     statistics::{AppState, StatistcsPlugin},
     system::SystemPlugin,
@@ -49,6 +51,7 @@ use bevy_light_2d::prelude::*;
 
 //use bevy_panic_handler::PanicHandler;
 use bevy_seedling::SeedlingPlugin;
+use bevy_trickfilm::prelude::*;
 use js_engine::JsEnginePlugin;
 
 pub struct SimpleWarfarePlugins;
@@ -72,7 +75,8 @@ impl PluginGroup for SimpleWarfarePlugins {
             .add(SynchronizePlugin)
             .add(NetPlugin)
             .add(MapPlugin)
-            .add(CustomPlugin);
+            .add(CustomPlugin)
+            .add(SharedCustomPlugin);
         group
     }
 }
@@ -103,6 +107,7 @@ impl Plugin for SimpleWarfarePlugin {
             .add_plugins(Light2dPlugin)
             .add_plugins(SeedlingPlugin::default())
             .add_plugins(SimpleWarfarePlugins)
-            .insert_resource(Gravity(Vec2::ZERO));
+            .insert_resource(Gravity(Vec2::ZERO))
+            .add_plugins(Animation2DPlugin);
     }
 }

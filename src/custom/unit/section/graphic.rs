@@ -1,5 +1,9 @@
 use crate::bevy_ext::try_from_js::*;
-use bevy::{prelude::*, sprite::Anchor};
+use bevy::{
+    ecs::{component::HookContext, world::DeferredWorld},
+    prelude::*,
+    sprite::Anchor,
+};
 use boa_engine::value::TryFromJs;
 use serde::{Deserialize, Serialize};
 
@@ -20,6 +24,8 @@ pub struct Graphic {
     pub texture_atlas_layout: Option<TextureAtlasLayout>,
     #[boa(from_js_with = "vec2_try_from_js")]
     pub offset: Vec2,
+    #[boa(rename = "easyAnimation")]
+    pub easy_animation_path: Option<String>,
 }
 
 impl Graphic {
