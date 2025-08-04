@@ -15,6 +15,6 @@ pub struct MapPlugin;
 impl Plugin for MapPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(TiledPhysicsPlugin::<TiledPhysicsParryBackend>::default())
-            .add_plugins(SimpleWarfareNorthStarPlugin);
+            .add_plugins(SimpleWarfareNavigatorPlugin);
     }
 }

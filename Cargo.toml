@@ -10,11 +10,11 @@ members = ["crates/simple_warfare_macros"]
 
 
 [dependencies]
-thiserror = "2.0.12"
-rand = "0.9.1"
+thiserror = "2"
+rand = "0.9"
 bevy-inspector-egui = "0.31.0"
-serde = "1.0.219"
-toml = "0.9.2"
+serde = "1"
+toml = "0.9"
 mlua = { version = "0.11.1", features = [
     "lua54",
     "async",
@@ -35,7 +35,7 @@ bevy_ecs_ldtk = { version = "0.12.0", features = ["atlas"] }
 rand_core = "0.9.3"
 bevy_rand = "0.11"
 bevy_prng = { version = "0.11.1", features = ["rand_chacha", "wyrand"] }
-bevy_light_2d = "0.6.0"
+bevy_light_2d = "0.7.0"
 bevy_fly_camera = "0.16.0"
 #bevy-panic-handler = "5.0.0"
 avian2d = { version = "0.3.0", features = [

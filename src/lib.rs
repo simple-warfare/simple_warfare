@@ -38,7 +38,6 @@ use bevy::{
     remote::{RemotePlugin, http::RemoteHttpPlugin},
 };
 use bevy_aseprite_ultra::AsepriteUltraPlugin;
-use bevy_ecs_ldtk::prelude::*;
 use bevy_ecs_tiled::tiled::TiledPlugin;
 use bevy_fly_camera::FlyCameraPlugin;
 use bevy_hui::prelude::*;

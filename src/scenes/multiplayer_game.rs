@@ -300,4 +300,3 @@ fn add_observer_for_button(mut commands: Commands, buttons: Query<Entity, With<B
     });
 }
 
-fn refresh_lobby() {}

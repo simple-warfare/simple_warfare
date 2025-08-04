@@ -1560,9 +1560,9 @@ dependencies = [
 
 [[package]]
 name = "bevy_light_2d"
-version = "0.6.0"
+version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "07e9e01c82b56bfab0f194867a23b4d3086c14a55329f381e165f6eb2e5ccf27"
+checksum = "1bffff22dfcac2163b454fec19f4f75b5da0400c26ed2efbd72450e9ee3331b6"
 dependencies = [
  "bevy",
  "smallvec",

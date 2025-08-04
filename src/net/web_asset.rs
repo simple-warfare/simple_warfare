@@ -25,15 +25,9 @@ impl Plugin for SimpleWarfareWebAssetPlugin {
             .route(
                 "/simple_warfare/clinet/get_room_info/thumbnail",
                 axum::routing::get(get_thumbnail_from_this),
-            )
-            .route(
-                "/simple_warfare/clinet/fetch_file/{*path}",
-                axum::routing::get(get_thumbnail_from_this),
             );
     }
 }
-
-pub fn fetch_file(Path(file_path): Path<String>) -> impl IntoResponse {}
 
 pub(super) async fn get_thumbnail_from_this() -> impl IntoResponse {
     let mut headers = HeaderMap::new();
