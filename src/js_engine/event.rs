@@ -4,7 +4,7 @@ use crate::{
     assets::mods::js::JsAsset,
     custom::{
         CustomModAsset,
-        unit::{section::core::Core, unit::SpawnedUnitData},
+        unit::{CustomInnerInfo, section::core::Core, unit::SpawnedUnitData},
     },
     js_engine::{
         global::class::entity::JsEntity,
@@ -38,6 +38,11 @@ pub enum JsEngineRequestEvent {
         signal_entity: Entity,
     },
     SynchronizeData(SynchronizeData), //RemoteJsProxy(Box<dyn Fn(JsProxy) -> String + Send + Sync + 'static>),
+
+    InsertCustomInnerInfo {
+        entity: Entity,
+        custom_inner_info: CustomInnerInfo,
+    },
 }
 
 impl JsEngineRequestEvent {
@@ -74,12 +79,7 @@ impl JsEngineRequestEvent {
 pub enum JsEngineResponseEvent {
     EngineInited,
     //Mod
-    SpawnedUnit {
-        unit_id: UnitId,
-        entity: Entity,
-        module_path: String,
-        data: SpawnedUnitData,
-    },
+    SpawnedUnit { data: SpawnedUnitData },
     ToTeleport(TeleportType),
     ToLook(LookType),
 
@@ -87,18 +87,8 @@ pub enum JsEngineResponseEvent {
 }
 
 impl JsEngineResponseEvent {
-    pub fn spawned_unit(
-        unit_id: UnitId,
-        entity: Entity,
-        module_path: String,
-        data: SpawnedUnitData,
-    ) -> Self {
-        Self::SpawnedUnit {
-            unit_id,
-            entity,
-            module_path,
-            data,
-        }
+    pub fn spawned_unit(data: SpawnedUnitData) -> Self {
+        Self::SpawnedUnit { data }
     }
 }
 

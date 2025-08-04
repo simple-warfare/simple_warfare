@@ -1,8 +1,10 @@
-use std::{cell::RefCell, rc::Rc};
+use std::{cell::RefCell, rc::Rc, sync::Arc};
 
 use bevy::{platform::collections::HashMap, prelude::Entity};
 use boa_engine::{object::builtins::JsProxy, prelude::*};
 use rustc_hash::FxHashMap;
+
+use crate::custom::unit::CustomInnerInfo;
 
 #[derive(Default, Trace, Finalize, JsData)]
 pub struct UnitMap {
@@ -39,4 +41,10 @@ pub struct OnUnitExitSignalMap {
 pub struct SignalEntityMap {
     #[unsafe_ignore_trace]
     pub map: Rc<RefCell<FxHashMap<Entity, JsObject>>>,
+}
+
+#[derive(Default, Trace, Finalize, JsData)]
+pub struct CustomInnerInfoMap {
+    #[unsafe_ignore_trace]
+    pub map: Rc<RefCell<FxHashMap<Entity, Arc<CustomInnerInfo>>>>,
 }

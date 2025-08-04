@@ -120,4 +120,7 @@ fn insert_host_defined_data(ctx: &mut Context) {
         .host_defined_mut()
         .insert(JsObjectMap::default());
     ctx.realm().host_defined_mut().insert(JsProxyMap::default());
+    ctx.realm()
+        .host_defined_mut()
+        .insert(CustomInnerInfoMap::default());
 }

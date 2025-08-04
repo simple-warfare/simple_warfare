@@ -388,6 +388,37 @@ impl Sw {
             })
         };
 
+        let bind_inner_info = unsafe {
+            NativeFunction::from_closure(move |_referrer, args, ctx| {
+                if let Some(object) = args.first() {
+                    let object = object.to_object(ctx)?;
+                    let entity =
+                        JsEntity::try_from_js(&object.get(js_string!("entity"), ctx)?, ctx)?
+                            .to_entity();
+                    let custom_inner_info = ctx
+                        .realm()
+                        .host_defined()
+                        .get::<CustomInnerInfoMap>()
+                        .unwrap()
+                        .map
+                        .borrow()
+                        .get(&entity)
+                        .unwrap()
+                        .clone();
+
+                    object.set(
+                        js_string!("moduleParentPath"),
+                        JsValue::String(js_string!(custom_inner_info.module_parent_path.as_str())),
+                        false,
+                        ctx,
+                    )?;
+                    Ok(JsValue::Boolean(true))
+                } else {
+                    Ok(JsValue::Boolean(false))
+                }
+            })
+        };
+
         let fs = Fs::init(context, sw_request_sender.clone());
 
         ObjectInitializer::with_native_data_and_proto(

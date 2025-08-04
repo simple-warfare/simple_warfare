@@ -2,7 +2,7 @@ use std::path::Path;
 
 use crate::{
     custom::unit::{
-        NewSpawnedUnit,
+        CustomUnitInnerInfo, NewSpawnedUnit,
         physics::EnablePhysics,
         section::{
             Section,
@@ -47,27 +47,25 @@ fn check_new_unit(
     mut unit_mapping: ResMut<UnitMapping>,
 ) -> Result {
     for event in reader.read() {
-        if let JsEngineResponseEvent::SpawnedUnit {
-            unit_id,
-            entity,
-            module_path,
-            data,
-        } = event
-        {
-            unit_mapping.add_entity(*unit_id, *entity);
+        if let JsEngineResponseEvent::SpawnedUnit { data } = event {
+            unit_mapping.add_entity(data.unit_id, data.entity);
+
+            let custom_unit_inner_info = CustomUnitInnerInfo::new(data.module_path);
+
+            let unit_entity = data.entity;
             let core = &data.section.core;
             let graphics = &data.section.graphics;
             let colliders = &data.section.colliders;
             let point_lights = &data.section.point_lights;
             let turrets = &data.section.turrets;
+
             let turret_entities: Vec<Entity> = turrets
                 .data
                 .iter()
                 .map(|turret| {
-                    let image_path = Path::new(module_path)
-                        .parent()
-                        .unwrap()
-                        .join(turret.image.path.clone());
+                    let turret_image = turret.image;
+
+                    let image_path = custom_unit_inner_info.get_real_path(turret_image.path);
 
                     let anchor = turret.image.anchor();
                     let sprite = Sprite {
@@ -80,6 +78,7 @@ fn check_new_unit(
                         .insert((
                             Spatial,
                             Custom,
+                            CustomUnit,
                             sprite,
                             turret.clone(),
                             turret.transform.to_transform(),
@@ -87,14 +86,10 @@ fn check_new_unit(
                         .id()
                 })
                 .collect();
+
             commands
-                .entity(*entity)
-                .insert((
-                    Name::new(core.name.clone()),
-                    CustomUnit,
-                    Custom,
-                    EnablePhysics,
-                ))
+                .entity(unit_entity)
+                .insert((Name::new(&core.name), CustomUnit, Custom, EnablePhysics))
                 .insert((
                     data.section.clone(),
                     EnablePhysics,
@@ -127,7 +122,7 @@ fn check_new_unit(
                     }
                 });
 
-            writer.write(NewSpawnedUnit(*entity));
+            writer.write(NewSpawnedUnit(unit_entity));
         }
     }
     Ok(())

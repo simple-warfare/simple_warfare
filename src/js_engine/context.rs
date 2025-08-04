@@ -138,12 +138,12 @@ pub(super) fn process_js_event(
                             .insert(entity, unit_proxy);
 
                         response_sender
-                            .send(JsEngineResponseEvent::spawned_unit(
+                            .send(JsEngineResponseEvent::spawned_unit(SpawnedUnitData::new(
+                                section,
                                 unit_id,
                                 entity,
                                 module_path,
-                                SpawnedUnitData::new(section),
-                            ))
+                            )))
                             .unwrap();
                     }
                 }
@@ -293,6 +293,10 @@ pub(super) fn process_js_event(
                     )?;
             }
         },
+        JsEngineRequestEvent::InsertCustomInnerInfo {
+            entity,
+            custom_inner_info,
+        } => todo!(),
     }
     Ok(())
 }

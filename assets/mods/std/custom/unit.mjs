@@ -20,6 +20,7 @@ export class CustomUnit extends Synchronize {
     this.core = creates.core();
     this.created = new CreatedSignal();
     this.selected = new SelectedSignal();
+    sw.bindInnerInfo(this);
   }
 
   teleportSelfTo(target) {
