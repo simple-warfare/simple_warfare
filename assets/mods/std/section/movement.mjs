@@ -70,8 +70,8 @@ export function fromValues(
   );
 }
 
-export function fromToml(toml) {
-  let movement = parse(toml);
+export function fromSectionFile(file) {
+  let movement = parse(file.data);
   movement.movementType =
     typeof movement.movementType !== "undefined"
       ? movement.movementType

@@ -1,5 +1,4 @@
-import * as manyFromValues from "std:from-values.mjs";
-import * as manyFromTomls from "std:form-toml.mjs";
+import * as manyFromSectionFiles from "std:from-section-file.mjs";
 import { CustomUnit } from "std:custom/unit.mjs";
 import { CircleCollider, ColliderType } from "std:physics/collider.mjs";
 import { Signal } from "std:signal/signal.mjs";
@@ -11,13 +10,13 @@ export class Tank extends CustomUnit {
   constructor(moduleParentPath) {
     super(moduleParentPath);
 
-    let core = sw.fs.readFile(this, "core.toml");
-    let main_graphic = sw.fs.readFile(this, "graphics/main.toml");
-    let movement = sw.fs.readFile(this, "movement.toml");
+    let core = sw.fs.readSectionFile(this, "core.toml");
+    let main_graphic = sw.fs.readSectionFile(this, "graphics/main.toml");
+    let movement = sw.fs.readSectionFile(this, "movement.toml");
 
-    this.core = manyFromTomls.core(core);
-    this.graphics.push(manyFromTomls.graphic(main_graphic));
-    this.movement = manyFromTomls.movement(movement);
+    this.core = manyFromSectionFiles.core(core);
+    this.graphics.push(manyFromSectionFiles.graphic(main_graphic));
+    this.movement = manyFromSectionFiles.movement(movement);
 
     this.colliders.push(new CircleCollider(ColliderType.Circle, 25));
 

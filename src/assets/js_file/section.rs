@@ -8,6 +8,7 @@ use thiserror::Error;
 #[derive(Debug, Default, Asset, TypePath, Clone, TryFromAndIntoJs)]
 pub struct SectionFile {
     pub data: String,
+    #[boa(rename = "realPath")]
     pub path: String,
     pub crc32: u32,
 }

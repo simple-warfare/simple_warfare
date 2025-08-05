@@ -26,6 +26,8 @@ pub struct Graphic {
     pub offset: Vec2,
     #[boa(rename = "easyAnimation")]
     pub easy_animation_path: Option<String>,
+    #[boa(rename = "realPath")]
+    pub real_path: Option<String>,
 }
 
 impl Graphic {

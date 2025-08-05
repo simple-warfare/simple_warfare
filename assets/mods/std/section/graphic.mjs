@@ -26,6 +26,10 @@ export class Graphic extends Synchronize {
   setEasyAnimation(easyAnimation) {
     this.easyAnimation = easyAnimation;
   }
+
+  setRealPath(realPath) {
+    this.realPath = realPath;
+  }
 }
 
 export function fromValues(
@@ -53,8 +57,8 @@ export function fromValues(
   );
 }
 
-export function fromToml(tomlString) {
-  let t = parse(tomlString);
+export function fromSectionFile(file) {
+  let t = parse(file.data);
 
   t.path = typeof t.path !== "undefined" ? t.path : "";
   t.layer = typeof t.layer !== "undefined" ? t.layer : 0;
@@ -73,5 +77,6 @@ export function fromToml(tomlString) {
 
   graphic.setEasyAnimation(t.easyAnimation);
 
+  graphic.setRealPath(file.realPath);
   return graphic;
 }

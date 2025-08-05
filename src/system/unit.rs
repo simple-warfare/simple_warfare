@@ -190,6 +190,8 @@ fn check_new_graphic(
 
         entity_commands.insert(sprite);
 
+        info!("realPath:{:?}", graphic.real_path);
+
         if graphic.easy_animation_path.is_some() {
             let mut a = AnimationPlayer2D::default();
             a.play(

@@ -49,8 +49,8 @@ export function create() {
   return new Core("None", 0, 0, 0, 0, 0, 0, true);
 }
 
-export function fromToml(toml) {
-  let core = parse(toml);
+export function fromSectionFile(file) {
+  let core = parse(file.data);
   core.name = typeof core.name !== "undefined" ? core.name : "undefinedName";
   core.hp = typeof core.hp !== "undefined" ? core.hp : 0;
   core.maxHp = typeof core.maxHp !== "undefined" ? core.maxHp : 0;

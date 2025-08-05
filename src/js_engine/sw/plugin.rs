@@ -1,6 +1,6 @@
 use crate::{
-    assets::js_file::toml::TomlFile,
-    bevy_ext::condition::js_read_toml_files_has_data,
+    assets::js_file::{section::SectionFile, toml::TomlFile},
+    bevy_ext::condition::read_files_has_data,
     custom::{
         ui::quick::{QuickDialogData, QuickUi},
         unit::unit::Custom,
@@ -17,21 +17,52 @@ use bevy::{platform::collections::HashMap, prelude::*};
 use bevy_hui::prelude::*;
 pub struct SwPlugin;
 
+pub trait ReadFilesMap {
+    type K;
+    type V;
+    fn get_map(&self) -> &HashMap<Self::K, Self::V>;
+}
+
 #[derive(Default, Resource)]
 pub struct ReadTomlFiles {
     pub map: HashMap<Handle<TomlFile>, Vec<Box<oneshot::Sender<TomlFile>>>>,
 }
 
+impl ReadFilesMap for ReadTomlFiles {
+    type K = Handle<TomlFile>;
+    type V = Vec<Box<oneshot::Sender<TomlFile>>>;
+    fn get_map(&self) -> &HashMap<Self::K, Self::V> {
+        &self.map
+    }
+}
+
+#[derive(Default, Resource)]
+pub struct ReadSectionFiles {
+    pub map: HashMap<Handle<SectionFile>, Vec<Box<oneshot::Sender<SectionFile>>>>,
+}
+impl ReadFilesMap for ReadSectionFiles {
+    type K = Handle<SectionFile>;
+    type V = Vec<Box<oneshot::Sender<SectionFile>>>;
+    fn get_map(&self) -> &HashMap<Self::K, Self::V> {
+        &self.map
+    }
+}
+
 impl Plugin for SwPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<ReadTomlFiles>()
+            .init_resource::<ReadSectionFiles>()
             .add_systems(
                 Update,
                 handle_sw_event.run_if(resource_exists::<SwRequestReceiver>),
             )
             .add_systems(
                 Update,
-                check_js_read_file.run_if(js_read_toml_files_has_data()),
+                check_read_toml_file.run_if(read_files_has_data::<ReadTomlFiles>()),
+            )
+            .add_systems(
+                Update,
+                check_read_section_file.run_if(read_files_has_data::<ReadSectionFiles>()),
             )
             .add_systems(Update, (finish_teleport, finish_look));
     }
@@ -40,8 +71,10 @@ impl Plugin for SwPlugin {
 fn handle_sw_event(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
-    js_files: Res<Assets<TomlFile>>,
-    mut js_read_files: ResMut<ReadTomlFiles>,
+    toml_files: Res<Assets<TomlFile>>,
+    section_files: Res<Assets<SectionFile>>,
+    mut read_toml_files: ResMut<ReadTomlFiles>,
+    mut read_section_files: ResMut<ReadSectionFiles>,
     sw_request_receiver: ResMut<SwRequestReceiver>,
     sw_response_sender: ResMut<SwResponseSender>,
 ) -> Result {
@@ -73,12 +106,24 @@ fn handle_sw_event(
                     }
                 },
             },
-            SwRequestEvent::ReadTomlFile(sender, file_path) => {
-                let file_handle = asset_server.load(file_path);
+            SwRequestEvent::ReadTomlFile(sender, path_buf) => {
+                let file_handle = asset_server.load(path_buf);
                 if asset_server.is_loaded(file_handle.id()) {
-                    sender.send(js_files.get(file_handle.id()).cloned().unwrap())?;
+                    sender.send(toml_files.get(file_handle.id()).cloned().unwrap())?;
                 } else {
-                    js_read_files
+                    read_toml_files
+                        .map
+                        .entry(file_handle)
+                        .or_default()
+                        .push(sender);
+                }
+            }
+            SwRequestEvent::ReadSectionFile(sender, path_buf) => {
+                let file_handle = asset_server.load(path_buf);
+                if asset_server.is_loaded(file_handle.id()) {
+                    sender.send(section_files.get(file_handle.id()).cloned().unwrap())?;
+                } else {
+                    read_section_files
                         .map
                         .entry(file_handle)
                         .or_default()
@@ -90,25 +135,48 @@ fn handle_sw_event(
     Ok(())
 }
 
-fn check_js_read_file(
+fn check_read_toml_file(
     asset_server: Res<AssetServer>,
     mut evnets: EventReader<AssetEvent<TomlFile>>,
-    js_files: Res<Assets<TomlFile>>,
-    mut js_read_files: ResMut<ReadTomlFiles>,
+    toml_files: Res<Assets<TomlFile>>,
+    mut read_toml_files: ResMut<ReadTomlFiles>,
 ) -> Result {
     for event in evnets.read() {
         if let AssetEvent::LoadedWithDependencies { id } = *event
-            && let Some(mut senders) = js_read_files
+            && let Some(mut senders) = read_toml_files
                 .map
                 .remove(&asset_server.get_id_handle(id).unwrap())
         {
             senders.drain(..).for_each(|sender| {
-                sender.send(js_files.get(id).cloned().unwrap()).unwrap();
+                sender.send(toml_files.get(id).cloned().unwrap()).unwrap();
             });
         }
     }
     Ok(())
 }
+
+fn check_read_section_file(
+    asset_server: Res<AssetServer>,
+    mut evnets: EventReader<AssetEvent<SectionFile>>,
+    section_files: Res<Assets<SectionFile>>,
+    mut read_section_files: ResMut<ReadSectionFiles>,
+) -> Result {
+    for event in evnets.read() {
+        if let AssetEvent::LoadedWithDependencies { id } = *event
+            && let Some(mut senders) = read_section_files
+                .map
+                .remove(&asset_server.get_id_handle(id).unwrap())
+        {
+            senders.drain(..).for_each(|sender| {
+                sender
+                    .send(section_files.get(id).cloned().unwrap())
+                    .unwrap();
+            });
+        }
+    }
+    Ok(())
+}
+
 fn finish_teleport(
     mut js_response_reader: EventReader<JsEngineResponseEvent>,
     mut customs: Query<&mut Transform, With<Custom>>,
