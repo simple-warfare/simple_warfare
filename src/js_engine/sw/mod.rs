@@ -20,9 +20,7 @@ use std::{
 };
 
 use crate::{
-    bevy_ext::try_from_js::vec2_try_from_js,
-    custom::{ui::quick::QuickUi, unit::section::core::Core},
-    js_engine::{
+    assets::js_file::toml::TomlFile, bevy_ext::try_from_js::vec2_try_from_js, custom::{ui::quick::QuickUi, unit::section::core::Core}, js_engine::{
         context::emit_signal,
         event::{JsEngineRequestEvent, JsEngineResponseEvent},
         global::class::entity::JsEntity,
@@ -30,7 +28,7 @@ use crate::{
         signal::JsDefaultSignalType,
         sw::fs::Fs,
         synchronize::SynchronizeType,
-    },
+    }
 };
 
 #[derive(Resource)]
@@ -45,7 +43,7 @@ pub struct Sw;
 #[derive(Event)]
 pub enum SwRequestEvent {
     RegisterEntity,
-    ReadFile(Box<oneshot::Sender<String>>, PathBuf),
+    ReadTomlFile(Box<oneshot::Sender<TomlFile>>, PathBuf),
     CreateQuickUi(QuickUi),
 }
 

@@ -45,6 +45,5 @@ fn setup(
         TilemapAnchor::Center,
     ));
     mod_server.want_spawn_unit("example:Tank");
-    mod_server.want_spawn_unit("example:Tank");
-    mod_server.want_spawn_unit("example:Tank");
+    mod_server.want_spawn_unit("钠锘聚核:Sunflower");
 }

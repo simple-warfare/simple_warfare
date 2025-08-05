@@ -1,5 +1,5 @@
 use crate::{
-    assets::js_file::JsTomlFile,
+    assets::js_file::toml::TomlFile,
     bevy_ext::condition::js_read_toml_files_has_data,
     custom::{
         ui::quick::{QuickDialogData, QuickUi},
@@ -18,13 +18,13 @@ use bevy_hui::prelude::*;
 pub struct SwPlugin;
 
 #[derive(Default, Resource)]
-pub struct JsReadTomlFiles {
-    pub map: HashMap<Handle<JsTomlFile>, Vec<Box<oneshot::Sender<String>>>>,
+pub struct ReadTomlFiles {
+    pub map: HashMap<Handle<TomlFile>, Vec<Box<oneshot::Sender<TomlFile>>>>,
 }
 
 impl Plugin for SwPlugin {
     fn build(&self, app: &mut App) {
-        app.init_resource::<JsReadTomlFiles>()
+        app.init_resource::<ReadTomlFiles>()
             .add_systems(
                 Update,
                 handle_sw_event.run_if(resource_exists::<SwRequestReceiver>),
@@ -40,8 +40,8 @@ impl Plugin for SwPlugin {
 fn handle_sw_event(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
-    js_files: Res<Assets<JsTomlFile>>,
-    mut js_read_files: ResMut<JsReadTomlFiles>,
+    js_files: Res<Assets<TomlFile>>,
+    mut js_read_files: ResMut<ReadTomlFiles>,
     sw_request_receiver: ResMut<SwRequestReceiver>,
     sw_response_sender: ResMut<SwResponseSender>,
 ) -> Result {
@@ -73,17 +73,17 @@ fn handle_sw_event(
                     }
                 },
             },
-            SwRequestEvent::ReadFile(sender, file_path) => {
+            SwRequestEvent::ReadTomlFile(sender, file_path) => {
                 let file_handle = asset_server.load(file_path);
                 if asset_server.is_loaded(file_handle.id()) {
-                    sender.send(js_files.get(file_handle.id()).unwrap().data.clone())?;
-                } else if let Some(file_senders) = js_read_files.map.get_mut(&file_handle) {
-                    file_senders.push(sender);
+                    sender.send(js_files.get(file_handle.id()).cloned().unwrap())?;
                 } else {
-                    js_read_files.map.insert(file_handle, vec![sender]);
+                    js_read_files
+                        .map
+                        .entry(file_handle)
+                        .or_default()
+                        .push(sender);
                 }
-
-                //
             }
         }
     }
@@ -92,9 +92,9 @@ fn handle_sw_event(
 
 fn check_js_read_file(
     asset_server: Res<AssetServer>,
-    mut evnets: EventReader<AssetEvent<JsTomlFile>>,
-    js_files: Res<Assets<JsTomlFile>>,
-    mut js_read_files: ResMut<JsReadTomlFiles>,
+    mut evnets: EventReader<AssetEvent<TomlFile>>,
+    js_files: Res<Assets<TomlFile>>,
+    mut js_read_files: ResMut<ReadTomlFiles>,
 ) -> Result {
     for event in evnets.read() {
         if let AssetEvent::LoadedWithDependencies { id } = *event
@@ -103,7 +103,7 @@ fn check_js_read_file(
                 .remove(&asset_server.get_id_handle(id).unwrap())
         {
             senders.drain(..).for_each(|sender| {
-                sender.send(js_files.get(id).unwrap().data.clone()).unwrap();
+                sender.send(js_files.get(id).cloned().unwrap()).unwrap();
             });
         }
     }

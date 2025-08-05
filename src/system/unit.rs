@@ -45,10 +45,7 @@ impl Plugin for UnitSystemPlugin {
                 FixedUpdate,
                 check_new_unit.run_if(on_event::<JsEngineResponseEvent>),
             )
-            .add_systems(
-                Update,
-                check_new_graphic.run_if(any_with_component::<Graphic>),
-            );
+            .add_systems(Update, check_new_graphic);
     }
 }
 fn check_new_unit(
@@ -126,6 +123,7 @@ fn check_new_unit(
                     EnablePhysics,
                     Selectable,
                     Spatial,
+                    InheritedVisibility::default(),
                     WayPointQueue::default(),
                     RigidBody::Dynamic,
                     MaxLinearSpeed(40.),
@@ -155,13 +153,15 @@ fn check_new_unit(
 
 fn check_new_graphic(
     mut commands: Commands,
-    graphic_query: Query<(Entity, &Graphic, &CustomInnerInfoStorage)>,
+    graphic_query: Query<(Entity, &Graphic, &CustomInnerInfoStorage), Added<Graphic>>,
     asset_server: Res<AssetServer>,
     mut shared_cutom_handle_mapping: ResMut<SharedCutomHandleMapping>,
     mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
 ) {
     for (entity, graphic, custom_inner_info) in graphic_query {
         let mut entity_commands = commands.entity(entity);
+        let image_path = custom_inner_info.inner.get_real_path(&graphic.path);
+
         let sprite = if let (Some(frame_width), Some(frame_height)) =
             (graphic.frame_width, graphic.frame_height)
         {
@@ -174,16 +174,16 @@ fn check_new_graphic(
             );
             let texture_atlas_layout = texture_atlas_layouts.add(layout);
             Sprite {
-                image: asset_server.load(&graphic.path),
+                image: asset_server.load(image_path),
                 texture_atlas: Some(TextureAtlas {
                     layout: texture_atlas_layout.clone(),
-                    ..Default::default()
+                    index: 0,
                 }),
                 ..Default::default()
             }
         } else {
             Sprite {
-                image: asset_server.load(&graphic.path),
+                image: asset_server.load(image_path),
                 ..Default::default()
             }
         };
@@ -191,7 +191,13 @@ fn check_new_graphic(
         entity_commands.insert(sprite);
 
         if graphic.easy_animation_path.is_some() {
-            entity_commands.insert(AnimationPlayer2D::default());
+            let mut a = AnimationPlayer2D::default();
+            a.play(
+                asset_server
+                    .load("mods/custom/钠锘聚核/单位/向日葵/graphics/main.trickfilm.ron#run-left"),
+            )
+            .repeat();
+            entity_commands.insert(a);
         }
     }
 }

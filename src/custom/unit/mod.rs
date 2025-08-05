@@ -27,7 +27,7 @@ pub struct CustomInnerInfo {
 
 #[derive(Debug, Component, Clone)]
 pub struct CustomInnerInfoStorage {
-    inner: Arc<CustomInnerInfo>,
+    pub inner: Arc<CustomInnerInfo>,
 }
 
 impl CustomInnerInfoStorage {

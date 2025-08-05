@@ -40,7 +40,7 @@ impl Fs {
                 // 一次性管道用于接受加载好的文件
                 let (sender, receiver) = oneshot::channel();
                 sw_request_sender
-                    .send(SwRequestEvent::ReadFile(Box::new(sender), real_path))
+                    .send(SwRequestEvent::ReadTomlFile(Box::new(sender), real_path))
                     .unwrap();
                 if let Ok(string) = receiver.recv() {
                     Ok(JsValue::String(js_string!(string)))

@@ -46,10 +46,12 @@ pub(super) fn module_receiver_request(
     let file_handle = asset_server.load(path);
     if asset_server.is_loaded(file_handle.id()) {
         sender.send(js_assets.get(file_handle.id()).unwrap().clone())?;
-    } else if let Some(file_senders) = boa_load_js_asset.map.get_mut(&file_handle) {
-        file_senders.push(sender);
     } else {
-        boa_load_js_asset.map.insert(file_handle, vec![sender]);
+        boa_load_js_asset
+            .map
+            .entry(file_handle)
+            .or_default()
+            .push(sender);
     }
 
     Ok(())

@@ -82,7 +82,7 @@ pub(super) fn process_js_event(
                 // 将模块添加到模块映射中
                 module_map
                     .entry_ref(&mod_info.name)
-                    .or_insert(vec![])
+                    .or_default()
                     .push(ModModule::new(module.clone(), enable_class));
                 let module_path = module.path().unwrap().to_string_lossy().into_owned();
                 context

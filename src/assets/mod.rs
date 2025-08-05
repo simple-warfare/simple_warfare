@@ -13,7 +13,10 @@ use crate::{
     assets::{
         byte::{ByteFile, ByteFileLoader},
         custom::map::grid_layers::{CustomGridLayers, CustomGridLayersLoader},
-        js_file::{JsTomlFile, JsTomlFileLoader},
+        js_file::{
+            section::{SectionFile, SectionFileLoader},
+            toml::{TomlFile, TomlFileLoader},
+        },
         map::tiled::{
             SimpleWarfareMap, SimpleWarfareMapInfo, SimpleWarfareMapInfoLoader,
             SimpleWarfareMapLoader,
@@ -90,8 +93,10 @@ pub struct AssetsPlugin;
 
 impl Plugin for AssetsPlugin {
     fn build(&self, app: &mut App) {
-        app.init_asset::<JsTomlFile>() //js读取toml格式的文件将以String返回js
-            .init_asset_loader::<JsTomlFileLoader>()
+        app.init_asset::<TomlFile>() //js读取toml格式的文件将以String返回js
+            .init_asset_loader::<TomlFileLoader>()
+            .init_asset::<SectionFile>()
+            .init_asset_loader::<SectionFileLoader>()
             .init_asset::<ModInfo>()
             .init_asset_loader::<ModInfoLoader>()
             .init_asset::<LuaAsset>()
