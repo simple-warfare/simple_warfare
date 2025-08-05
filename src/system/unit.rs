@@ -1,6 +1,7 @@
-use std::sync::Arc;
+use std::{path::Path, sync::Arc};
 
 use crate::{
+    bevy_ext::error::CommonBevyError,
     custom::{
         CustomTypedIdStorage,
         unit::{
@@ -153,14 +154,23 @@ fn check_new_unit(
 
 fn check_new_graphic(
     mut commands: Commands,
-    graphic_query: Query<(Entity, &Graphic, &CustomInnerInfoStorage), Added<Graphic>>,
+    graphic_query: Query<(Entity, &Graphic), Added<Graphic>>,
     asset_server: Res<AssetServer>,
     mut shared_cutom_handle_mapping: ResMut<SharedCutomHandleMapping>,
     mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
-) {
-    for (entity, graphic, custom_inner_info) in graphic_query {
+) -> Result {
+    for (entity, graphic) in graphic_query {
         let mut entity_commands = commands.entity(entity);
-        let image_path = custom_inner_info.inner.get_real_path(&graphic.path);
+        let Some(real_path) = &graphic.real_path else {
+            continue;
+        };
+
+        let image_path = Path::new(real_path)
+            .parent()
+            .ok_or(Into::<BevyError>::into(
+                CommonBevyError::ParentPathNotFound(real_path),
+            ))?
+            .join(&graphic.path);
 
         let sprite = if let (Some(frame_width), Some(frame_height)) =
             (graphic.frame_width, graphic.frame_height)
@@ -202,4 +212,6 @@ fn check_new_graphic(
             entity_commands.insert(a);
         }
     }
+
+    Ok(())
 }

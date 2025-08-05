@@ -76,7 +76,7 @@ export function fromSectionFile(file) {
   );
 
   graphic.setEasyAnimation(t.easyAnimation);
-
   graphic.setRealPath(file.realPath);
+  
   return graphic;
 }
