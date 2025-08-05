@@ -39,6 +39,7 @@ fn setup(
         let mut grid = Grid::<OrdinalNeighborhood>::new(&grid_settings);
 
         for (user_type, custom_tile) in grid_layer.custom_tile.iter() {
+            let grid = &mut grid;
             let Some(layer) = map_layers.get(&Some(user_type.clone())) else {
                 continue;
             };
@@ -56,5 +57,8 @@ fn setup(
                 }
             });
         }
+
+        //TODO 区分相同user_type,但实际不能合并的grid
+        commands.spawn(grid);
     }
 }
