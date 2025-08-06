@@ -2,5 +2,6 @@ width = 168
 height = 108
 frameHeight = 54
 frameWidth = 24
+lockRotation = 0
 easyAnimation = "main.trickfilm.ron"
 path = "向日葵.png"

@@ -28,7 +28,7 @@ use crate::{
     statistics::*,
 };
 use avian2d::prelude::*;
-use bevy::prelude::*;
+use bevy::{ecs::spawn::SpawnWith, prelude::*};
 use bevy_trickfilm::prelude::*;
 
 pub struct UnitSystemPlugin;

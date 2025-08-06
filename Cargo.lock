@@ -1287,6 +1287,32 @@ dependencies = [
 ]
 
 [[package]]
+name = "bevy_enhanced_input"
+version = "0.15.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7fda99bbb76fff2b57ea97189a57787262273cff1b8cf1431513d1e62eb8de12"
+dependencies = [
+ "bevy",
+ "bevy_enhanced_input_macros",
+ "bitflags 2.9.1",
+ "log",
+ "serde",
+ "smallvec",
+ "variadics_please",
+]
+
+[[package]]
+name = "bevy_enhanced_input_macros"
+version = "0.15.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1bffacfa966a1944a2c803ff1d9d332b3f4a9fd6c1ac97db7c33f7005a7936b6"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.104",
+]
+
+[[package]]
 name = "bevy_fly_camera"
 version = "0.16.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -8156,6 +8182,7 @@ dependencies = [
  "bevy_ecs_ldtk",
  "bevy_ecs_tiled 0.8.0",
  "bevy_ecs_tilemap",
+ "bevy_enhanced_input",
  "bevy_fly_camera",
  "bevy_hanabi",
  "bevy_hui 0.4.0 (git+https://github.com/shishanyue/bevy_hui.git)",

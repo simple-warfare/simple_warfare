@@ -79,10 +79,10 @@ pub struct SelectedMap(pub Handle<SimpleWarfareMap>);
 
 #[derive(Resource, Default, Debug)]
 pub struct SelectionState {
-    pub start: Vec2,
-    pub end: Vec2,
-    pub real_start: Vec2,
-    pub real_end: Vec2,
+    pub viewport_start: Vec2,
+    pub viewport_end: Vec2,
+    pub world_2d_start: Vec2,
+    pub world_2d_end: Vec2,
     pub is_selecting: bool,
 }
 
@@ -99,8 +99,8 @@ impl SelectionState {
 }
 #[derive(Clone, Default, Resource)]
 pub struct MousePosition {
-    pub windows: Option<Vec2>,
-    pub world: Option<Vec2>,
+    pub viewport: Option<Vec2>,
+    pub world_2d: Option<Vec2>,
 }
 
 #[derive(States, Default, Debug, Hash, Eq, Ord, PartialEq, PartialOrd, Clone, Copy)]

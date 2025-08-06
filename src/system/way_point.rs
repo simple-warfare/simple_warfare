@@ -1,9 +1,9 @@
 use avian2d::prelude::{AngularVelocity, LinearVelocity};
-use bevy::prelude::*;
+use bevy::{pbr::graph, prelude::*};
 
 use crate::{
     custom::unit::{
-        section::movement::Movement,
+        section::{graphic::Graphic, movement::Movement},
         turret::JsTurret,
         way_point::{WayPoint, WayPointQueue},
     },
@@ -17,6 +17,12 @@ impl Plugin for WayPointSystemPlugin {
         app.add_systems(
             FixedUpdate,
             handle_move_way_point.run_if(in_state(SceneState::GameScene)),
+        )
+        .add_systems(
+            PostUpdate,
+            lock_rotation
+                .after(TransformSystem::TransformPropagate)
+                .run_if(in_state(SceneState::GameScene)),
         );
     }
 }
@@ -86,4 +92,18 @@ fn handle_turret_attack_way_point(
         &mut LinearVelocity,
     )>,
 ) {
+}
+
+fn lock_rotation(
+    graphics_query: Query<(&Graphic, &mut Transform, &ChildOf)>,
+    graphics_parent_query: Query<&Transform, Without<Graphic>>,
+) {
+    for (graphic, mut transform, parent) in graphics_query {
+        if let Some(lock_rotation_angle) = graphic.lock_rotation {
+            let parent_transform = graphics_parent_query.get(parent.0).unwrap();
+
+            transform.rotation =
+                parent_transform.rotation.inverse() * Quat::from_rotation_z(lock_rotation_angle);
+        }
+    }
 }

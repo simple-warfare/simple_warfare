@@ -17,6 +17,9 @@ pub struct Graphic {
     pub frame_width: Option<u32>,
     #[boa(rename = "frameHeight")]
     pub frame_height: Option<u32>,
+
+    #[boa(rename = "lockRotation", from_js_with = "option_f32_try_from_js")]
+    pub lock_rotation: Option<f32>,
     #[boa(
         rename = "textureAtlasLayout",
         from_js_with = "texture_atlas_layout_try_from_js"

@@ -46,6 +46,14 @@ pub fn f32_try_from_js(value: &JsValue, context: &mut Context) -> JsResult<f32> 
     value.to_f32(context)
 }
 
+pub fn option_f32_try_from_js(value: &JsValue, context: &mut Context) -> JsResult<Option<f32>> {
+    if value.is_undefined() {
+        JsResult::Ok(None)
+    } else {
+        value.to_f32(context).map(|n| Some(n))
+    }
+}
+
 pub fn entity_try_from_js(value: &JsValue, context: &mut Context) -> JsResult<Entity> {
     let js_entity = JsEntity::try_from_js(value, context).expect("try_from_js error");
     Ok(js_entity.to_entity())

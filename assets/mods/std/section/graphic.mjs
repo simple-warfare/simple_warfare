@@ -10,7 +10,8 @@ export class Graphic extends Synchronize {
     frameWidth,
     frameHeight,
     textureAtlasLayout,
-    offset
+    offset,
+    lockRotation
   ) {
     super();
     this.width = width;
@@ -21,6 +22,7 @@ export class Graphic extends Synchronize {
     this.frameHeight = frameHeight;
     this.textureAtlasLayout = textureAtlasLayout;
     this.offset = offset;
+    this.lockRotation = lockRotation;
   }
 
   setEasyAnimation(easyAnimation) {
@@ -72,11 +74,12 @@ export function fromSectionFile(file) {
     t.frameWidth,
     t.frameHeight,
     t.textureAtlasLayout,
-    t.offset
+    t.offset,
+    t.lockRotation
   );
 
   graphic.setEasyAnimation(t.easyAnimation);
   graphic.setRealPath(file.realPath);
-  
+
   return graphic;
 }
