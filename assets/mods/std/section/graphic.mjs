@@ -33,6 +33,10 @@ export class Graphic extends Synchronize {
   setRealPath(realPath) {
     this.realPath = realPath;
   }
+
+  playTrickFilm(registion) {
+    console.log(registion);
+  }
 }
 
 export function fromValues(

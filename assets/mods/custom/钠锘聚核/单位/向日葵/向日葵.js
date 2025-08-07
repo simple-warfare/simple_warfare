@@ -18,17 +18,18 @@ export class Sunflower extends CustomUnit {
 
     this.core = manyFromSectionFiles.core(core);
 
-    this.main_graphic = manyFromSectionFiles.graphic(main_graphic_file);
+    let main_graphic = manyFromSectionFiles.graphic(main_graphic_file);
 
     this.graphics.push(main_graphic);
     this.movement = manyFromSectionFiles.movement(movement);
 
-    console.log(this.graphics[0].easyAnimationRegister[0]);
+    //console.log(this.graphics[0].easyAnimationRegister[0]);
     this.colliders.push(new CircleCollider(ColliderType.Circle, 25));
 
     this.newWayPointFunc = (wayPoint) => {
       if (wayPoint.type == "move") {
-        this.graphics[0].playTrickFilm()
+        let main_graphic = this.graphics[0];
+        main_graphic.playTrickFilm(main_graphic.trickFilmRegistion[0]);
       }
     };
 
