@@ -6,7 +6,7 @@ use crate::{
     assets::mods::js::JsAsset,
     custom::{
         CustomModAsset, CustomTypedId,
-        unit::{CustomInnerInfo, section::core::Core, unit::SpawnedUnitData},
+        unit::{CustomInnerInfo, section::core::Core, unit::JsUnit, way_point::WayPoint},
     },
     js_engine::{
         global::class::entity::JsEntity,
@@ -37,6 +37,10 @@ pub enum JsEngineRequestEvent {
         signal_entity: Entity,
     },
     EmitEmptySignal {
+        signal_entity: Entity,
+    },
+    NewWayPointSignal {
+        way_point: WayPoint,
         signal_entity: Entity,
     },
     SynchronizeData(SynchronizeData), //RemoteJsProxy(Box<dyn Fn(JsProxy) -> String + Send + Sync + 'static>),
@@ -73,6 +77,13 @@ impl JsEngineRequestEvent {
         }
     }
 
+    pub fn new_way_point_signal(way_point: WayPoint, signal_entity: Entity) -> Self {
+        Self::NewWayPointSignal {
+            way_point,
+            signal_entity,
+        }
+    }
+
     pub fn emit_empty_signal(signal_entity: Entity) -> Self {
         Self::EmitEmptySignal { signal_entity }
     }
@@ -82,7 +93,7 @@ impl JsEngineRequestEvent {
 pub enum JsEngineResponseEvent {
     EngineInited,
     //Mod
-    SpawnedUnit { data: SpawnedUnitData },
+    SpawnedUnit { js_unit: JsUnit },
     ToTeleport(TeleportType),
     ToLook(LookType),
 
@@ -90,8 +101,8 @@ pub enum JsEngineResponseEvent {
 }
 
 impl JsEngineResponseEvent {
-    pub fn spawned_unit(data: SpawnedUnitData) -> Self {
-        Self::SpawnedUnit { data }
+    pub fn spawned_unit(js_unit: JsUnit) -> Self {
+        Self::SpawnedUnit { js_unit }
     }
 }
 

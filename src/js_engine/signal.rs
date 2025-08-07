@@ -8,6 +8,7 @@ pub enum JsDefaultSignalType {
     Selected,
     OnUnitEnter,
     OnUnitExit,
+    NewWayPoint,
 }
 
 impl TryFromJs for JsDefaultSignalType {
@@ -17,6 +18,7 @@ impl TryFromJs for JsDefaultSignalType {
             "Selected" => Ok(Self::Selected),
             "OnUnitEnter" => Ok(Self::OnUnitEnter),
             "OnUnitExit" => Ok(Self::OnUnitExit),
+            "NewWayPoint" => Ok(Self::NewWayPoint),
             _ => Err(JsNativeError::typ()
                 .with_message("the DefaultSignal type is undefine")
                 .into()),

@@ -3,5 +3,6 @@ height = 108
 frameHeight = 54
 frameWidth = 24
 lockRotation = 0
-easyAnimation = "main.trickfilm.ron"
+trickFilm = "main.trickfilm.ron"
+trickFilmRegistion = ["run-left", "run-right"]
 path = "向日葵.png"

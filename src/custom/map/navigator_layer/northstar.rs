@@ -1,10 +1,11 @@
-use std::path::PathBuf;
+use std::{path::PathBuf, sync::Arc};
 
 use bevy::{
     asset::uuid::Uuid,
     platform::collections::{HashMap, HashSet},
     prelude::*,
 };
+use indexmap::IndexMap;
 use serde::{Deserialize, Serialize};
 
 use crate::{assets::custom::map::grid_layers::CustomGridLayers, custom::map::CustomTile};
@@ -41,8 +42,11 @@ impl CustomGridLayer {
 pub struct CustomGridLayersServer {
     pub new_layer: Vec<PathBuf>,
     pub handles: Option<Vec<Handle<CustomGridLayers>>>,
-    pub layer: Vec<CustomGridLayerStorage>,
+    pub layer: IndexMap<Vec<Uuid>, CustomGridLayerStorage>,
 }
+
+#[derive(Debug, Default, Resource)]
+pub struct NorthstarGridEntitiesStorage(pub HashMap<Arc<Vec<Uuid>>, Entity>);
 
 impl CustomGridLayersServer {
     pub fn new_layer(&mut self, path: PathBuf) {
@@ -50,40 +54,47 @@ impl CustomGridLayersServer {
     }
     pub fn add_layer(&mut self, layers: CustomGridLayers) {
         for layer in &layers.layer {
-            if self.layer.is_empty() {
-                self.layer.push(layer.storage());
-                continue;
+            if let Some(index) = self.find_matching_layer_index(layer) {
+                self.merge_layer_at_index(index, layer);
+            } else {
+                self.layer.insert(
+                    layer.merge_with.iter().map(|m| *m).collect(),
+                    layer.storage(),
+                );
             }
+        }
+    }
 
-            let mut found = false;
+    fn find_matching_layer_index(&self, layer: &CustomGridLayer) -> Option<usize> {
+        if self.layer.is_empty() {
+            return None;
+        }
 
-            for (index, already_layer) in self.layer.clone().into_iter().enumerate() {
-                if already_layer.movement_type == layer.movement_type {
-                    if already_layer
-                        .merge_with
-                        .iter()
-                        .any(|merge_with| layer.merge_with.contains(merge_with))
-                    {
-                        let mut updated_layer = already_layer.clone();
-                        updated_layer
-                            .merge_with
-                            .extend(layer.merge_with.iter().cloned());
-
-                        for tile in layer.custom_tile.clone().into_iter() {
-                            updated_layer
-                                .custom_tile
-                                .insert(tile.user_type.clone(), tile);
-                        }
-
-                        self.layer[index] = updated_layer;
-                        found = true;
-                        break;
-                    }
-                }
+        self.layer.iter().find_map(|(merge_with, storage_layer)| {
+            if storage_layer.movement_type == layer.movement_type
+                && storage_layer
+                    .merge_with
+                    .iter()
+                    .any(|m| layer.merge_with.contains(m))
+            {
+                Some(self.layer.get_index_of(merge_with).unwrap())
+            } else {
+                None
             }
-            if !found {
-                self.layer.push(layer.storage());
-            }
+        })
+    }
+
+    fn merge_layer_at_index(&mut self, index: usize, layer: &CustomGridLayer) {
+        let updated_layer = &mut self.layer[index];
+
+        updated_layer
+            .merge_with
+            .extend(layer.merge_with.iter().cloned());
+
+        for tile in &layer.custom_tile {
+            updated_layer
+                .custom_tile
+                .insert(tile.user_type.clone(), tile.clone());
         }
     }
 }

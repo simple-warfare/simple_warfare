@@ -1,7 +1,7 @@
 use crate::{
     custom::{
         CustomModEnableJs,
-        unit::{section::Section, unit::SpawnedUnitData},
+        unit::{section::Section, unit::JsUnit},
     },
     js_engine::{
         engine::JsEngine,
@@ -153,11 +153,14 @@ pub(super) fn process_js_event(
                                 .to_object(context)?
                                 .clone(),
                         )?;
-                        let entity = JsEntity::try_from_js(
-                            &unit_proxy.get(js_string!("entity"), context)?,
+
+                        let js_unit = JsUnit::try_from_proxy(
+                            &unit_proxy,
                             context,
-                        )?
-                        .to_entity();
+                            unit_id,
+                            custom_typed_id,
+                            module_path,
+                        )?;
 
                         emit_signal(
                             &unit_proxy
@@ -167,8 +170,6 @@ pub(super) fn process_js_event(
                             context,
                         )?;
 
-                        let section = Section::try_from_proxy(&unit_proxy, context)?;
-
                         context
                             .realm()
                             .host_defined_mut()
@@ -176,16 +177,10 @@ pub(super) fn process_js_event(
                             .unwrap()
                             .map
                             .borrow_mut()
-                            .insert(entity, unit_proxy);
+                            .insert(js_unit.entity, unit_proxy);
 
                         response_sender
-                            .send(JsEngineResponseEvent::spawned_unit(SpawnedUnitData::new(
-                                section,
-                                unit_id,
-                                entity,
-                                module_path,
-                                custom_typed_id,
-                            )))
+                            .send(JsEngineResponseEvent::spawned_unit(js_unit))
                             .unwrap();
                     }
                 }
@@ -352,6 +347,26 @@ pub(super) fn process_js_event(
                 .0
                 .push(entity);
         }
+        JsEngineRequestEvent::NewWayPointSignal {
+            way_point,
+            signal_entity,
+        } => {
+           let new_way_point_signal = context
+                .realm()
+                .host_defined()
+                .get::<NewWayPointSignalMap>()
+                .unwrap()
+                .map
+                .borrow()
+                .get(&signal_entity)
+                .unwrap()
+                .clone();
+            emit_signal(
+                &new_way_point_signal,
+                &[way_point.try_into_js(context)?],
+                context,
+            )?; 
+        },
     }
     Ok(())
 }

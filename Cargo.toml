@@ -91,6 +91,7 @@ bevy_northstar = { git = "https://github.com/simple-warfare/bevy_northstar.git",
     "serde",
 ] }
 bevy_enhanced_input = "0.15.2"
+indexmap = "2.10.0"
 
 rayon = "1.10.0"
 dashmap = { version = "6.1.0", features = ["rayon"] }

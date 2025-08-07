@@ -1,42 +1,63 @@
 use bevy::prelude::*;
+use boa_engine::object::builtins::JsProxy;
+use boa_engine::value::TryFromJs;
+use serde::{Deserialize, Serialize};
+use simple_warfare_macros::TryFromAndIntoJs;
 
+use crate::bevy_ext::try_from_js::*;
 use crate::{
-    custom::{CustomTypedId, unit::section::Section},
+    custom::{
+        CustomTypedId,
+        unit::{
+            section::{Section, graphic::Graphics},
+            way_point::WayPointQueue,
+        },
+    },
     net::shared::UnitId,
 };
+use boa_engine::{JsResult, js_string, prelude::*};
 
-#[derive(Debug, Component)]
+#[derive(Debug, Default, Component)]
 pub struct Custom;
 
-#[derive(Debug, Component)]
+#[derive(Debug, Default, Component)]
+#[require(Custom, InheritedVisibility)]
 pub struct CustomTurrrt;
 
-#[derive(Debug, Component)]
+#[derive(Debug, Default, Component)]
+#[require(Custom, InheritedVisibility, WayPointQueue)]
 pub struct CustomUnit;
 
-#[derive(Debug, Clone)]
-pub struct SpawnedUnitData {
+#[derive(Debug, Clone, Component, Serialize, Deserialize, Reflect)]
+
+pub struct JsUnit {
     pub unit_id: UnitId,
-    pub entity: Entity,
-    pub module_path: String,
-    pub section: Section,
     pub custom_typed_id: CustomTypedId,
+    pub entity: Entity,
+    pub section: Section,
+    pub module_path: String,
+    pub new_way_point_entity: Entity,
 }
 
-impl SpawnedUnitData {
-    pub fn new(
-        section: Section,
+
+impl JsUnit {
+    pub fn try_from_proxy(
+        proxy: &JsProxy,
+        context: &mut Context,
         unit_id: UnitId,
-        entity: Entity,
-        module_path: String,
         custom_typed_id: CustomTypedId,
-    ) -> Self {
-        Self {
-            section,
+        module_path: String,
+    ) -> JsResult<JsUnit> {
+        Ok(Self {
+            entity: entity_try_from_js(&proxy.get(js_string!("entity"), context)?, context)?,
+            section: Section::try_from_proxy(proxy, context)?,
             unit_id,
-            entity,
-            module_path,
             custom_typed_id,
-        }
+            module_path,
+            new_way_point_entity: entity_try_from_js(
+                &proxy.get(js_string!("newWayPointEntity"), context)?,
+                context,
+            )?,
+        })
     }
 }

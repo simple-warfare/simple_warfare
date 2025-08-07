@@ -1,5 +1,6 @@
 use bevy::{ecs::bundle::Bundle, reflect::Reflect};
 use boa_engine::{JsResult, js_string, object::builtins::JsProxy, prelude::*, value::TryFromJs};
+use serde::{Deserialize, Serialize};
 
 use crate::custom::unit::{
     light2d::point_light2d::JsPointLight2d,
@@ -20,7 +21,7 @@ pub mod graphic;
 pub mod light2d;
 pub mod movement;
 
-#[derive(Debug, Clone, Bundle, Reflect)]
+#[derive(Debug, Clone, Serialize, Deserialize, Bundle, Reflect)]
 pub struct Section {
     pub core: Core,
     pub colliders: JsColliders,
@@ -51,11 +52,7 @@ impl Section {
 
     pub fn try_from_proxy(proxy: &JsProxy, context: &mut Context) -> JsResult<Section> {
         Ok(Self {
-            core: Core::try_from_js(
-                &proxy.get(js_string!("core"), context).expect("get error"),
-                context,
-            )
-            .expect("parse error"),
+            core: Core::try_from_js(&proxy.get(js_string!("core"), context)?, context)?,
             colliders: JsColliders::new(Vec::<JsCollider>::try_from_js(
                 &JsValue::Object(
                     proxy

@@ -1,8 +1,12 @@
+use std::sync::Arc;
+
 use bevy::{log::tracing_subscriber::layer, prelude::*};
 use bevy_ecs_tiled::prelude::*;
 use bevy_northstar::prelude::*;
 
-use crate::custom::map::navigator_layer::northstar::CustomGridLayersServer;
+use crate::custom::map::navigator_layer::northstar::{
+    CustomGridLayersServer, NorthstarGridEntitiesStorage,
+};
 
 pub struct SimpleWarfareNorthStarPlugin;
 
@@ -21,6 +25,7 @@ fn setup(
     mut commands: Commands,
     map_assets: Res<Assets<TiledMapAsset>>,
     custom_grid_layers_server: Res<CustomGridLayersServer>,
+    mut northstar_grid_entities_storage: ResMut<NorthstarGridEntitiesStorage>,
 ) {
     let tiled_map_asset = trigger.get_map_asset(&map_assets).unwrap();
     let tiled_map = &tiled_map_asset.map;
@@ -30,8 +35,7 @@ fn setup(
         .collect::<HashMap<_, _>>();
     let tilemap_size = tiled_map_asset.tilemap_size;
 
-    info!("layers:{:?}", custom_grid_layers_server.layer);
-    for grid_layer in custom_grid_layers_server.layer.iter() {
+    for (merge_with, grid_layer) in custom_grid_layers_server.layer.iter() {
         let grid_settings = GridSettingsBuilder::new_2d(tilemap_size.x, tilemap_size.y)
             .chunk_size(16)
             .build();
@@ -58,7 +62,10 @@ fn setup(
             });
         }
 
-        //TODO 区分相同user_type,但实际不能合并的grid
-        commands.spawn(grid);
+        grid.build();
+
+        northstar_grid_entities_storage
+            .0
+            .insert(Arc::new(merge_with.clone()), commands.spawn(grid).id());
     }
 }

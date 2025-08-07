@@ -27,8 +27,11 @@ pub struct Graphic {
     pub texture_atlas_layout: Option<TextureAtlasLayout>,
     #[boa(from_js_with = "vec2_try_from_js")]
     pub offset: Vec2,
-    #[boa(rename = "easyAnimation")]
-    pub easy_animation_path: Option<String>,
+    #[boa(rename = "trickFilm")]
+    pub trick_film: Option<String>,
+
+    #[boa(rename = "trickFilmRegistion")]
+    pub trick_film_registion: Option<Vec<String>>,
     #[boa(rename = "realPath")]
     pub real_path: Option<String>,
 }
@@ -50,7 +53,7 @@ impl Graphic {
     }
 }
 
-#[derive(Debug, Default, Clone, Component, Reflect, TryFromJs)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, Component, Reflect, TryFromJs)]
 pub struct Graphics {
     pub data: Vec<Graphic>,
 }

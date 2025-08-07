@@ -30,7 +30,7 @@ pub struct JsTurret {
     pub on_unit_exit_signal_entity: Entity,
 }
 
-#[derive(Debug, Default, Clone, Component, Reflect, TryFromJs)]
+#[derive(Debug, Default, Clone, Serialize, Deserialize, Component, Reflect, TryFromJs)]
 pub struct Turrets {
     pub data: Vec<JsTurret>,
 }

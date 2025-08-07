@@ -38,6 +38,12 @@ pub struct OnUnitExitSignalMap {
     pub map: Rc<RefCell<FxHashMap<Entity, JsObject>>>,
 }
 #[derive(Default, Trace, Finalize, JsData)]
+pub struct NewWayPointSignalMap {
+    #[unsafe_ignore_trace]
+    pub map: Rc<RefCell<FxHashMap<Entity, JsObject>>>,
+}
+
+#[derive(Default, Trace, Finalize, JsData)]
 pub struct SignalEntityMap {
     #[unsafe_ignore_trace]
     pub map: Rc<RefCell<FxHashMap<Entity, JsObject>>>,

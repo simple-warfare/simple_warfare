@@ -1,21 +1,37 @@
-import * as manyFromSectionFiles from "std:from-section-file.mjs";
-import { CustomUnit } from "std:custom/unit.mjs";
-import { CircleCollider, ColliderType } from "std:physics/collider.mjs";
-import { SingleTurret } from "custom:example/tank/single_turret.js";
-import { ComfirmDialog } from "std:ui/quick/dialog/comfirm.mjs";
+import {
+  CustomUnit,
+  manyFromSectionFiles,
+  CircleCollider,
+  ColliderType,
+} from "std:index.mjs";
 
 export class Sunflower extends CustomUnit {
   constructor(moduleParentPath) {
     super(moduleParentPath);
 
     let core = sw.fs.readSectionFile(this, "core.section.toml");
-    let main_graphic = sw.fs.readSectionFile(this, "graphics/main.section.toml");
+    let main_graphic_file = sw.fs.readSectionFile(
+      this,
+      "graphics/main.section.toml"
+    );
     let movement = sw.fs.readSectionFile(this, "movement.section.toml");
 
     this.core = manyFromSectionFiles.core(core);
-    this.graphics.push(manyFromSectionFiles.graphic(main_graphic));
+
+    this.main_graphic = manyFromSectionFiles.graphic(main_graphic_file);
+
+    this.graphics.push(main_graphic);
     this.movement = manyFromSectionFiles.movement(movement);
 
+    console.log(this.graphics[0].easyAnimationRegister[0]);
     this.colliders.push(new CircleCollider(ColliderType.Circle, 25));
+
+    this.newWayPointFunc = (wayPoint) => {
+      if (wayPoint.type == "move") {
+        this.graphics[0].playTrickFilm()
+      }
+    };
+
+    this.newWayPoint.connect(this.newWayPointFunc);
   }
 }

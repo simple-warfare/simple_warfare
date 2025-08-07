@@ -8209,6 +8209,7 @@ dependencies = [
  "earcutr 0.5.0",
  "fluent",
  "image",
+ "indexmap",
  "mlua",
  "new_mime_guess",
  "oneshot",

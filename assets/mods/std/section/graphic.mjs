@@ -25,8 +25,9 @@ export class Graphic extends Synchronize {
     this.lockRotation = lockRotation;
   }
 
-  setEasyAnimation(easyAnimation) {
-    this.easyAnimation = easyAnimation;
+  setEasyAnimation(trickFilm, trickFilmRegistion) {
+    this.trickFilm = trickFilm;
+    this.trickFilmRegistion = trickFilmRegistion;
   }
 
   setRealPath(realPath) {
@@ -78,7 +79,7 @@ export function fromSectionFile(file) {
     t.lockRotation
   );
 
-  graphic.setEasyAnimation(t.easyAnimation);
+  graphic.setEasyAnimation(t.trickFilm, t.trickFilmRegistion);
   graphic.setRealPath(file.realPath);
 
   return graphic;

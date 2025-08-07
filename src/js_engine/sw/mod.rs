@@ -236,6 +236,18 @@ impl Sw {
                             .borrow_mut()
                             .insert(entity, signal);
                     }
+                    JsDefaultSignalType::NewWayPoint => {
+                        let entity =
+                            JsEntity::try_from_js(&signal.get(js_string!("entity"), ctx)?, ctx)?
+                                .to_entity();
+                        ctx.realm()
+                            .host_defined_mut()
+                            .get_mut::<NewWayPointSignalMap>()
+                            .unwrap()
+                            .map
+                            .borrow_mut()
+                            .insert(entity, signal);
+                    }
                 }
 
                 Ok(JsValue::undefined())

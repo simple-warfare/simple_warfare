@@ -1,5 +1,9 @@
 import * as creates from "std:create.mjs";
-import { CreatedSignal, SelectedSignal } from "std:signal/signal.mjs";
+import {
+  CreatedSignal,
+  NewWayPointSignal,
+  SelectedSignal,
+} from "std:signal/signal.mjs";
 import { TargetType } from "std:sw/sw.mjs";
 import { Synchronize } from "std:synchronize.mjs";
 
@@ -21,6 +25,9 @@ export class CustomUnit extends Synchronize {
     this.core = creates.core();
     this.created = new CreatedSignal();
     this.selected = new SelectedSignal();
+    this.newWayPoint = new NewWayPointSignal();
+
+    this.newWayPointEntity = this.newWayPoint.entity;
     //sw.bindInnerInfo(this);
   }
 

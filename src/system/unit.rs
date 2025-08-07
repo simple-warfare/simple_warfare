@@ -14,8 +14,7 @@ use crate::{
                 movement::Movement,
             },
             turret::JsTurret,
-            unit::{Custom, CustomUnit},
-            way_point::WayPointQueue,
+            unit::{CustomTurrrt, CustomUnit},
         },
     },
     js_engine::{
@@ -28,7 +27,8 @@ use crate::{
     statistics::*,
 };
 use avian2d::prelude::*;
-use bevy::{ecs::spawn::SpawnWith, prelude::*};
+use bevy::prelude::*;
+use bevy_northstar::prelude::*;
 use bevy_trickfilm::prelude::*;
 
 pub struct UnitSystemPlugin;
@@ -58,21 +58,22 @@ fn check_new_unit(
     js_engine_request_sender: Res<JsEngineRequestSender>,
 ) -> Result {
     for event in reader.read() {
-        if let JsEngineResponseEvent::SpawnedUnit { data } = event {
-            unit_mapping.add_entity(data.unit_id, data.entity);
+        if let JsEngineResponseEvent::SpawnedUnit { js_unit } = event {
+            info!("{:?}", js_unit.section.graphics);
+            unit_mapping.add_entity(js_unit.unit_id, js_unit.entity);
 
-            let custom_unit_inner_info = Arc::new(CustomInnerInfo::new(&data.module_path));
+            let custom_unit_inner_info = Arc::new(CustomInnerInfo::new(&js_unit.module_path));
             let custom_inner_info_storage =
                 CustomInnerInfoStorage::new(custom_unit_inner_info.clone());
-            let custom_typed_id = data.custom_typed_id;
+            let custom_typed_id = js_unit.custom_typed_id;
 
-            let unit_entity = data.entity;
+            let unit_entity = js_unit.entity;
 
-            let core = &data.section.core;
-            let graphics = &data.section.graphics;
-            let colliders = &data.section.colliders;
-            let point_lights = &data.section.point_lights;
-            let turrets = &data.section.turrets;
+            let core = &js_unit.section.core;
+            let graphics = &js_unit.section.graphics;
+            let colliders = &js_unit.section.colliders;
+            let point_lights = &js_unit.section.point_lights;
+            let turrets = &js_unit.section.turrets;
 
             js_engine_request_sender
                 .0
@@ -100,8 +101,7 @@ fn check_new_unit(
                         .entity(turret.entity)
                         .insert((
                             Spatial,
-                            Custom,
-                            CustomUnit,
+                            CustomTurrrt,
                             sprite,
                             turret.clone(),
                             turret.transform.to_transform(),
@@ -110,29 +110,24 @@ fn check_new_unit(
                 })
                 .collect();
 
-            commands
-                .entity(unit_entity)
-                .insert((
-                    Name::new(core.name.clone()),
-                    CustomTypedIdStorage(custom_typed_id),
-                    CustomUnit,
-                    Custom,
-                    EnablePhysics,
-                ))
-                .insert((
-                    data.section.clone(),
-                    EnablePhysics,
-                    Selectable,
-                    Spatial,
-                    InheritedVisibility::default(),
-                    WayPointQueue::default(),
-                    RigidBody::Dynamic,
-                    MaxLinearSpeed(40.),
-                    AngularDamping(0.8),
-                    LinearDamping(0.8),
-                    ExternalForce::default().with_persistence(false),
-                    ComputedMass::new(core.mass),
-                ))
+            let mut unit_commands = commands.entity(unit_entity);
+            unit_commands.insert((
+                Name::new(core.name.clone()),
+                CustomTypedIdStorage(custom_typed_id),
+                CustomUnit,
+                js_unit.clone(),
+                EnablePhysics,
+                Selectable,
+                Spatial,
+                RigidBody::Dynamic,
+                MaxLinearSpeed(40.),
+                AngularDamping(0.8),
+                LinearDamping(0.8),
+                ExternalForce::default().with_persistence(false),
+                ComputedMass::new(core.mass),
+            ));
+
+            unit_commands
                 .add_children(&turret_entities)
                 .with_children(|parent| {
                     for graphic in graphics.data.clone().into_iter() {
@@ -202,7 +197,7 @@ fn check_new_graphic(
 
         info!("realPath:{:?}", graphic.real_path);
 
-        if graphic.easy_animation_path.is_some() {
+        if graphic.trick_film.is_some() {
             let mut a = AnimationPlayer2D::default();
             a.play(
                 asset_server

@@ -1,8 +1,9 @@
 use avian2d::{math::Scalar, prelude::Collider};
 use bevy::prelude::*;
 use boa_engine::{JsResult, js_string, prelude::*, value::TryFromJs};
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Component, Reflect)]
+#[derive(Debug, Clone, Serialize, Deserialize, Component, Reflect)]
 pub enum JsCollider {
     Circle(Scalar),
     Rectangle(Scalar, Scalar),

@@ -1,16 +1,14 @@
 use crate::{
     custom::unit::{
         physics::EnablePhysics,
-        unit::CustomUnit,
+        unit::{CustomUnit, JsUnit},
         way_point::{WayPoint, WayPointQueue},
     },
     js_engine::{JsEngineRequestSender, event::JsEngineRequestEvent},
     scenes::SceneState,
     statistics::*,
 };
-use bevy::{
-    color::palettes::css::*, ecs::spawn::SpawnWith, prelude::*,
-};
+use bevy::{color::palettes::css::*, ecs::spawn::SpawnWith, prelude::*};
 use bevy_enhanced_input::prelude::*;
 pub struct UnitInputSystemPlugin;
 
@@ -58,24 +56,6 @@ impl Plugin for UnitInputSystemPlugin {
                     .chain()
                     .run_if(in_state(SceneState::GameScene)),
             );
-
-        /*
-        .add_systems(
-            FixedUpdate,
-            (
-                handle_cursor_move,
-                handle_mouse_input,
-                calculate_world_position_of_selection,
-                (update_selected_unit, add_move_way_point),
-                (
-                    draw_selection_box,
-                    draw_selected_unit,
-                    draw_consecutive_way_point_move,
-                ),
-            )
-                .chain()
-                .run_if(in_state(SceneState::GameScene)),
-        ); */
     }
 }
 
@@ -207,15 +187,25 @@ pub fn draw_selected_unit(mut gizmos: Gizmos, selected_units: Query<&Transform, 
 
 pub fn add_move_way_point(
     _trigger: Trigger<Fired<AddMoveWayPointAction>>,
-    selected_units: Query<&mut WayPointQueue, With<Selected>>,
+    selected_units: Query<(&JsUnit, &mut WayPointQueue), With<Selected>>,
     mouse_position: Res<MousePosition>,
-) {
+    js_engine_request_sender: Res<JsEngineRequestSender>,
+) -> Result {
     let Some(mouse_pos) = mouse_position.world_2d else {
-        return;
+        return Ok(());
     };
-    for mut quene in selected_units {
-        quene.data.push_back(WayPoint::Move(mouse_pos));
+    for (js_unit, mut quene) in selected_units {
+        let way_point = WayPoint::Move(mouse_pos);
+        quene.data.push_back(way_point.clone());
+        js_engine_request_sender
+            .0
+            .send(JsEngineRequestEvent::new_way_point_signal(
+                way_point,
+                js_unit.new_way_point_entity,
+            ))?;
     }
+
+    Ok(())
 }
 
 pub fn draw_consecutive_way_point_move(

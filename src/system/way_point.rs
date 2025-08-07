@@ -5,6 +5,7 @@ use crate::{
     custom::unit::{
         section::{graphic::Graphic, movement::Movement},
         turret::JsTurret,
+        unit::JsUnit,
         way_point::{WayPoint, WayPointQueue},
     },
     scenes::SceneState,
@@ -29,16 +30,13 @@ impl Plugin for WayPointSystemPlugin {
 
 fn handle_move_way_point(
     time: Res<Time>,
-    way_point_queue: Query<
-        (
-            &mut WayPointQueue,
-            &Transform,
-            &Movement,
-            &mut AngularVelocity,
-            &mut LinearVelocity,
-        ),
-        With<Movement>,
-    >,
+    way_point_queue: Query<(
+        &mut WayPointQueue,
+        &Transform,
+        &JsUnit,
+        &mut AngularVelocity,
+        &mut LinearVelocity,
+    )>,
 ) {
     use std::f32::consts::*;
 
@@ -50,7 +48,7 @@ fn handle_move_way_point(
     for (
         mut queue,
         transform,
-        movement,
+        js_unit,
         //mut external_force,
         mut angular_velocity,
         mut linear_velocity,
@@ -63,6 +61,7 @@ fn handle_move_way_point(
                 queue.data.pop_front();
                 continue;
             }
+            let movement = &js_unit.section.movement;
 
             let target_angle = direction.to_angle();
             let current_angle = transform.rotation.to_euler(EulerRot::ZYX).0 + FRAC_PI_2;
