@@ -2,7 +2,7 @@ export class Synchronize {
     constructor(type) {
         this.type = type
         this._synchronizeProxy = new Proxy(this, SynchronizeHandle)
-        this.entity = sw.registerEntity(this)
+        this.entity = simpleWarfareCli.registerEntity(this)
         //this._synchronizeProxy = createDeepProxy(this, SynchronizeHandle)
     }
 
@@ -32,7 +32,7 @@ export const SynchronizeHandle = {
     set(target, prop, value) {
         //console.log(`设置属性: ${String(prop)} = ${value}`)
         //console.log(`属性类型: ${typeof prop}`)
-        sw.synchronize(this.entity, this.type)
+        simpleWarfareCli.synchronize(this.entity, this.type)
         return Reflect.set(target, prop, value)
     },
 

@@ -7,7 +7,7 @@ use boa_engine::{
     js_string, object::ObjectInitializer, prelude::*, property::Attribute, value::TryIntoJs,
 };
 
-use crate::js_engine::sw::SwRequestEvent;
+use crate::js_engine::simple_warfare_cli::SwRequestEvent;
 
 /// Js端Sw的成员之一，负责实现Js加载文件
 #[derive(Debug, Default, Trace, Finalize, JsData)]

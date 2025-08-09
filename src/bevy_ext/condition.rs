@@ -4,7 +4,7 @@ use std::hash::Hash;
 use crate::{
     js_engine::{
         plugin::BoaLoadJsAsset,
-        sw::plugin::{ReadFilesMap, ReadTomlFiles},
+        simple_warfare_cli::plugin::{ReadFilesMap, ReadTomlFiles},
     },
     mod_engine::server::ModServer,
 };

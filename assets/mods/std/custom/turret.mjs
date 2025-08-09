@@ -5,7 +5,7 @@ import {
   OnUnitEnterSignal,
   OnUnitExitSignal,
 } from "std:signal/signal.mjs";
-import { TargetType } from "std:sw/sw.mjs";
+import { TargetType } from "std:simple-warfare-cli/target.mjs";
 import { Synchronize } from "std:synchronize.mjs";
 
 export class Turret extends Synchronize {
@@ -25,7 +25,7 @@ export class Turret extends Synchronize {
   }
 
   lookAt(target) {
-    sw.lookAt(TargetType.Position, this.entity, target);
+    simpleWarfareCli.lookAt(TargetType.Position, this.entity, target);
   }
 }
 

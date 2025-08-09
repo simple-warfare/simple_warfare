@@ -8,6 +8,6 @@ export class ComfirmDialog {
         this.type = QuickDialogType.Comfirm
         this.onPressCancel = new Signal()
         this.onPressComfirm = new Signal()
-        sw.createQuickUi(this)
+        simpleWarfareCli.createQuickUi(this)
     }
 };

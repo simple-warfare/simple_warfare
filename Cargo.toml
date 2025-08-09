@@ -90,12 +90,14 @@ new_mime_guess = "4.0.4"
 bevy_northstar = { git = "https://github.com/simple-warfare/bevy_northstar.git", features = [
     "serde",
 ] }
-bevy_enhanced_input = "0.15.2"
+bevy_enhanced_input = "0.15.3"
 indexmap = "2.10.0"
 
 rayon = "1.10.0"
 dashmap = { version = "6.1.0", features = ["rayon"] }
-earcutr = "0.5.0"
+
+seldom_state = { git = "https://github.com/simple-warfare/seldom_state.git" }
+
 [dependencies.bevy]
 version = "0.16.1"
 features = [

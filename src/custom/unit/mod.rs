@@ -6,6 +6,7 @@ pub mod transform;
 pub mod turret;
 pub mod unit;
 pub mod way_point;
+pub mod animation;
 
 use std::{
     path::{Path, PathBuf},

@@ -9,8 +9,8 @@ use crate::{
         global::class::entity::JsEntity,
         host_defined::*,
         module::ModModule,
-        sw::{LookType, TeleportType},
-        synchronize::SynchronizeData,
+        simple_warfare_cli::{LookType, TeleportType},
+        synchronize::SynchronizeDataFromJs,
     },
 };
 use bevy::prelude::*;
@@ -284,8 +284,8 @@ pub(super) fn process_js_event(
                 .clone();
             emit_signal(&signal, &[], context)?;
         }
-        JsEngineRequestEvent::SynchronizeData(synchronize_data) => match synchronize_data {
-            SynchronizeData::Core(core) => {
+        JsEngineRequestEvent::SynchronizeFromJs { data } => match data {
+            SynchronizeDataFromJs::Core(core) => {
                 let core_object = context
                     .realm()
                     .host_defined()
@@ -307,7 +307,7 @@ pub(super) fn process_js_event(
                         context,
                     )?;
             }
-            SynchronizeData::Movement(movement) => {
+            SynchronizeDataFromJs::Movement(movement) => {
                 let movement_object = context
                     .realm()
                     .host_defined()
@@ -351,7 +351,7 @@ pub(super) fn process_js_event(
             way_point,
             signal_entity,
         } => {
-           let new_way_point_signal = context
+            let new_way_point_signal = context
                 .realm()
                 .host_defined()
                 .get::<NewWayPointSignalMap>()
@@ -365,8 +365,8 @@ pub(super) fn process_js_event(
                 &new_way_point_signal,
                 &[way_point.try_into_js(context)?],
                 context,
-            )?; 
-        },
+            )?;
+        }
     }
     Ok(())
 }

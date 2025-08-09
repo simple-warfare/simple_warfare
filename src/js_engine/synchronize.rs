@@ -9,29 +9,34 @@ use crate::{
     },
 };
 
-pub enum SynchronizeData {
+pub enum SynchronizeDataFromJs {
     //Section
     Core(Core),
     Movement(Movement),
 }
 
 #[derive(Debug, Clone, Copy, Component, Reflect)]
-pub enum SynchronizeType {
+pub enum SynchronizeDataFromJsType {
     Core,
+    Movement,
 }
 
-impl TryFromJs for SynchronizeType {
+impl TryFromJs for SynchronizeDataFromJsType {
     fn try_from_js(value: &JsValue, _context: &mut Context) -> JsResult<Self> {
-        match value {
-            JsValue::String(movement_type) => match movement_type.to_std_string_lossy().as_str() {
-                "Core" => Ok(SynchronizeType::Core),
+        if let JsValue::String(synchronize_type) = value {
+            match synchronize_type.to_std_string_lossy().as_str() {
+                "Core" => Ok(SynchronizeDataFromJsType::Core),
+                "Movement" => Ok(SynchronizeDataFromJsType::Movement),
                 _ => Err(JsNativeError::typ()
-                    .with_message("cannot convert value to a SynchronizeType")
+                    .with_message("cannot convert value to a SynchronizeDataFromJsType")
                     .into()),
-            },
-            _ => Err(JsNativeError::typ()
-                .with_message("cannot convert value to a SynchronizeType")
-                .into()),
+            }
+        } else {
+            Err(JsNativeError::typ()
+                .with_message(
+                    "cannot convert a value which is not a string to a SynchronizeDataFromJsType",
+                )
+                .into())
         }
     }
 }
@@ -54,8 +59,8 @@ pub fn synchronize_data(
     for core in synchronize_datas {
         js_engine_requests_sender
             .0
-            .send(JsEngineRequestEvent::SynchronizeData(
-                SynchronizeData::Core(core.clone()),
+            .send(JsEngineRequestEvent::synchronize_from_js(
+                SynchronizeDataFromJs::Core(core.clone()),
             ))?;
     }
     Ok(())
@@ -66,9 +71,23 @@ fn handle_synchronize_core_event(
     mut cores: Query<&mut Core>,
 ) -> Result {
     for event in synchronize_core_events.read() {
-        if let JsEngineResponseEvent::SynchronizeCore(core) = event {
-            let mut target_core = cores.get_mut(core.entity)?;
-            *target_core = core.clone();
+        if let JsEngineResponseEvent::SynchronizeCoreFromJs { data } = event {
+            let mut target_core = cores.get_mut(data.entity)?;
+            *target_core = data.clone();
+        }
+    }
+    Ok(())
+}
+
+
+fn handle_synchronize_movement_event(
+    mut synchronize_core_events: EventReader<JsEngineResponseEvent>,
+    mut cores: Query<&mut Core>,
+) -> Result {
+    for event in synchronize_core_events.read() {
+        if let JsEngineResponseEvent::SynchronizeCoreFromJs { data } = event {
+            let mut target_core = cores.get_mut(data.entity)?;
+            *target_core = data.clone();
         }
     }
     Ok(())

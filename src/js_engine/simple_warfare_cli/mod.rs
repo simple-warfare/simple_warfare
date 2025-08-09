@@ -1,5 +1,7 @@
 pub mod fs;
 pub mod plugin;
+pub mod server;
+
 use bevy::prelude::*;
 use boa_engine::{
     JsArgs, JsResult, js_string,
@@ -22,15 +24,18 @@ use std::{
 use crate::{
     assets::js_file::{section::SectionFile, toml::TomlFile},
     bevy_ext::try_from_js::vec2_try_from_js,
-    custom::{ui::quick::QuickUi, unit::section::core::Core},
+    custom::{
+        ui::quick::QuickUi,
+        unit::section::{core::Core, movement::Movement},
+    },
     js_engine::{
         context::emit_signal,
         event::{JsEngineRequestEvent, JsEngineResponseEvent},
         global::class::entity::JsEntity,
         host_defined::*,
         signal::JsDefaultSignalType,
-        sw::fs::Fs,
-        synchronize::SynchronizeType,
+        simple_warfare_cli::{fs::Fs, server::init_server_objects},
+        synchronize::{SynchronizeDataFromJs, SynchronizeDataFromJsType},
     },
 };
 
@@ -41,7 +46,7 @@ pub struct SwRequestReceiver(pub Arc<Mutex<Receiver<SwRequestEvent>>>);
 pub struct SwResponseSender(pub Arc<Sender<SwResponseEvent>>);
 
 #[derive(Debug, Default, Trace, Finalize, JsData)]
-pub struct Sw;
+pub struct SimpleWarfareCli;
 
 #[derive(Event)]
 pub enum SwRequestEvent {
@@ -111,8 +116,8 @@ impl TryFromJs for JsTargetType {
 }
 
 /// 创建Sw这个Js端的全局对象
-impl Sw {
-    pub const NAME: JsString = js_string!("sw");
+impl SimpleWarfareCli {
+    pub const NAME: JsString = js_string!("simpleWarfareCli");
 
     pub fn init(
         context: &mut Context,
@@ -392,12 +397,22 @@ impl Sw {
                     .unwrap()
                     .clone();
 
-                match SynchronizeType::try_from_js(args.get(1).unwrap(), ctx)? {
-                    SynchronizeType::Core => js_engine_response_sender
-                        .send(JsEngineResponseEvent::SynchronizeCore(Core::try_from_js(
-                            &JsValue::Object(object),
-                            ctx,
-                        )?))
+                match SynchronizeDataFromJsType::try_from_js(args.get(1).unwrap(), ctx)? {
+                    SynchronizeDataFromJsType::Core => js_engine_response_sender
+                        .send(JsEngineResponseEvent::synchronize_from_js(
+                            SynchronizeDataFromJs::Core(Core::try_from_js(
+                                &JsValue::Object(object),
+                                ctx,
+                            )?),
+                        ))
+                        .unwrap(),
+                    SynchronizeDataFromJsType::Movement => js_engine_response_sender
+                        .send(JsEngineResponseEvent::synchronize_from_js(
+                            SynchronizeDataFromJs::Movement(Movement::try_from_js(
+                                &JsValue::Object(object),
+                                ctx,
+                            )?),
+                        ))
                         .unwrap(),
                 };
 
@@ -422,34 +437,42 @@ impl Sw {
 
         let fs = Fs::init(context, sw_request_sender.clone());
 
-        ObjectInitializer::with_native_data_and_proto(
+        let server_objects = init_server_objects(context, sw_request_sender.clone());
+
+        let mut initializer = ObjectInitializer::with_native_data_and_proto(
             Self,
             JsObject::with_object_proto(context.realm().intrinsics()),
             context,
-        )
-        .property(
-            JsSymbol::to_string_tag(),
-            Self::NAME,
-            Attribute::CONFIGURABLE,
-        )
-        .function(teleport, js_string!("teleport"), 3)
-        .function(look_at, js_string!("lookAt"), 3)
-        //.function(register_signal, js_string!("register_signal"), 1)
-        .function(signal_emit, js_string!("signalEmit"), 2)
-        .function(register_entity, js_string!("registerEntity"), 0)
-        .function(
-            register_default_signal,
-            js_string!("registerDefaultSignal"),
-            1,
-        )
-        .function(create_quick_ui, js_string!("createQuickUi"), 1)
-        .function(register_signal, js_string!("registerSignal"), 1)
-        .function(get_object, js_string!("getObject"), 1)
-        .function(get_proxy, js_string!("getProxy"), 1)
-        .function(alter_target_state, js_string!("alterTargetState"), 3)
-        .function(synchronize, js_string!("synchronize"), 2)
-        .function(bind_inner_info, js_string!("bindInnerInfo"), 1)
-        .property(js_string!("fs"), fs, Attribute::CONFIGURABLE)
-        .build()
+        );
+        initializer
+            .property(
+                JsSymbol::to_string_tag(),
+                Self::NAME,
+                Attribute::CONFIGURABLE,
+            )
+            .function(teleport, js_string!("teleport"), 3)
+            .function(look_at, js_string!("lookAt"), 3)
+            //.function(register_signal, js_string!("register_signal"), 1)
+            .function(signal_emit, js_string!("signalEmit"), 2)
+            .function(register_entity, js_string!("registerEntity"), 0)
+            .function(
+                register_default_signal,
+                js_string!("registerDefaultSignal"),
+                1,
+            )
+            .function(create_quick_ui, js_string!("createQuickUi"), 1)
+            .function(register_signal, js_string!("registerSignal"), 1)
+            .function(get_object, js_string!("getObject"), 1)
+            .function(get_proxy, js_string!("getProxy"), 1)
+            .function(alter_target_state, js_string!("alterTargetState"), 3)
+            .function(synchronize, js_string!("synchronize"), 2)
+            .function(bind_inner_info, js_string!("bindInnerInfo"), 1)
+            .property(Fs::NAME, fs, Attribute::CONFIGURABLE);
+
+        for (server_name, server_object) in server_objects {
+            initializer.property(server_name, server_object, Attribute::CONFIGURABLE);
+        }
+
+        initializer.build()
     }
 }

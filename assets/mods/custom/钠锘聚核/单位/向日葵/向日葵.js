@@ -9,12 +9,12 @@ export class Sunflower extends CustomUnit {
   constructor(moduleParentPath) {
     super(moduleParentPath);
 
-    let core = sw.fs.readSectionFile(this, "core.section.toml");
-    let main_graphic_file = sw.fs.readSectionFile(
+    let core = simpleWarfareCli.fs.readSectionFile(this, "core.section.toml");
+    let main_graphic_file = simpleWarfareCli.fs.readSectionFile(
       this,
       "graphics/main.section.toml"
     );
-    let movement = sw.fs.readSectionFile(this, "movement.section.toml");
+    let movement = simpleWarfareCli.fs.readSectionFile(this, "movement.section.toml");
 
     this.core = manyFromSectionFiles.core(core);
 
@@ -28,8 +28,7 @@ export class Sunflower extends CustomUnit {
 
     this.newWayPointFunc = (wayPoint) => {
       if (wayPoint.type == "move") {
-        let main_graphic = this.graphics[0];
-        main_graphic.playTrickFilm(main_graphic.trickFilmRegistion[0]);
+        let mainTrickFilmPlayer = this.graphics[0].trickFilmPlayer;
       }
     };
 

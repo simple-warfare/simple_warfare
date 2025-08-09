@@ -59,6 +59,18 @@ pub fn entity_try_from_js(value: &JsValue, context: &mut Context) -> JsResult<En
     Ok(js_entity.to_entity())
 }
 
+pub fn option_entity_try_from_js(
+    value: &JsValue,
+    context: &mut Context,
+) -> JsResult<Option<Entity>> {
+    if value.is_undefined() {
+        JsResult::Ok(None)
+    } else {
+        let js_entity = JsEntity::try_from_js(value, context).expect("try_from_js error");
+        Ok(Some(js_entity.to_entity()))
+    }
+}
+
 pub fn quat_try_from_js(value: &JsValue, context: &mut Context) -> JsResult<Quat> {
     let quat_array = JsTypedArray::from_object(value.to_object(context)?)?;
     Ok(Quat::from_xyzw(

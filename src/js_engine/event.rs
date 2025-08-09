@@ -6,12 +6,17 @@ use crate::{
     assets::mods::js::JsAsset,
     custom::{
         CustomModAsset, CustomTypedId,
-        unit::{CustomInnerInfo, section::core::Core, unit::JsUnit, way_point::WayPoint},
+        unit::{
+            CustomInnerInfo,
+            section::{core::Core, movement::Movement},
+            unit::JsUnit,
+            way_point::WayPoint,
+        },
     },
     js_engine::{
         global::class::entity::JsEntity,
-        sw::{LookType, TeleportType},
-        synchronize::SynchronizeData,
+        simple_warfare_cli::{LookType, TeleportType},
+        synchronize::{SynchronizeDataFromJs, SynchronizeDataFromJsType},
     },
     net::shared::UnitId,
 };
@@ -43,7 +48,9 @@ pub enum JsEngineRequestEvent {
         way_point: WayPoint,
         signal_entity: Entity,
     },
-    SynchronizeData(SynchronizeData), //RemoteJsProxy(Box<dyn Fn(JsProxy) -> String + Send + Sync + 'static>),
+    SynchronizeFromJs {
+        data: SynchronizeDataFromJs,
+    }, //RemoteJsProxy(Box<dyn Fn(JsProxy) -> String + Send + Sync + 'static>),
 
     InsertCustomInnerInfo {
         custom_typed_id: CustomTypedId,
@@ -87,6 +94,10 @@ impl JsEngineRequestEvent {
     pub fn emit_empty_signal(signal_entity: Entity) -> Self {
         Self::EmitEmptySignal { signal_entity }
     }
+
+    pub fn synchronize_from_js(data: SynchronizeDataFromJs) -> Self {
+        Self::SynchronizeFromJs { data }
+    }
 }
 
 #[derive(Debug, Event, Clone)]
@@ -97,12 +108,22 @@ pub enum JsEngineResponseEvent {
     ToTeleport(TeleportType),
     ToLook(LookType),
 
-    SynchronizeCore(Core),
+    SynchronizeCoreFromJs { data: Core },
+    SynchronizeMovementFromJs { data: Movement },
 }
 
 impl JsEngineResponseEvent {
     pub fn spawned_unit(js_unit: JsUnit) -> Self {
         Self::SpawnedUnit { js_unit }
+    }
+
+    pub fn synchronize_from_js(data: SynchronizeDataFromJs) -> Self {
+        match data {
+            SynchronizeDataFromJs::Core(core) => Self::SynchronizeCoreFromJs { data: core },
+            SynchronizeDataFromJs::Movement(movement) => {
+                Self::SynchronizeMovementFromJs { data: movement }
+            }
+        }
     }
 }
 

@@ -4,7 +4,7 @@ import {
   NewWayPointSignal,
   SelectedSignal,
 } from "std:signal/signal.mjs";
-import { TargetType } from "std:sw/sw.mjs";
+import { TargetType } from "std:simple-warfare-cli/target.mjs";
 import { Synchronize } from "std:synchronize.mjs";
 
 export const UnitType = {
@@ -16,7 +16,7 @@ export class CustomUnit extends Synchronize {
   constructor(moduleParentPath) {
     super();
     this.moduleParentPath = moduleParentPath;
-    //this.entity = sw.registerEntity(this)
+    //this.entity = simpleWarfareCli.registerEntity(this)
     this.graphics = new Array();
     this.colliders = new Array();
     this.pointLights = new Array();
@@ -28,11 +28,11 @@ export class CustomUnit extends Synchronize {
     this.newWayPoint = new NewWayPointSignal();
 
     this.newWayPointEntity = this.newWayPoint.entity;
-    //sw.bindInnerInfo(this);
+    //simpleWarfareCli.bindInnerInfo(this);
   }
 
   teleportSelfTo(target) {
-    sw.teleport(TargetType.Position, this.entity, target);
+    simpleWarfareCli.teleport(TargetType.Position, this.entity, target);
   }
 
   getCore() {

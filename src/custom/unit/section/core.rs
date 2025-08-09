@@ -3,7 +3,6 @@ use bevy::prelude::*;
 use serde::{Deserialize, Serialize};
 use simple_warfare_macros::TryFromAndIntoJs;
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Component, Reflect, TryFromAndIntoJs)]
-#[boa(rename_all = "camelCase")]
 pub struct Core {
     #[boa(
         from_js_with = "entity_try_from_js",

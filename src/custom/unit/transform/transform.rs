@@ -6,6 +6,8 @@ use serde::{Deserialize, Serialize};
     Debug, Default, Clone, Component, Serialize, Deserialize, PartialEq, Reflect, TryFromJs,
 )]
 pub struct JsTransform {
+    #[boa(from_js_with = "option_entity_try_from_js")]
+    pub entity: Option<Entity>,
     /// Position of the entity. In 2d, the last value of the `Vec3` is used for z-ordering.
     ///
     /// See the [`translations`] example for usage.

@@ -10,9 +10,9 @@ export class Tank extends CustomUnit {
   constructor(moduleParentPath) {
     super(moduleParentPath);
 
-    let core = sw.fs.readSectionFile(this, "core.toml");
-    let main_graphic = sw.fs.readSectionFile(this, "graphics/main.toml");
-    let movement = sw.fs.readSectionFile(this, "movement.toml");
+    let core = simpleWarfareCli.fs.readSectionFile(this, "core.toml");
+    let main_graphic = simpleWarfareCli.fs.readSectionFile(this, "graphics/main.toml");
+    let movement = simpleWarfareCli.fs.readSectionFile(this, "movement.toml");
 
     this.core = manyFromSectionFiles.core(core);
     this.graphics.push(manyFromSectionFiles.graphic(main_graphic));

@@ -7,7 +7,7 @@ pub mod loader;
 pub mod module;
 pub mod plugin;
 pub mod signal;
-pub mod sw;
+pub mod simple_warfare_cli;
 pub mod synchronize;
 
 use std::sync::{
@@ -22,7 +22,7 @@ use crate::{
         event::{EventPlugin, JsEngineRequestEvent, JsEngineResponseEvent},
         loader::{SimpleWarfareModuleLoader, SwModuleLoaderRequestReceiver},
         plugin::SwLoaderPlugin,
-        sw::{SwRequestReceiver, SwResponseSender, plugin::SwPlugin},
+        simple_warfare_cli::{SwRequestReceiver, SwResponseSender, plugin::SwPlugin},
     },
     statistics::AppState,
 };

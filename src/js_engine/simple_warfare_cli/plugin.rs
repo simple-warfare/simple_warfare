@@ -7,7 +7,7 @@ use crate::{
     },
     js_engine::{
         event::JsEngineResponseEvent,
-        sw::{
+        simple_warfare_cli::{
             LookType, SwRequestEvent, SwRequestReceiver, SwResponseEvent, SwResponseSender,
             TeleportType,
         },

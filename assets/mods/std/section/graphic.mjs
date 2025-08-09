@@ -1,5 +1,6 @@
 import * as create from "std:create.mjs";
 import { parse } from "package:smol-toml/index.js";
+import { TrickFilmPlayer } from "std:animation/trick-film.mjs";
 import { Synchronize } from "std:synchronize.mjs";
 export class Graphic extends Synchronize {
   constructor(
@@ -25,17 +26,12 @@ export class Graphic extends Synchronize {
     this.lockRotation = lockRotation;
   }
 
-  setEasyAnimation(trickFilm, trickFilmRegistion) {
-    this.trickFilm = trickFilm;
-    this.trickFilmRegistion = trickFilmRegistion;
+  setTrickFilmPlayer(trickFilmPlayer) {
+    this.trickFilmPlayer = trickFilmPlayer;
   }
 
   setRealPath(realPath) {
     this.realPath = realPath;
-  }
-
-  playTrickFilm(registion) {
-    console.log(registion);
   }
 }
 
@@ -83,7 +79,15 @@ export function fromSectionFile(file) {
     t.lockRotation
   );
 
-  graphic.setEasyAnimation(t.trickFilm, t.trickFilmRegistion);
+  if (
+    typeof t.trickFilm !== "undefined" &&
+    typeof t.trickFilmRegistion !== "undefined"
+  ) {
+    graphic.setTrickFilmPlayer(
+      new TrickFilmPlayer(t.trickFilm, t.trickFilmRegistion)
+    );
+  }
+
   graphic.setRealPath(file.realPath);
 
   return graphic;

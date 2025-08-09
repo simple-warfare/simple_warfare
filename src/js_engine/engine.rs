@@ -18,7 +18,7 @@ use crate::{
         host_defined::*,
         loader::SimpleWarfareModuleLoader,
         module::ModModule,
-        sw::{Sw, SwRequestEvent, SwResponseEvent},
+        simple_warfare_cli::{SimpleWarfareCli, SwRequestEvent, SwResponseEvent},
     },
 };
 
@@ -76,7 +76,7 @@ fn egister_global_property(
     ctx.register_global_property(Console::NAME, console, Attribute::all())
         .expect("the console builtin shouldn't exist");
 
-    let sw = Sw::init(
+    let simple_warfare_cli = SimpleWarfareCli::init(
         ctx,
         js_engine_request_sender,
         js_engine_response_sender,
@@ -84,7 +84,7 @@ fn egister_global_property(
         sw_response_receiver,
     );
 
-    ctx.register_global_property(Sw::NAME, sw, Attribute::all())
+    ctx.register_global_property(SimpleWarfareCli::NAME, simple_warfare_cli, Attribute::all())
         .expect("the sw builtin shouldn't exist");
 }
 

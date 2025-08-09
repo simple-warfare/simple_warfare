@@ -4,9 +4,9 @@ export class Signal extends Synchronize {
   constructor() {
     super();
     this.type = DefaultSignalType.Custom;
-    this.entity = sw.registerEntity(this);
+    this.entity = simpleWarfareCli.registerEntity(this);
     this.connectArray = new Array();
-    sw.registerSignal(this);
+    simpleWarfareCli.registerSignal(this);
   }
 
   connect(func) {
@@ -14,7 +14,7 @@ export class Signal extends Synchronize {
   }
 
   emit(args) {
-    sw.signalEmit(this, args);
+    simpleWarfareCli.signalEmit(this, args);
   }
 }
 
@@ -31,7 +31,7 @@ export class CreatedSignal extends Signal {
   constructor() {
     super();
     this.type = DefaultSignalType.Created;
-    sw.registerDefaultSignal(this);
+    simpleWarfareCli.registerDefaultSignal(this);
   }
 }
 
@@ -39,7 +39,7 @@ export class SelectedSignal extends Signal {
   constructor() {
     super();
     this.type = DefaultSignalType.Selected;
-    sw.registerDefaultSignal(this);
+    simpleWarfareCli.registerDefaultSignal(this);
   }
 }
 
@@ -47,7 +47,7 @@ export class NewWayPointSignal extends Signal {
   constructor() {
     super();
     this.type = DefaultSignalType.NewWayPoint;
-    sw.registerDefaultSignal(this);
+    simpleWarfareCli.registerDefaultSignal(this);
   }
 }
 
@@ -55,7 +55,7 @@ export class OnUnitEnterSignal extends Signal {
   constructor() {
     super();
     this.type = DefaultSignalType.OnUnitEnter;
-    sw.registerDefaultSignal(this);
+    simpleWarfareCli.registerDefaultSignal(this);
   }
 }
 
@@ -63,6 +63,6 @@ export class OnUnitExitSignal extends Signal {
   constructor() {
     super();
     this.type = DefaultSignalType.OnUnitExit;
-    sw.registerDefaultSignal(this);
+    simpleWarfareCli.registerDefaultSignal(this);
   }
 }

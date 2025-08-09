@@ -1,6 +1,6 @@
 import { Turret } from "std:custom/turret.mjs";
 import * as manyFromValues from "std:from-values.mjs";
-import { TargetType } from "std:sw/sw.mjs";
+import { TargetType } from "std:simple-warfare-cli/target.mjs";
 import { ComfirmDialog } from "std:ui/quick/dialog/comfirm.mjs";
 export class SingleTurret extends Turret {
   constructor() {
@@ -26,7 +26,7 @@ export class SingleTurret extends Turret {
     );
 
     this.created_func = () => {
-      sw.lookAt(
+      simpleWarfareCli.lookAt(
         TargetType.Position,
         this.entity,
         manyFromValues.vec2(
@@ -36,14 +36,14 @@ export class SingleTurret extends Turret {
       );
     };
     this.onUnitEnterFunc = (units) => {
-      sw.lookAt(TargetType.Entity, this.entity, units[0]);
+      simpleWarfareCli.lookAt(TargetType.Entity, this.entity, units[0]);
       this.quick_dialog = new ComfirmDialog("Damage", "Damage Hp 10");
       this.target_entity = units[0];
       this.quick_dialog.onPressComfirm.connect(this.onPressComfirmFunc);
     };
 
     this.onPressComfirmFunc = () => {
-      let target_proxy = sw.getProxy(this.target_entity);
+      let target_proxy = simpleWarfareCli.getProxy(this.target_entity);
 
       console.log(`before:${target_proxy.core.hp}`);
       target_proxy.getCore().hp -= 100;
