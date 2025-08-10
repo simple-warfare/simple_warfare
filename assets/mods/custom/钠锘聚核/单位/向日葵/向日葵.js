@@ -14,7 +14,10 @@ export class Sunflower extends CustomUnit {
       this,
       "graphics/main.section.toml"
     );
-    let movement = simpleWarfareCli.fs.readSectionFile(this, "movement.section.toml");
+    let movement = simpleWarfareCli.fs.readSectionFile(
+      this,
+      "movement.section.toml"
+    );
 
     this.core = manyFromSectionFiles.core(core);
 
@@ -29,6 +32,7 @@ export class Sunflower extends CustomUnit {
     this.newWayPointFunc = (wayPoint) => {
       if (wayPoint.type == "move") {
         let mainTrickFilmPlayer = this.graphics[0].trickFilmPlayer;
+        mainTrickFilmPlayer.start(mainTrickFilmPlayer.registions.run_left);
       }
     };
 

@@ -11,14 +11,16 @@ use bevy::{platform::collections::HashMap, prelude::*};
 use boa_engine::{js_string, prelude::*, property::Attribute};
 use boa_runtime::Console;
 
-use crate::{
-    custom::CustomTypedId,
-    js_engine::{
-        event::{JsEngineRequestEvent, JsEngineResponseEvent},
-        host_defined::*,
-        loader::SimpleWarfareModuleLoader,
-        module::ModModule,
-        simple_warfare_cli::{SimpleWarfareCli, SwRequestEvent, SwResponseEvent},
+use crate::custom::CustomTypedId;
+
+use super::{
+    event::{JsEngineRequestEvent, JsEngineResponseEvent},
+    host_defined::*,
+    loader::SimpleWarfareModuleLoader,
+    module::ModModule,
+    simple_warfare_cli::{
+        SimpleWarfareCli, SwCliRequestEvent, SwCliResponseEvent, io::fs::SwFsRequestEvent,
+        server::trick_film_player::SwTrickFilmPlayerRequestEvent,
     },
 };
 
@@ -33,8 +35,10 @@ impl JsEngine {
         loader: SimpleWarfareModuleLoader,
         js_engine_request_sender: Arc<Sender<JsEngineRequestEvent>>,
         js_engine_response_sender: Arc<Sender<JsEngineResponseEvent>>,
-        sw_request_sender: Arc<Sender<SwRequestEvent>>,
-        sw_response_receiver: Arc<Mutex<Receiver<SwResponseEvent>>>,
+        sw_cli_request_sender: Arc<Sender<SwCliRequestEvent>>,
+        sw_cli_response_receiver: Arc<Mutex<Receiver<SwCliResponseEvent>>>,
+        sw_fs_request_sender: Arc<Sender<SwFsRequestEvent>>,
+        sw_trick_film_player_request_sender: Arc<Sender<SwTrickFilmPlayerRequestEvent>>,
     ) -> Self {
         let context_builder = Context::builder();
         let loader = Rc::new(loader);
@@ -51,8 +55,10 @@ impl JsEngine {
             &mut ctx.borrow_mut(),
             js_engine_request_sender,
             js_engine_response_sender,
-            sw_request_sender,
-            sw_response_receiver,
+            sw_cli_request_sender,
+            sw_cli_response_receiver,
+            sw_fs_request_sender,
+            sw_trick_film_player_request_sender,
         );
 
         register_global_callable(&mut ctx.borrow_mut());
@@ -69,8 +75,10 @@ fn egister_global_property(
     ctx: &mut Context,
     js_engine_request_sender: Arc<Sender<JsEngineRequestEvent>>,
     js_engine_response_sender: Arc<Sender<JsEngineResponseEvent>>,
-    sw_request_sender: Arc<Sender<SwRequestEvent>>,
-    sw_response_receiver: Arc<Mutex<Receiver<SwResponseEvent>>>,
+    sw_cli_request_sender: Arc<Sender<SwCliRequestEvent>>,
+    sw_cli_response_receiver: Arc<Mutex<Receiver<SwCliResponseEvent>>>,
+    sw_fs_request_sender: Arc<Sender<SwFsRequestEvent>>,
+    sw_trick_film_player_request_sender: Arc<Sender<SwTrickFilmPlayerRequestEvent>>,
 ) {
     let console = Console::init(ctx);
     ctx.register_global_property(Console::NAME, console, Attribute::all())
@@ -80,8 +88,10 @@ fn egister_global_property(
         ctx,
         js_engine_request_sender,
         js_engine_response_sender,
-        sw_request_sender,
-        sw_response_receiver,
+        sw_cli_request_sender,
+        sw_cli_response_receiver,
+        sw_fs_request_sender,
+        sw_trick_film_player_request_sender,
     );
 
     ctx.register_global_property(SimpleWarfareCli::NAME, simple_warfare_cli, Attribute::all())

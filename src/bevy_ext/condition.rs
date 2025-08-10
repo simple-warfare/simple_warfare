@@ -2,10 +2,7 @@ use bevy::prelude::*;
 use std::hash::Hash;
 
 use crate::{
-    js_engine::{
-        plugin::BoaLoadJsAsset,
-        simple_warfare_cli::plugin::{ReadFilesMap, ReadTomlFiles},
-    },
+    js_engine::{plugin::BoaLoadJsAsset, simple_warfare_cli::io::fs::plugin::ReadFilesMap},
     mod_engine::server::ModServer,
 };
 

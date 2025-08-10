@@ -16,6 +16,7 @@ pub mod spatial;
 pub mod statistics;
 pub mod system;
 pub mod utils;
+pub mod boa_ext;
 
 use crate::{
     assets::AssetsPlugin,

@@ -1,4 +1,6 @@
-use crate::bevy_ext::try_from_js::*;
+use crate::{
+    bevy_ext::try_from_js::*, custom::unit::animation::trick_film_player::TrickFilmPlayer,
+};
 use bevy::{
     ecs::{component::HookContext, world::DeferredWorld},
     prelude::*,
@@ -27,13 +29,11 @@ pub struct Graphic {
     pub texture_atlas_layout: Option<TextureAtlasLayout>,
     #[boa(from_js_with = "vec2_try_from_js")]
     pub offset: Vec2,
-    #[boa(rename = "trickFilm")]
-    pub trick_film: Option<String>,
-
-    #[boa(rename = "trickFilmRegistion")]
-    pub trick_film_registion: Option<Vec<String>>,
     #[boa(rename = "realPath")]
     pub real_path: Option<String>,
+
+    #[boa(rename = "trickFilmPlayer")]
+    pub trick_film_player: Option<TrickFilmPlayer>,
 }
 
 impl Graphic {

@@ -1,25 +1,72 @@
-use std::{
-    path::Path,
-    sync::{Arc, mpsc::Sender},
-};
+pub mod plugin;
 
+use bevy::prelude::*;
 use boa_engine::{
     js_string, object::ObjectInitializer, prelude::*, property::Attribute, value::TryIntoJs,
 };
+use std::{
+    path::{Path, PathBuf},
+    sync::{
+        Arc, Mutex,
+        mpsc::{Receiver, Sender},
+    },
+};
 
-use crate::js_engine::simple_warfare_cli::SwRequestEvent;
+use crate::assets::js_file::{section::SectionFile, toml::TomlFile};
 
 /// Js端Sw的成员之一，负责实现Js加载文件
 #[derive(Debug, Default, Trace, Finalize, JsData)]
 pub struct Fs;
 
+#[derive(Resource)]
+pub struct SwFsRequestReceiver(pub Arc<Mutex<Receiver<SwFsRequestEvent>>>);
+
+#[derive(Resource, Clone)]
+pub struct SwFsResponseSender(pub Arc<Sender<SwFsResponseEvent>>);
+
+#[derive(Event)]
+pub enum SwFsRequestEvent {
+    ReadSectionFile {
+        file_sender: Box<oneshot::Sender<SectionFile>>,
+        file_path: PathBuf,
+    },
+    ReadTomlFile {
+        file_sender: Box<oneshot::Sender<TomlFile>>,
+        file_path: PathBuf,
+    },
+}
+
+impl SwFsRequestEvent {
+    pub fn read_section_file(
+        file_sender: Box<oneshot::Sender<SectionFile>>,
+        file_path: PathBuf,
+    ) -> Self {
+        SwFsRequestEvent::ReadSectionFile {
+            file_sender,
+            file_path,
+        }
+    }
+    pub fn read_toml_file(file_sender: Box<oneshot::Sender<TomlFile>>, file_path: PathBuf) -> Self {
+        SwFsRequestEvent::ReadTomlFile {
+            file_sender,
+            file_path,
+        }
+    }
+}
+
+#[derive(Event)]
+pub enum SwFsResponseEvent {}
+
 impl Fs {
     pub const NAME: JsString = js_string!("fs");
 
     /// TODO:目前只能加载String到Js端,等待完善
-    pub fn init(context: &mut Context, sw_request_sender: Arc<Sender<SwRequestEvent>>) -> JsObject {
+    pub fn init(
+        context: &mut Context,
+        sw_fs_request_sender: Arc<Sender<SwFsRequestEvent>>,
+    ) -> JsObject {
         let read_section_file = unsafe {
-            let sw_request_sender = sw_request_sender.clone();
+            let sw_fs_request_sender = sw_fs_request_sender.clone();
             NativeFunction::from_closure(move |_referrer, args, ctx| {
                 // Js入参中第二个应该为文件路径
                 let Some(this) = args.first() else {
@@ -41,8 +88,11 @@ impl Fs {
 
                 // 一次性管道用于接受加载好的文件
                 let (sender, receiver) = oneshot::channel();
-                sw_request_sender
-                    .send(SwRequestEvent::ReadSectionFile(Box::new(sender), real_path))
+                sw_fs_request_sender
+                    .send(SwFsRequestEvent::read_section_file(
+                        Box::new(sender),
+                        real_path,
+                    ))
                     .unwrap();
                 if let Ok(section_file) = receiver.recv() {
                     let section_object = section_file.try_into_js(ctx)?.to_object(ctx)?;

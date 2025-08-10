@@ -1,4 +1,4 @@
-pub mod fs;
+pub mod io;
 pub mod plugin;
 pub mod server;
 
@@ -30,34 +30,37 @@ use crate::{
     },
     js_engine::{
         context::emit_signal,
-        event::{JsEngineRequestEvent, JsEngineResponseEvent},
         global::class::entity::JsEntity,
         host_defined::*,
         signal::JsDefaultSignalType,
-        simple_warfare_cli::{fs::Fs, server::init_server_objects},
         synchronize::{SynchronizeDataFromJs, SynchronizeDataFromJsType},
     },
 };
 
+use self::{
+    io::fs::{Fs, SwFsRequestEvent},
+    server::{init_server_objects, trick_film_player::SwTrickFilmPlayerRequestEvent},
+};
+
+use super::event::{JsEngineRequestEvent, JsEngineResponseEvent};
+
 #[derive(Resource)]
-pub struct SwRequestReceiver(pub Arc<Mutex<Receiver<SwRequestEvent>>>);
+pub struct SwCliRequestReceiver(pub Arc<Mutex<Receiver<SwCliRequestEvent>>>);
 
 #[derive(Resource, Clone)]
-pub struct SwResponseSender(pub Arc<Sender<SwResponseEvent>>);
+pub struct SwCliResponseSender(pub Arc<Sender<SwCliResponseEvent>>);
 
 #[derive(Debug, Default, Trace, Finalize, JsData)]
 pub struct SimpleWarfareCli;
 
 #[derive(Event)]
-pub enum SwRequestEvent {
+pub enum SwCliRequestEvent {
     RegisterEntity,
-    ReadSectionFile(Box<oneshot::Sender<SectionFile>>, PathBuf),
-    ReadTomlFile(Box<oneshot::Sender<TomlFile>>, PathBuf),
     CreateQuickUi(QuickUi),
 }
 
 #[derive(Event, Clone)]
-pub enum SwResponseEvent {
+pub enum SwCliResponseEvent {
     None,
     RegisteredEntity(Entity),
 }
@@ -123,8 +126,10 @@ impl SimpleWarfareCli {
         context: &mut Context,
         js_engine_request_sender: Arc<Sender<JsEngineRequestEvent>>,
         js_engine_response_sender: Arc<Sender<JsEngineResponseEvent>>,
-        sw_request_sender: Arc<Sender<SwRequestEvent>>,
-        sw_response_receiver: Arc<Mutex<Receiver<SwResponseEvent>>>,
+        sw_cli_request_sender: Arc<Sender<SwCliRequestEvent>>,
+        sw_cli_response_receiver: Arc<Mutex<Receiver<SwCliResponseEvent>>>,
+        sw_fs_request_sender: Arc<Sender<SwFsRequestEvent>>,
+        sw_trick_film_player_request_sender: Arc<Sender<SwTrickFilmPlayerRequestEvent>>,
     ) -> JsObject {
         // Js传送单位位置的方法
         let teleport = unsafe {
@@ -261,14 +266,14 @@ impl SimpleWarfareCli {
 
         // 将Js的Object与Bevy的Entity绑定的方法
         let register_entity = unsafe {
-            let sw_request_sender = sw_request_sender.clone();
-            let sw_response_receiver = sw_response_receiver.clone();
+            let sw_cli_request_sender = sw_cli_request_sender.clone();
+            let sw_cli_response_receiver = sw_cli_response_receiver.clone();
             NativeFunction::from_closure(move |_referrer, args, ctx| {
-                sw_request_sender
-                    .send(SwRequestEvent::RegisterEntity)
+                sw_cli_request_sender
+                    .send(SwCliRequestEvent::RegisterEntity)
                     .unwrap();
-                if let SwResponseEvent::RegisteredEntity(entity) =
-                    sw_response_receiver.lock().unwrap().recv().unwrap()
+                if let SwCliResponseEvent::RegisteredEntity(entity) =
+                    sw_cli_response_receiver.lock().unwrap().recv().unwrap()
                 {
                     let js_object = args.get_or_undefined(0).to_object(ctx)?;
 
@@ -310,11 +315,11 @@ impl SimpleWarfareCli {
         };
 
         let create_quick_ui = unsafe {
-            let sw_request_sender = sw_request_sender.clone();
+            let sw_cli_request_sender = sw_cli_request_sender.clone();
             NativeFunction::from_closure(move |_referrer, args, ctx| {
                 let quick_ui = args.first().unwrap();
-                sw_request_sender
-                    .send(SwRequestEvent::CreateQuickUi(QuickUi::try_from_js(
+                sw_cli_request_sender
+                    .send(SwCliRequestEvent::CreateQuickUi(QuickUi::try_from_js(
                         quick_ui, ctx,
                     )?))
                     .unwrap();
@@ -435,9 +440,10 @@ impl SimpleWarfareCli {
             })
         };
 
-        let fs = Fs::init(context, sw_request_sender.clone());
+        let fs = Fs::init(context, sw_fs_request_sender.clone());
 
-        let server_objects = init_server_objects(context, sw_request_sender.clone());
+        let server_objects =
+            init_server_objects(context, sw_trick_film_player_request_sender.clone());
 
         let mut initializer = ObjectInitializer::with_native_data_and_proto(
             Self,

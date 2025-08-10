@@ -33,7 +33,7 @@ fn handle_move_way_point(
     way_point_queue: Query<(
         &mut WayPointQueue,
         &Transform,
-        &JsUnit,
+        &Movement,
         &mut AngularVelocity,
         &mut LinearVelocity,
     )>,
@@ -48,7 +48,7 @@ fn handle_move_way_point(
     for (
         mut queue,
         transform,
-        js_unit,
+        movement,
         //mut external_force,
         mut angular_velocity,
         mut linear_velocity,
@@ -61,7 +61,6 @@ fn handle_move_way_point(
                 queue.data.pop_front();
                 continue;
             }
-            let movement = &js_unit.section.movement;
 
             let target_angle = direction.to_angle();
             let current_angle = transform.rotation.to_euler(EulerRot::ZYX).0 + FRAC_PI_2;

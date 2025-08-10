@@ -4,5 +4,5 @@ frameHeight = 54
 frameWidth = 24
 lockRotation = 0
 trickFilm = "main.trickfilm.ron"
-trickFilmRegistion = ["run-left", "run-right"]
+trickFilmRegistion = ["run_left", "run_right"]
 path = "向日葵.png"

@@ -177,7 +177,7 @@ pub(super) fn process_js_event(
                             .unwrap()
                             .map
                             .borrow_mut()
-                            .insert(js_unit.entity, unit_proxy);
+                            .insert(js_unit.data.entity, unit_proxy);
 
                         response_sender
                             .send(JsEngineResponseEvent::spawned_unit(js_unit))

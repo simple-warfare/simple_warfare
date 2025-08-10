@@ -59,15 +59,15 @@ fn check_new_unit(
 ) -> Result {
     for event in reader.read() {
         if let JsEngineResponseEvent::SpawnedUnit { js_unit } = event {
-            info!("{:?}", js_unit.section.graphics);
-            unit_mapping.add_entity(js_unit.unit_id, js_unit.entity);
+            let ref js_unit_data = js_unit.data;
+            unit_mapping.add_entity(js_unit_data.unit_id, js_unit_data.entity);
 
-            let custom_unit_inner_info = Arc::new(CustomInnerInfo::new(&js_unit.module_path));
+            let custom_unit_inner_info = Arc::new(CustomInnerInfo::new(&js_unit_data.module_path));
             let custom_inner_info_storage =
                 CustomInnerInfoStorage::new(custom_unit_inner_info.clone());
-            let custom_typed_id = js_unit.custom_typed_id;
+            let custom_typed_id = js_unit_data.custom_typed_id;
 
-            let unit_entity = js_unit.entity;
+            let unit_entity = js_unit_data.entity;
 
             let core = &js_unit.section.core;
             let graphics = &js_unit.section.graphics;
@@ -197,14 +197,8 @@ fn check_new_graphic(
 
         info!("realPath:{:?}", graphic.real_path);
 
-        if graphic.trick_film.is_some() {
-            let mut a = AnimationPlayer2D::default();
-            a.play(
-                asset_server
-                    .load("mods/custom/钠锘聚核/单位/向日葵/graphics/main.trickfilm.ron#run-left"),
-            )
-            .repeat();
-            entity_commands.insert(a);
+        if graphic.trick_film_player.is_some() {
+            entity_commands.insert(AnimationPlayer2D::default());
         }
     }
 

@@ -84,7 +84,7 @@ export function fromSectionFile(file) {
     typeof t.trickFilmRegistion !== "undefined"
   ) {
     graphic.setTrickFilmPlayer(
-      new TrickFilmPlayer(t.trickFilm, t.trickFilmRegistion)
+      new TrickFilmPlayer(graphic.entity, t.trickFilm, t.trickFilmRegistion)
     );
   }
 

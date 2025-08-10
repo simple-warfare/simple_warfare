@@ -1,15 +1,13 @@
 use bevy::prelude::*;
 use boa_engine::object::builtins::JsProxy;
-use boa_engine::value::TryFromJs;
 use serde::{Deserialize, Serialize};
-use simple_warfare_macros::TryFromAndIntoJs;
 
 use crate::bevy_ext::try_from_js::*;
 use crate::{
     custom::{
         CustomTypedId,
         unit::{
-            section::{Section, graphic::Graphics},
+            section::Section,
             way_point::WayPointQueue,
         },
     },
@@ -28,17 +26,22 @@ pub struct CustomTurrrt;
 #[require(Custom, InheritedVisibility, WayPointQueue)]
 pub struct CustomUnit;
 
-#[derive(Debug, Clone, Component, Serialize, Deserialize, Reflect)]
+
+#[derive(Debug, Clone, Bundle, Serialize, Deserialize, Reflect)]
 
 pub struct JsUnit {
+    pub section: Section,
+    pub data: JsUnitData,
+}
+
+#[derive(Debug, Clone, Component, Serialize, Deserialize, Reflect)]
+pub struct JsUnitData {
     pub unit_id: UnitId,
     pub custom_typed_id: CustomTypedId,
     pub entity: Entity,
-    pub section: Section,
     pub module_path: String,
     pub new_way_point_entity: Entity,
 }
-
 
 impl JsUnit {
     pub fn try_from_proxy(
@@ -47,17 +50,19 @@ impl JsUnit {
         unit_id: UnitId,
         custom_typed_id: CustomTypedId,
         module_path: String,
-    ) -> JsResult<JsUnit> {
+    ) -> JsResult<Self> {
         Ok(Self {
-            entity: entity_try_from_js(&proxy.get(js_string!("entity"), context)?, context)?,
             section: Section::try_from_proxy(proxy, context)?,
-            unit_id,
-            custom_typed_id,
-            module_path,
-            new_way_point_entity: entity_try_from_js(
-                &proxy.get(js_string!("newWayPointEntity"), context)?,
-                context,
-            )?,
+            data: JsUnitData {
+                unit_id,
+                custom_typed_id,
+                entity: entity_try_from_js(&proxy.get(js_string!("entity"), context)?, context)?,
+                module_path,
+                new_way_point_entity: entity_try_from_js(
+                    &proxy.get(js_string!("newWayPointEntity"), context)?,
+                    context,
+                )?,
+            },
         })
     }
 }

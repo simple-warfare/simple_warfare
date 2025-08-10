@@ -22,13 +22,20 @@ use crate::{
         event::{EventPlugin, JsEngineRequestEvent, JsEngineResponseEvent},
         loader::{SimpleWarfareModuleLoader, SwModuleLoaderRequestReceiver},
         plugin::SwLoaderPlugin,
-        simple_warfare_cli::{SwRequestReceiver, SwResponseSender, plugin::SwPlugin},
+        simple_warfare_cli::{SwCliRequestReceiver, SwCliResponseSender, plugin::SwPlugin},
     },
     statistics::AppState,
 };
 use bevy::prelude::*;
 use boa_engine::prelude::*;
 use thiserror::Error;
+
+use self::simple_warfare_cli::{
+    io::fs::{SwFsRequestReceiver, SwFsResponseSender},
+    server::trick_film_player::{
+        SwTrickFilmPlayerRequestReceiver, SwTrickFilmPlayerResponseSender,
+    },
+};
 
 #[derive(Error, Debug)]
 pub enum JsEngineError {
@@ -83,10 +90,32 @@ fn init_js_context(mut commands: Commands) -> Result {
         sw_module_request_receiver,
     ))));
 
-    let (sw_request_sender, sw_request_receiver) = mpsc::channel();
-    let (sw_response_sender, sw_response_receiver) = mpsc::channel();
-    commands.insert_resource(SwResponseSender(Arc::new(sw_response_sender.clone())));
-    commands.insert_resource(SwRequestReceiver(Arc::new(Mutex::new(sw_request_receiver))));
+    let (sw_cli_request_sender, sw_cli_request_receiver) = mpsc::channel();
+    let (sw_cli_response_sender, sw_cli_response_receiver) = mpsc::channel();
+    commands.insert_resource(SwCliResponseSender(Arc::new(
+        sw_cli_response_sender.clone(),
+    )));
+    commands.insert_resource(SwCliRequestReceiver(Arc::new(Mutex::new(
+        sw_cli_request_receiver,
+    ))));
+
+    let (sw_fs_request_sender, sw_fs_request_receiver) = mpsc::channel();
+    let (sw_fs_response_sender, sw_fs_response_receiver) = mpsc::channel();
+    commands.insert_resource(SwFsResponseSender(Arc::new(sw_fs_response_sender.clone())));
+    commands.insert_resource(SwFsRequestReceiver(Arc::new(Mutex::new(
+        sw_fs_request_receiver,
+    ))));
+
+    let (sw_trick_film_player_request_sender, sw_trick_film_player_request_receiver) =
+        mpsc::channel();
+    let (sw_trick_film_player_response_sender, sw_trick_film_player_response_receiver) =
+        mpsc::channel();
+    commands.insert_resource(SwTrickFilmPlayerResponseSender(Arc::new(
+        sw_trick_film_player_response_sender.clone(),
+    )));
+    commands.insert_resource(SwTrickFilmPlayerRequestReceiver(Arc::new(Mutex::new(
+        sw_trick_film_player_request_receiver,
+    ))));
 
     let js_response_sender = Arc::new(js_response_sender.clone());
 
@@ -95,8 +124,10 @@ fn init_js_context(mut commands: Commands) -> Result {
             SimpleWarfareModuleLoader::new("assets/", Arc::new(sw_module_request_sender)).unwrap(),
             js_request_sender.clone(),
             js_response_sender.clone(),
-            Arc::new(sw_request_sender),
-            Arc::new(Mutex::new(sw_response_receiver)),
+            Arc::new(sw_cli_request_sender),
+            Arc::new(Mutex::new(sw_cli_response_receiver)),
+            Arc::new(sw_fs_request_sender),
+            Arc::new(sw_trick_film_player_request_sender),
         );
         // 开始监听
         // 由bevy的EventWriter写入事件并经js_event_bridge中转到此

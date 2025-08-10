@@ -1,6 +1,4 @@
 use crate::{
-    assets::js_file::{section::SectionFile, toml::TomlFile},
-    bevy_ext::condition::read_files_has_data,
     custom::{
         ui::quick::{QuickDialogData, QuickUi},
         unit::unit::Custom,
@@ -8,61 +6,23 @@ use crate::{
     js_engine::{
         event::JsEngineResponseEvent,
         simple_warfare_cli::{
-            LookType, SwRequestEvent, SwRequestReceiver, SwResponseEvent, SwResponseSender,
-            TeleportType,
+            LookType, SwCliRequestEvent, SwCliRequestReceiver, SwCliResponseEvent,
+            SwCliResponseSender, TeleportType,
         },
     },
 };
-use bevy::{platform::collections::HashMap, prelude::*};
+use bevy::prelude::*;
 use bevy_hui::prelude::*;
+
+use super::io::IoPlugin;
 pub struct SwPlugin;
-
-pub trait ReadFilesMap {
-    type K;
-    type V;
-    fn get_map(&self) -> &HashMap<Self::K, Self::V>;
-}
-
-#[derive(Default, Resource)]
-pub struct ReadTomlFiles {
-    pub map: HashMap<Handle<TomlFile>, Vec<Box<oneshot::Sender<TomlFile>>>>,
-}
-
-impl ReadFilesMap for ReadTomlFiles {
-    type K = Handle<TomlFile>;
-    type V = Vec<Box<oneshot::Sender<TomlFile>>>;
-    fn get_map(&self) -> &HashMap<Self::K, Self::V> {
-        &self.map
-    }
-}
-
-#[derive(Default, Resource)]
-pub struct ReadSectionFiles {
-    pub map: HashMap<Handle<SectionFile>, Vec<Box<oneshot::Sender<SectionFile>>>>,
-}
-impl ReadFilesMap for ReadSectionFiles {
-    type K = Handle<SectionFile>;
-    type V = Vec<Box<oneshot::Sender<SectionFile>>>;
-    fn get_map(&self) -> &HashMap<Self::K, Self::V> {
-        &self.map
-    }
-}
 
 impl Plugin for SwPlugin {
     fn build(&self, app: &mut App) {
-        app.init_resource::<ReadTomlFiles>()
-            .init_resource::<ReadSectionFiles>()
+        app.add_plugins(IoPlugin)
             .add_systems(
                 Update,
-                handle_sw_event.run_if(resource_exists::<SwRequestReceiver>),
-            )
-            .add_systems(
-                Update,
-                check_read_toml_file.run_if(read_files_has_data::<ReadTomlFiles>()),
-            )
-            .add_systems(
-                Update,
-                check_read_section_file.run_if(read_files_has_data::<ReadSectionFiles>()),
+                handle_sw_event.run_if(resource_exists::<SwCliRequestReceiver>),
             )
             .add_systems(Update, (finish_teleport, finish_look));
     }
@@ -71,27 +31,23 @@ impl Plugin for SwPlugin {
 fn handle_sw_event(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
-    toml_files: Res<Assets<TomlFile>>,
-    section_files: Res<Assets<SectionFile>>,
-    mut read_toml_files: ResMut<ReadTomlFiles>,
-    mut read_section_files: ResMut<ReadSectionFiles>,
-    sw_request_receiver: ResMut<SwRequestReceiver>,
-    sw_response_sender: ResMut<SwResponseSender>,
+    sw_cli_request_receiver: ResMut<SwCliRequestReceiver>,
+    sw_cli_response_sender: ResMut<SwCliResponseSender>,
 ) -> Result {
-    if let Ok(event) = sw_request_receiver
+    if let Ok(event) = sw_cli_request_receiver
         .0
         .lock()
         .expect("lock js Response receiver error in the system `engine_inited`")
         .try_recv()
     {
         match event {
-            SwRequestEvent::RegisterEntity => {
+            SwCliRequestEvent::RegisterEntity => {
                 let entity = commands.spawn_empty().id();
-                sw_response_sender
+                sw_cli_response_sender
                     .0
-                    .send(SwResponseEvent::RegisteredEntity(entity))?;
+                    .send(SwCliResponseEvent::RegisteredEntity(entity))?;
             }
-            SwRequestEvent::CreateQuickUi(quick_ui) => match quick_ui {
+            SwCliRequestEvent::CreateQuickUi(quick_ui) => match quick_ui {
                 QuickUi::Dialog(quick_dialog) => match quick_dialog {
                     QuickDialogData::Comfirm(data) => {
                         let node_entity = commands.spawn(data.clone()).id();
@@ -106,72 +62,6 @@ fn handle_sw_event(
                     }
                 },
             },
-            SwRequestEvent::ReadTomlFile(sender, path_buf) => {
-                let file_handle = asset_server.load(path_buf);
-                if asset_server.is_loaded(file_handle.id()) {
-                    sender.send(toml_files.get(file_handle.id()).cloned().unwrap())?;
-                } else {
-                    read_toml_files
-                        .map
-                        .entry(file_handle)
-                        .or_default()
-                        .push(sender);
-                }
-            }
-            SwRequestEvent::ReadSectionFile(sender, path_buf) => {
-                let file_handle = asset_server.load(path_buf);
-                if asset_server.is_loaded(file_handle.id()) {
-                    sender.send(section_files.get(file_handle.id()).cloned().unwrap())?;
-                } else {
-                    read_section_files
-                        .map
-                        .entry(file_handle)
-                        .or_default()
-                        .push(sender);
-                }
-            }
-        }
-    }
-    Ok(())
-}
-
-fn check_read_toml_file(
-    asset_server: Res<AssetServer>,
-    mut evnets: EventReader<AssetEvent<TomlFile>>,
-    toml_files: Res<Assets<TomlFile>>,
-    mut read_toml_files: ResMut<ReadTomlFiles>,
-) -> Result {
-    for event in evnets.read() {
-        if let AssetEvent::LoadedWithDependencies { id } = *event
-            && let Some(mut senders) = read_toml_files
-                .map
-                .remove(&asset_server.get_id_handle(id).unwrap())
-        {
-            senders.drain(..).for_each(|sender| {
-                sender.send(toml_files.get(id).cloned().unwrap()).unwrap();
-            });
-        }
-    }
-    Ok(())
-}
-
-fn check_read_section_file(
-    asset_server: Res<AssetServer>,
-    mut evnets: EventReader<AssetEvent<SectionFile>>,
-    section_files: Res<Assets<SectionFile>>,
-    mut read_section_files: ResMut<ReadSectionFiles>,
-) -> Result {
-    for event in evnets.read() {
-        if let AssetEvent::LoadedWithDependencies { id } = *event
-            && let Some(mut senders) = read_section_files
-                .map
-                .remove(&asset_server.get_id_handle(id).unwrap())
-        {
-            senders.drain(..).for_each(|sender| {
-                sender
-                    .send(section_files.get(id).cloned().unwrap())
-                    .unwrap();
-            });
         }
     }
     Ok(())
