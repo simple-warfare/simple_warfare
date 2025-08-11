@@ -1,10 +1,9 @@
-import { Synchronize } from "std:synchronize.mjs";
+import { Synchronize, SynchronizeWithoutEntity } from "std:synchronize.mjs";
 
 export class Signal extends Synchronize {
   constructor() {
     super();
     this.type = DefaultSignalType.Custom;
-    this.entity = simpleWarfareCli.registerEntity(this);
     this.connectArray = new Array();
     simpleWarfareCli.registerSignal(this);
   }
@@ -25,6 +24,7 @@ export const DefaultSignalType = {
   OnUnitEnter: "OnUnitEnter",
   OnUnitExit: "OnUnitExit",
   NewWayPoint: "NewWayPoint",
+  ActiveWayPointChanged: "ActiveWayPointChanged",
 };
 
 export class CreatedSignal extends Signal {
@@ -51,6 +51,14 @@ export class NewWayPointSignal extends Signal {
   }
 }
 
+export class ActiveWayPointChangedSignal extends Signal {
+  constructor() {
+    super();
+    this.type = DefaultSignalType.ActiveWayPointChanged;
+    simpleWarfareCli.registerDefaultSignal(this);
+  }
+}
+
 export class OnUnitEnterSignal extends Signal {
   constructor() {
     super();
@@ -64,5 +72,18 @@ export class OnUnitExitSignal extends Signal {
     super();
     this.type = DefaultSignalType.OnUnitExit;
     simpleWarfareCli.registerDefaultSignal(this);
+  }
+}
+
+export class SignalStorage extends SynchronizeWithoutEntity {
+  constructor(entity) {
+    super();
+    this.entity = entity;
+    this.signalMap = new Map();
+  }
+  addSignals(...signals) {
+    for (let signal of signals) {
+      this.signalMap.set(signal.type, signal);
+    }
   }
 }

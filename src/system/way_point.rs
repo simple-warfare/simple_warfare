@@ -13,16 +13,27 @@ use crate::{
 
 pub struct WayPointSystemPlugin;
 
+#[derive(Debug, Hash, PartialEq, Eq, Clone, SystemSet)]
+pub struct HandleWayPointSystem;
+
 impl Plugin for WayPointSystemPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
-            FixedUpdate,
-            handle_move_way_point.run_if(in_state(SceneState::GameScene)),
+            PostUpdate,
+            handle_move_way_point
+                .run_if(in_state(SceneState::GameScene))
+                .in_set(HandleWayPointSystem),
         )
         .add_systems(
             PostUpdate,
             lock_rotation
                 .after(TransformSystem::TransformPropagate)
+                .run_if(in_state(SceneState::GameScene)),
+        )
+        .add_systems(
+            PostUpdate,
+            check_active_way_point_changed
+                .after(HandleWayPointSystem)
                 .run_if(in_state(SceneState::GameScene)),
         );
     }
@@ -105,3 +116,5 @@ fn lock_rotation(
         }
     }
 }
+
+fn check_active_way_point_changed(way_point_queue: Query<(&WayPointQueue,), Changed<WayPointQueue>>) {}

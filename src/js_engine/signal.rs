@@ -2,13 +2,15 @@ use bevy::prelude::*;
 use boa_engine::prelude::*;
 use boa_engine::{JsResult, value::TryFromJs};
 
-#[derive(Debug, Clone, Component, Reflect)]
+use serde::{Deserialize, Serialize};
+#[derive(Debug, Clone, Copy, Hash, Component, Reflect, Serialize, Deserialize, PartialEq, Eq)]
 pub enum JsDefaultSignalType {
     Created,
     Selected,
     OnUnitEnter,
     OnUnitExit,
     NewWayPoint,
+    ActiveWayPointChanged,
 }
 
 impl TryFromJs for JsDefaultSignalType {
@@ -19,6 +21,7 @@ impl TryFromJs for JsDefaultSignalType {
             "OnUnitEnter" => Ok(Self::OnUnitEnter),
             "OnUnitExit" => Ok(Self::OnUnitExit),
             "NewWayPoint" => Ok(Self::NewWayPoint),
+            "ActiveWayPointChanged" => Ok(Self::ActiveWayPointChanged),
             _ => Err(JsNativeError::typ()
                 .with_message("the DefaultSignal type is undefine")
                 .into()),

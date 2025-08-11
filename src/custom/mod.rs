@@ -13,6 +13,7 @@ use bevy::prelude::*;
 pub mod map;
 pub mod ui;
 pub mod unit;
+pub mod signal;
 
 pub type CustomTypedId = i32;
 

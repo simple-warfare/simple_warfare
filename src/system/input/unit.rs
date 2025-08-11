@@ -196,13 +196,13 @@ pub fn add_move_way_point(
     };
     for (js_unit_data, mut quene) in selected_units {
         let way_point = WayPoint::Move(mouse_pos);
-        quene.data.push_back(way_point.clone());
-        js_engine_request_sender
-            .0
-            .send(JsEngineRequestEvent::new_way_point_signal(
-                way_point,
-                js_unit_data.new_way_point_entity,
-            ))?;
+        // quene.data.push_back(way_point.clone());
+        // js_engine_request_sender
+        //     .0
+        //     .send(JsEngineRequestEvent::new_way_point_signal(
+        //         way_point,
+        //         js_unit_data.new_way_point_entity,
+        //     ))?;
     }
 
     Ok(())

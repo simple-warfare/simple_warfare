@@ -7,6 +7,7 @@ import {
   CreatedSignal,
   NewWayPointSignal,
   SelectedSignal,
+  SignalStorage,
 } from "std:signal/signal.mjs";
 import { ComfirmDialog } from "std:ui/quick/dialog/comfirm.mjs";
 import { TargetType } from "std:simple-warfare-cli/target.mjs";
@@ -22,6 +23,7 @@ export {
   CreatedSignal,
   NewWayPointSignal,
   SelectedSignal,
+  SignalStorage,
   TargetType,
   Synchronize,
   SynchronizeWithoutEntity,

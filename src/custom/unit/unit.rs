@@ -4,6 +4,7 @@ use boa_engine::value::TryFromJs;
 use serde::{Deserialize, Serialize};
 
 use crate::bevy_ext::try_from_js::*;
+use crate::custom::signal::SignalStorage;
 use crate::{
     custom::{
         CustomTypedId,
@@ -40,7 +41,7 @@ pub struct JsUnitData {
     pub custom_typed_id: CustomTypedId,
     pub entity: Entity,
     pub module_path: String,
-    pub new_way_point_entity: Entity,
+    pub signal_storage: SignalStorage,
 }
 
 impl JsUnit {
@@ -62,8 +63,8 @@ impl JsUnit {
                 custom_typed_id,
                 entity: entity_try_from_js(&proxy.get(js_string!("entity"), context)?, context)?,
                 module_path,
-                new_way_point_entity: entity_try_from_js(
-                    &proxy.get(js_string!("newWayPointEntity"), context)?,
+                signal_storage: SignalStorage::try_from_js(
+                    &proxy.get(js_string!("signalStorage"), context)?,
                     context,
                 )?,
             },

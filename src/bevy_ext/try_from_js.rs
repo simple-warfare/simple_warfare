@@ -1,7 +1,13 @@
-use bevy::prelude::*;
+use bevy::{
+    platform::collections::{HashMap, HashSet},
+    prelude::*,
+};
 use boa_engine::{
     JsResult, js_string,
-    object::builtins::{JsArray, JsTypedArray},
+    object::{
+        FunctionObjectBuilder,
+        builtins::{JsArray, JsMap, JsSet, JsTypedArray},
+    },
     prelude::*,
     value::TryFromJs,
 };
@@ -142,4 +148,43 @@ pub fn array_collect_to_vec<T>(
         .map(|i| f(&array.at(i as i64, context)?, context))
         .collect::<Result<Vec<_>, _>>()
         .map(|v| if v.is_empty() { None } else { Some(v) })
+}
+
+pub fn hash_map_try_form_js<K, V>(value: &JsValue, context: &mut Context) -> JsResult<HashMap<K, V>>
+where
+    K: TryFromJs,
+    V: TryFromJs,
+{
+    let mut map = HashMap::<K, V>::new();
+    let js_map = JsMap::from_object(value.to_object(context)?)?;
+    let callback = FunctionObjectBuilder::new(
+        context.realm(),
+        NativeFunction::from_fn_ptr(|_this, args, context| {
+            info!("{:?}", args);
+            JsResult::Ok(JsValue::Undefined)
+        }),
+    )
+    .build();
+    js_map.for_each(callback, JsValue::Undefined, context)?;
+
+    JsResult::Ok(map)
+}
+
+pub fn hash_set_try_form_js<T>(value: &JsValue, context: &mut Context) -> JsResult<HashSet<T>>
+where
+    T: TryFromJs,
+{
+    let mut map = HashSet::<T>::new();
+    let js_map = JsSet::from_object(value.to_object(context)?)?;
+    let callback = FunctionObjectBuilder::new(
+        context.realm(),
+        NativeFunction::from_fn_ptr(|_this, args, context| {
+            info!("{:?}", args);
+            JsResult::Ok(JsValue::Undefined)
+        }),
+    )
+    .build();
+    js_map.for_each(callback, JsValue::Undefined, context)?;
+
+    JsResult::Ok(map)
 }
