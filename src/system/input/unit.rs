@@ -1,10 +1,13 @@
 use crate::{
-    custom::unit::{
-        physics::EnablePhysics,
-        unit::{CustomUnit, JsUnit, JsUnitData},
-        way_point::{WayPoint, WayPointQueue},
+    custom::{
+        signal::JsSignalStorage,
+        unit::{
+            physics::EnablePhysics,
+            unit::{CustomUnit, JsUnit, JsUnitData},
+            way_point::{WayPoint, WayPointQueue},
+        },
     },
-    js_engine::{event::JsEngineRequestEvent, JsEngineRequestSender},
+    js_engine::{JsEngineRequestSender, event::JsEngineRequestEvent, signal::JsSignalType},
     scenes::SceneState,
     statistics::*,
 };
@@ -187,22 +190,27 @@ pub fn draw_selected_unit(mut gizmos: Gizmos, selected_units: Query<&Transform, 
 
 pub fn add_move_way_point(
     _trigger: Trigger<Fired<AddMoveWayPointAction>>,
-    selected_units: Query<(&JsUnitData, &mut WayPointQueue), With<Selected>>,
+    selected_units: Query<(&JsSignalStorage, &mut WayPointQueue), With<Selected>>,
     mouse_position: Res<MousePosition>,
     js_engine_request_sender: Res<JsEngineRequestSender>,
 ) -> Result {
     let Some(mouse_pos) = mouse_position.world_2d else {
         return Ok(());
     };
-    for (js_unit_data, mut quene) in selected_units {
+    for (js_signal_storage, mut quene) in selected_units {
         let way_point = WayPoint::Move(mouse_pos);
-        // quene.data.push_back(way_point.clone());
-        // js_engine_request_sender
-        //     .0
-        //     .send(JsEngineRequestEvent::new_way_point_signal(
-        //         way_point,
-        //         js_unit_data.new_way_point_entity,
-        //     ))?;
+        quene.data.push_back(way_point.clone());
+        if let Some(new_way_point_signal) = js_signal_storage
+            .default_signal_map
+            .get(&JsSignalType::NewWayPoint)
+        {
+            js_engine_request_sender
+                .0
+                .send(JsEngineRequestEvent::new_way_point_signal(
+                    way_point,
+                    new_way_point_signal.entity,
+                ))?;
+        }
     }
 
     Ok(())

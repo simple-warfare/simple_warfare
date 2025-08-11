@@ -8,7 +8,10 @@ import {
   manyFromCreate,
   SignalStorage,
 } from "std:index.mjs";
-import { ActiveWayPointChangedSignal } from "std:signal/signal.mjs";
+import {
+  ActiveWayPointChangedSignal,
+  FixedUpdateSignal,
+} from "std:signal/signal.mjs";
 
 export const UnitType = {
   Unit: "Unit",
@@ -32,13 +35,15 @@ export class CustomUnit extends Synchronize {
     this.selected = new SelectedSignal();
     this.newWayPoint = new NewWayPointSignal();
     this.activeWayPointChanged = new ActiveWayPointChangedSignal();
+    this.fixedUpdate = new FixedUpdateSignal();
     this.signalStorage = new SignalStorage(this.entity);
 
     this.signalStorage.addSignals(
       this.created,
       this.selected,
       this.newWayPoint,
-      this.activeWayPointChanged
+      this.activeWayPointChanged,
+      this.fixedUpdate
     );
 
     //simpleWarfareCli.bindInnerInfo(this);

@@ -136,6 +136,9 @@ fn insert_host_defined_data(ctx: &mut Context) {
         .insert(ActiveWayPointChangedSignalMap::default());
     ctx.realm()
         .host_defined_mut()
+        .insert(FixedUpdateSignalMap::default());
+    ctx.realm()
+        .host_defined_mut()
         .insert(SignalEntityMap::default());
     ctx.realm()
         .host_defined_mut()

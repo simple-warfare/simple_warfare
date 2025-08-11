@@ -32,7 +32,7 @@ use crate::{
         context::emit_signal,
         global::class::entity::JsEntity,
         host_defined::*,
-        signal::JsDefaultSignalType,
+        signal::JsSignalType,
         synchronize::{SynchronizeData, SynchronizeDataType},
     },
 };
@@ -206,11 +206,11 @@ impl SimpleWarfareCli {
                 let signal = args.first().unwrap().to_object(ctx)?;
 
                 let default_signal_type =
-                    JsDefaultSignalType::try_from_js(&signal.get(js_string!("type"), ctx)?, ctx)?;
+                    JsSignalType::try_from_js(&signal.get(js_string!("type"), ctx)?, ctx)?;
 
                 match default_signal_type {
-                    JsDefaultSignalType::Created => emit_signal(&signal, &[], ctx)?,
-                    JsDefaultSignalType::Selected => {
+                    JsSignalType::Created => emit_signal(&signal, &[], ctx)?,
+                    JsSignalType::Selected => {
                         let entity =
                             JsEntity::try_from_js(&signal.get(js_string!("entity"), ctx)?, ctx)?
                                 .to_entity();
@@ -222,7 +222,7 @@ impl SimpleWarfareCli {
                             .borrow_mut()
                             .insert(entity, signal);
                     }
-                    JsDefaultSignalType::OnUnitEnter => {
+                    JsSignalType::OnUnitEnter => {
                         let entity =
                             JsEntity::try_from_js(&signal.get(js_string!("entity"), ctx)?, ctx)?
                                 .to_entity();
@@ -234,7 +234,7 @@ impl SimpleWarfareCli {
                             .borrow_mut()
                             .insert(entity, signal);
                     }
-                    JsDefaultSignalType::OnUnitExit => {
+                    JsSignalType::OnUnitExit => {
                         let entity =
                             JsEntity::try_from_js(&signal.get(js_string!("entity"), ctx)?, ctx)?
                                 .to_entity();
@@ -246,7 +246,7 @@ impl SimpleWarfareCli {
                             .borrow_mut()
                             .insert(entity, signal);
                     }
-                    JsDefaultSignalType::NewWayPoint => {
+                    JsSignalType::NewWayPoint => {
                         let entity =
                             JsEntity::try_from_js(&signal.get(js_string!("entity"), ctx)?, ctx)?
                                 .to_entity();
@@ -258,7 +258,7 @@ impl SimpleWarfareCli {
                             .borrow_mut()
                             .insert(entity, signal);
                     }
-                    JsDefaultSignalType::ActiveWayPointChanged => {
+                    JsSignalType::ActiveWayPointChanged => {
                         let entity =
                             JsEntity::try_from_js(&signal.get(js_string!("entity"), ctx)?, ctx)?
                                 .to_entity();
@@ -270,6 +270,20 @@ impl SimpleWarfareCli {
                             .borrow_mut()
                             .insert(entity, signal);
                     }
+                    JsSignalType::FixedUpdate => {
+                        let entity =
+                            JsEntity::try_from_js(&signal.get(js_string!("entity"), ctx)?, ctx)?
+                                .to_entity();
+                        ctx.realm()
+                            .host_defined_mut()
+                            .get_mut::<FixedUpdateSignalMap>()
+                            .unwrap()
+                            .map
+                            .borrow_mut()
+                            .insert(entity, signal);
+                    }
+
+                    JsSignalType::Custom => {}
                 }
 
                 Ok(JsValue::undefined())

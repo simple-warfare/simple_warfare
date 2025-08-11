@@ -10,10 +10,12 @@ use crate::{
 };
 use bevy::prelude::*;
 
+use self::signal::{JsSignalPlugin, JsSignalStorage};
+
 pub mod map;
+pub mod signal;
 pub mod ui;
 pub mod unit;
-pub mod signal;
 
 pub type CustomTypedId = i32;
 
@@ -116,7 +118,9 @@ pub struct CustomPlugin;
 
 impl Plugin for CustomPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins(NavigatorLayerPlugin)
+        app.register_type::<JsSignalStorage>()
+            .add_plugins(NavigatorLayerPlugin)
+            .add_plugins(JsSignalPlugin)
             .init_resource::<CustomGridLayersServer>()
             .init_resource::<NorthstarGridEntitiesStorage>();
     }

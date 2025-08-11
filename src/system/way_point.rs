@@ -2,12 +2,16 @@ use avian2d::prelude::{AngularVelocity, LinearVelocity};
 use bevy::{pbr::graph, prelude::*};
 
 use crate::{
-    custom::unit::{
-        section::{graphic::Graphic, movement::Movement},
-        turret::JsTurret,
-        unit::JsUnit,
-        way_point::{WayPoint, WayPointQueue},
+    custom::{
+        signal::JsSignalStorage,
+        unit::{
+            section::{graphic::Graphic, movement::Movement},
+            turret::JsTurret,
+            unit::JsUnit,
+            way_point::{WayPoint, WayPointQueue},
+        },
     },
+    js_engine::{JsEngineRequestSender, event::JsEngineRequestEvent, signal::JsSignalType},
     scenes::SceneState,
 };
 
@@ -117,4 +121,29 @@ fn lock_rotation(
     }
 }
 
-fn check_active_way_point_changed(way_point_queue: Query<(&WayPointQueue,), Changed<WayPointQueue>>) {}
+fn check_active_way_point_changed(
+    js_engine_request_sender: Res<JsEngineRequestSender>,
+    active_way_point_changed_queue: Query<
+        (&WayPointQueue, &JsSignalStorage),
+        Changed<WayPointQueue>,
+    >,
+) -> Result {
+    for (quene, js_signal_storage) in active_way_point_changed_queue {
+        let Some(new_active_way_point) = quene.data.front() else {
+            continue;
+        };
+        if let Some(new_way_point_signal) = js_signal_storage
+            .default_signal_map
+            .get(&JsSignalType::ActiveWayPointChanged)
+        {
+            js_engine_request_sender.0.send(
+                JsEngineRequestEvent::active_way_point_changed_signal(
+                    new_active_way_point.clone(),
+                    new_way_point_signal.entity,
+                ),
+            )?;
+        }
+    }
+
+    Ok(())
+}

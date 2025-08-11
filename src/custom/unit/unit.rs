@@ -4,7 +4,7 @@ use boa_engine::value::TryFromJs;
 use serde::{Deserialize, Serialize};
 
 use crate::bevy_ext::try_from_js::*;
-use crate::custom::signal::SignalStorage;
+use crate::custom::signal::JsSignalStorage;
 use crate::{
     custom::{
         CustomTypedId,
@@ -32,6 +32,7 @@ pub struct CustomUnit;
 pub struct JsUnit {
     pub transform: JsTransform,
     pub section: Section,
+    pub signal_storage: JsSignalStorage,
     pub data: JsUnitData,
 }
 
@@ -41,7 +42,6 @@ pub struct JsUnitData {
     pub custom_typed_id: CustomTypedId,
     pub entity: Entity,
     pub module_path: String,
-    pub signal_storage: SignalStorage,
 }
 
 impl JsUnit {
@@ -57,16 +57,16 @@ impl JsUnit {
                 &proxy.get(js_string!("transform"), context)?,
                 context,
             )?,
+            signal_storage: JsSignalStorage::try_from_js(
+                &proxy.get(js_string!("signalStorage"), context)?,
+                context,
+            )?,
             section: Section::try_from_proxy(proxy, context)?,
             data: JsUnitData {
                 unit_id,
                 custom_typed_id,
                 entity: entity_try_from_js(&proxy.get(js_string!("entity"), context)?, context)?,
                 module_path,
-                signal_storage: SignalStorage::try_from_js(
-                    &proxy.get(js_string!("signalStorage"), context)?,
-                    context,
-                )?,
             },
         })
     }

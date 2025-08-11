@@ -25,6 +25,7 @@ export const DefaultSignalType = {
   OnUnitExit: "OnUnitExit",
   NewWayPoint: "NewWayPoint",
   ActiveWayPointChanged: "ActiveWayPointChanged",
+  FixedUpdate: "FixedUpdate",
 };
 
 export class CreatedSignal extends Signal {
@@ -71,6 +72,14 @@ export class OnUnitExitSignal extends Signal {
   constructor() {
     super();
     this.type = DefaultSignalType.OnUnitExit;
+    simpleWarfareCli.registerDefaultSignal(this);
+  }
+}
+
+export class FixedUpdateSignal extends Signal {
+  constructor() {
+    super();
+    this.type = DefaultSignalType.FixedUpdate;
     simpleWarfareCli.registerDefaultSignal(this);
   }
 }

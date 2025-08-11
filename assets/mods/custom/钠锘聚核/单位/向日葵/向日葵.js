@@ -29,7 +29,7 @@ export class Sunflower extends CustomUnit {
     //console.log(this.graphics[0].easyAnimationRegister[0]);
     this.colliders.push(new CircleCollider(ColliderType.Circle, 25));
 
-    this.newWayPointFunc = (wayPoint) => {
+    this.activeWayPointChangedFunc = (wayPoint) => {
       if (wayPoint.type == "move") {
         let mainTrickFilmPlayer = this.graphics[0].trickFilmPlayer;
 
@@ -41,6 +41,12 @@ export class Sunflower extends CustomUnit {
       }
     };
 
-    this.newWayPoint.connect(this.newWayPointFunc);
+    this.onFixedUpadteFunc = (delta_time) => {
+      console.log(`间隔时间为:${delta_time}s`);
+    };
+
+    this.fixedUpdate.connect(this.onFixedUpadteFunc);
+
+    this.activeWayPointChanged.connect(this.activeWayPointChangedFunc);
   }
 }

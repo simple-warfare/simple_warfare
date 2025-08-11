@@ -395,6 +395,46 @@ pub(super) fn process_js_event(
                 context,
             )?;
         }
+        JsEngineRequestEvent::ActiveWayPointChangedSignal {
+            way_point,
+            signal_entity,
+        } => {
+            let active_way_point_changed_signal = context
+                .realm()
+                .host_defined()
+                .get::<ActiveWayPointChangedSignalMap>()
+                .unwrap()
+                .map
+                .borrow()
+                .get(&signal_entity)
+                .unwrap()
+                .clone();
+            emit_signal(
+                &active_way_point_changed_signal,
+                &[way_point.try_into_js(context)?],
+                context,
+            )?;
+        }
+        JsEngineRequestEvent::FixedUpdateSignal {
+            delta_time,
+            signal_entity,
+        } => {
+            let fixed_update_signal = context
+                .realm()
+                .host_defined()
+                .get::<FixedUpdateSignalMap>()
+                .unwrap()
+                .map
+                .borrow()
+                .get(&signal_entity)
+                .unwrap()
+                .clone();
+            emit_signal(
+                &fixed_update_signal,
+                &[JsValue::Rational(delta_time as f64)],
+                context,
+            )?;
+        }
     }
     Ok(())
 }

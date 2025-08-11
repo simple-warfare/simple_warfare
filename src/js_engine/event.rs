@@ -48,6 +48,14 @@ pub enum JsEngineRequestEvent {
         way_point: WayPoint,
         signal_entity: Entity,
     },
+    ActiveWayPointChangedSignal {
+        way_point: WayPoint,
+        signal_entity: Entity,
+    },
+    FixedUpdateSignal {
+        delta_time: f32,
+        signal_entity: Entity,
+    },
     SynchronizeToJs {
         data: SynchronizeData,
     },
@@ -87,6 +95,20 @@ impl JsEngineRequestEvent {
         Self::NewWayPointSignal {
             way_point,
             signal_entity,
+        }
+    }
+
+    pub fn active_way_point_changed_signal(way_point: WayPoint, signal_entity: Entity) -> Self {
+        Self::ActiveWayPointChangedSignal {
+            way_point,
+            signal_entity,
+        }
+    }
+
+    pub fn fixed_update_signal(signal_entity: Entity, delta_time: f32) -> Self {
+        Self::FixedUpdateSignal {
+            signal_entity,
+            delta_time,
         }
     }
 
