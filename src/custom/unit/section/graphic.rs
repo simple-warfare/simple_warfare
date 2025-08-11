@@ -1,6 +1,4 @@
-use crate::{
-    bevy_ext::try_from_js::*, custom::unit::animation::trick_film_player::TrickFilmPlayer,
-};
+use crate::{bevy_ext::prelude::*, custom::unit::animation::trick_film_player::TrickFilmPlayer};
 use bevy::{
     ecs::{component::HookContext, world::DeferredWorld},
     prelude::*,
@@ -8,9 +6,12 @@ use bevy::{
 };
 use boa_engine::value::TryFromJs;
 use serde::{Deserialize, Serialize};
+use simple_warfare_macros::TryFromAndIntoJs;
 
 #[derive(Debug, Clone, Component, Serialize, Deserialize, PartialEq, Reflect, TryFromJs)]
 pub struct Graphic {
+    #[boa(from_js_with = "entity_try_from_js")]
+    pub entity: Entity,
     pub width: u32,
     pub height: u32,
     pub path: String,
@@ -32,6 +33,8 @@ pub struct Graphic {
     #[boa(rename = "realPath")]
     pub real_path: Option<String>,
 
+    #[boa(rename = "realParentPath")]
+    pub real_parent_path: Option<String>,
     #[boa(rename = "trickFilmPlayer")]
     pub trick_film_player: Option<TrickFilmPlayer>,
 }

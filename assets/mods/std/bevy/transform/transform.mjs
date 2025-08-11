@@ -1,10 +1,8 @@
-import {
-  create as vec3Create,
-  fromValues as vec3FromValues,
-} from "package:gl-matrix/vec3.js";
-import { create as quatCreate } from "package:gl-matrix/quat.js";
-export class Transform {
-  constructor(translation, rotation, scale) {
+import { manyFromCreate, manyFromValue, SynchronizeWithoutEntity } from "std:index.mjs";
+export class Transform extends SynchronizeWithoutEntity {
+  constructor(entity, translation, rotation, scale) {
+    super()
+    this.entity = entity;
     this.translation = translation;
     this.rotation = rotation;
     this.scale = scale;
@@ -12,12 +10,19 @@ export class Transform {
 }
 
 export function create() {
-  return new Transform(vec3Create(), quatCreate(), vec3FromValues(1, 1, 1));
+  return new Transform(
+    undefined,
+    manyFromCreate.vec3(),
+    manyFromCreate.quat(),
+    manyFromValue.vec3(1, 1, 1)
+  );
 }
 
-export function fromValues(translation, rotation, scale) {
-  translation = typeof translation !== "undefined" ? translation : vec3Create();
-  rotation = typeof rotation !== "undefined" ? rotation : quatCreate();
-  scale = typeof scale !== "undefined" ? scale : vec3FromValues(1, 1, 1);
-  return new Transform(translation, rotation, scale);
+export function fromValues(entity, translation, rotation, scale) {
+  translation =
+    typeof translation !== "undefined" ? translation : manyFromCreate.vec3()();
+  rotation =
+    typeof rotation !== "undefined" ? rotation : manyFromCreate.quat()();
+  scale = typeof scale !== "undefined" ? scale : manyFromValue.vec3(1, 1, 1);
+  return new Transform(entity, translation, rotation, scale);
 }

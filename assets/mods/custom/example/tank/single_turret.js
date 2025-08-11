@@ -5,7 +5,7 @@ import { ComfirmDialog } from "std:ui/quick/dialog/comfirm.mjs";
 export class SingleTurret extends Turret {
   constructor() {
     super(
-      manyFromValues.transForm(
+      manyFromValues.transfrom(
         manyFromValues.vec3(0, 0, 1),
         undefined,
         undefined

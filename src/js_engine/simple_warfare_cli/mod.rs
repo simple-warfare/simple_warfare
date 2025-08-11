@@ -33,7 +33,7 @@ use crate::{
         global::class::entity::JsEntity,
         host_defined::*,
         signal::JsDefaultSignalType,
-        synchronize::{SynchronizeDataFromJs, SynchronizeDataFromJsType},
+        synchronize::{SynchronizeData, SynchronizeDataType},
     },
 };
 
@@ -402,18 +402,18 @@ impl SimpleWarfareCli {
                     .unwrap()
                     .clone();
 
-                match SynchronizeDataFromJsType::try_from_js(args.get(1).unwrap(), ctx)? {
-                    SynchronizeDataFromJsType::Core => js_engine_response_sender
+                match SynchronizeDataType::try_from_js(args.get(1).unwrap(), ctx)? {
+                    SynchronizeDataType::Core => js_engine_response_sender
                         .send(JsEngineResponseEvent::synchronize_from_js(
-                            SynchronizeDataFromJs::Core(Core::try_from_js(
+                            SynchronizeData::Core(Core::try_from_js(
                                 &JsValue::Object(object),
                                 ctx,
                             )?),
                         ))
                         .unwrap(),
-                    SynchronizeDataFromJsType::Movement => js_engine_response_sender
+                    SynchronizeDataType::Movement => js_engine_response_sender
                         .send(JsEngineResponseEvent::synchronize_from_js(
-                            SynchronizeDataFromJs::Movement(Movement::try_from_js(
+                            SynchronizeData::Movement(Movement::try_from_js(
                                 &JsValue::Object(object),
                                 ctx,
                             )?),

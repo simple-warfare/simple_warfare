@@ -1,6 +1,7 @@
 export class TrickFilmPlayer {
-  constructor(graphicEntity, trickFilm, trickFilmRegistion) {
-    this.entity = graphicEntity;
+  constructor(graphic, trickFilm, trickFilmRegistion) {
+    this.graphic = graphic;
+    this.entity = graphic.entity;
     this.paused = false;
     this.speed = 1.0;
     this.trickFilm = trickFilm;
@@ -14,10 +15,10 @@ export class TrickFilmPlayer {
   }
 
   start(registion) {
-    this.server.start(this, registion);
+    this.server.start(this,this.graphic.realParentPath, registion);
   }
 
   play(registion) {
-    this.server.play(this, registion);
+    this.server.play(this,this.graphic.realParentPath, registion);
   }
 }

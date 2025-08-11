@@ -14,12 +14,13 @@ use crate::{
 use bevy::prelude::*;
 use bevy_hui::prelude::*;
 
-use super::io::IoPlugin;
+use super::{io::SwIoPlugin, server::SwServerPlugin};
 pub struct SwPlugin;
 
 impl Plugin for SwPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins(IoPlugin)
+        app.add_plugins(SwIoPlugin)
+            .add_plugins(SwServerPlugin)
             .add_systems(
                 Update,
                 handle_sw_event.run_if(resource_exists::<SwCliRequestReceiver>),

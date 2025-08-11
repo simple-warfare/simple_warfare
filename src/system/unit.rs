@@ -83,7 +83,7 @@ fn check_new_unit(
                     custom_typed_id,
                 })?;
 
-            let turret_entities: Vec<Entity> = turrets
+            let turret_entities = turrets
                 .data
                 .iter()
                 .map(|turret| {
@@ -104,11 +104,24 @@ fn check_new_unit(
                             CustomTurrrt,
                             sprite,
                             turret.clone(),
-                            turret.transform.to_transform(),
+                            Into::<Transform>::into(turret.transform.clone()),
                         ))
                         .id()
                 })
-                .collect();
+                .collect::<Vec<_>>();
+
+            let graphic_entities = graphics
+                .data
+                .clone()
+                .into_iter()
+                .map(|graphic| {
+                    let graphic_entity = graphic.entity;
+                    commands
+                        .entity(graphic_entity)
+                        .insert((graphic, custom_inner_info_storage.clone()));
+                    graphic_entity
+                })
+                .collect::<Vec<_>>();
 
             let mut unit_commands = commands.entity(unit_entity);
             unit_commands.insert((
@@ -129,10 +142,8 @@ fn check_new_unit(
 
             unit_commands
                 .add_children(&turret_entities)
+                .add_children(&graphic_entities)
                 .with_children(|parent| {
-                    for graphic in graphics.data.clone().into_iter() {
-                        parent.spawn((graphic, custom_inner_info_storage.clone()));
-                    }
                     for collider in colliders.to_avian2d().drain(..) {
                         parent.spawn(collider);
                     }
@@ -156,16 +167,11 @@ fn check_new_graphic(
 ) -> Result {
     for (entity, graphic) in graphic_query {
         let mut entity_commands = commands.entity(entity);
-        let Some(real_path) = &graphic.real_path else {
+        let Some(real_parent_path) = &graphic.real_parent_path else {
             continue;
         };
 
-        let image_path = Path::new(real_path)
-            .parent()
-            .ok_or(Into::<BevyError>::into(
-                CommonBevyError::ParentPathNotFound(real_path),
-            ))?
-            .join(&graphic.path);
+        let image_path = Path::new(real_parent_path).join(&graphic.path);
 
         let sprite = if let (Some(frame_width), Some(frame_height)) =
             (graphic.frame_width, graphic.frame_height)
@@ -194,8 +200,6 @@ fn check_new_graphic(
         };
 
         entity_commands.insert(sprite);
-
-        info!("realPath:{:?}", graphic.real_path);
 
         if graphic.trick_film_player.is_some() {
             entity_commands.insert(AnimationPlayer2D::default());

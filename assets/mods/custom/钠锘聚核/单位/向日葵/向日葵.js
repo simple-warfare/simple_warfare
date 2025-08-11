@@ -32,7 +32,12 @@ export class Sunflower extends CustomUnit {
     this.newWayPointFunc = (wayPoint) => {
       if (wayPoint.type == "move") {
         let mainTrickFilmPlayer = this.graphics[0].trickFilmPlayer;
-        mainTrickFilmPlayer.start(mainTrickFilmPlayer.registions.run_left);
+
+        if (this.transform.translation[0] > wayPoint.position[0]) {
+          mainTrickFilmPlayer.start(mainTrickFilmPlayer.registions.run_left);
+        } else {
+          mainTrickFilmPlayer.start(mainTrickFilmPlayer.registions.run_right);
+        }
       }
     };
 

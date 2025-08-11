@@ -10,7 +10,7 @@ use crate::{
         host_defined::*,
         module::ModModule,
         simple_warfare_cli::{LookType, TeleportType},
-        synchronize::SynchronizeDataFromJs,
+        synchronize::SynchronizeData,
     },
 };
 use bevy::prelude::*;
@@ -284,8 +284,8 @@ pub(super) fn process_js_event(
                 .clone();
             emit_signal(&signal, &[], context)?;
         }
-        JsEngineRequestEvent::SynchronizeFromJs { data } => match data {
-            SynchronizeDataFromJs::Core(core) => {
+        JsEngineRequestEvent::SynchronizeToJs { data } => match data {
+            SynchronizeData::Core(core) => {
                 let core_object = context
                     .realm()
                     .host_defined()
@@ -307,7 +307,7 @@ pub(super) fn process_js_event(
                         context,
                     )?;
             }
-            SynchronizeDataFromJs::Movement(movement) => {
+            SynchronizeData::Movement(movement) => {
                 let movement_object = context
                     .realm()
                     .host_defined()
@@ -328,6 +328,34 @@ pub(super) fn process_js_event(
                         &[movement.try_into_js(context)?],
                         context,
                     )?;
+            }
+            SynchronizeData::Transform(js_transform) => {
+                if let Some(target_entity) = js_transform.entity.as_ref() {
+                    let target_object = context
+                        .realm()
+                        .host_defined()
+                        .get::<JsObjectMap>()
+                        .unwrap()
+                        .map
+                        .borrow()
+                        .get(target_entity)
+                        .unwrap()
+                        .clone();
+
+                    let transform_object = target_object
+                        .get(js_string!("transform"), context)?
+                        .to_object(context)?;
+
+                    transform_object
+                        .get(js_string!("synchronize"), context)?
+                        .as_function()
+                        .unwrap()
+                        .call(
+                            &JsValue::Object(transform_object),
+                            &[js_transform.try_into_js(context)?],
+                            context,
+                        )?;
+                }
             }
         },
         JsEngineRequestEvent::InsertCustomInnerInfo {

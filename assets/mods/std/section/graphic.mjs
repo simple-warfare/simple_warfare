@@ -33,6 +33,10 @@ export class Graphic extends Synchronize {
   setRealPath(realPath) {
     this.realPath = realPath;
   }
+
+  setRealParentPath(realParentPath) {
+    this.realParentPath = realParentPath;
+  }
 }
 
 export function fromValues(
@@ -84,11 +88,12 @@ export function fromSectionFile(file) {
     typeof t.trickFilmRegistion !== "undefined"
   ) {
     graphic.setTrickFilmPlayer(
-      new TrickFilmPlayer(graphic.entity, t.trickFilm, t.trickFilmRegistion)
+      new TrickFilmPlayer(graphic, t.trickFilm, t.trickFilmRegistion)
     );
   }
 
   graphic.setRealPath(file.realPath);
+  graphic.setRealParentPath(file.realParentPath);
 
   return graphic;
 }

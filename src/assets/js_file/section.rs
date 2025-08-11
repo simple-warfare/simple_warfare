@@ -1,3 +1,5 @@
+use std::path::Path;
+
 use bevy::{
     asset::{AssetLoader, AsyncReadExt, LoadContext, io::Reader},
     prelude::*,
@@ -10,17 +12,20 @@ pub struct SectionFile {
     pub data: String,
     #[boa(rename = "realPath")]
     pub path: String,
+    #[boa(rename = "realParentPath")]
+    pub parent_path: String,
     pub crc32: u32,
 }
 
 impl SectionFile {
-    pub fn new(data: impl Into<String>, path: impl Into<String>) -> Self {
+    pub fn new(data: impl Into<String>, path: &Path) -> Self {
         let data = data.into();
         let crc32 = crc32fast::hash(data.as_bytes());
         Self {
             data,
             crc32,
-            path: path.into(),
+            path: path.to_string_lossy().into(),
+            parent_path: path.parent().unwrap().to_string_lossy().into(),
         }
     }
 }
@@ -49,11 +54,9 @@ impl AssetLoader for SectionFileLoader {
         load_context: &mut LoadContext<'_>,
     ) -> Result<Self::Asset, Self::Error> {
         let mut context = String::new();
+        let path = load_context.path();
         reader.read_to_string(&mut context).await?;
-        Ok(Self::Asset::new(
-            context,
-            load_context.path().to_string_lossy(),
-        ))
+        Ok(Self::Asset::new(context, path))
     }
 
     fn extensions(&self) -> &[&str] {

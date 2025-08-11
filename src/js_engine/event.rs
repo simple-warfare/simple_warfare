@@ -16,7 +16,7 @@ use crate::{
     js_engine::{
         global::class::entity::JsEntity,
         simple_warfare_cli::{LookType, TeleportType},
-        synchronize::{SynchronizeDataFromJs, SynchronizeDataFromJsType},
+        synchronize::{SynchronizeData, SynchronizeDataType},
     },
     net::shared::UnitId,
 };
@@ -48,10 +48,9 @@ pub enum JsEngineRequestEvent {
         way_point: WayPoint,
         signal_entity: Entity,
     },
-    SynchronizeFromJs {
-        data: SynchronizeDataFromJs,
-    }, //RemoteJsProxy(Box<dyn Fn(JsProxy) -> String + Send + Sync + 'static>),
-
+    SynchronizeToJs {
+        data: SynchronizeData,
+    },
     InsertCustomInnerInfo {
         custom_typed_id: CustomTypedId,
         entity: Entity,
@@ -95,8 +94,8 @@ impl JsEngineRequestEvent {
         Self::EmitEmptySignal { signal_entity }
     }
 
-    pub fn synchronize_from_js(data: SynchronizeDataFromJs) -> Self {
-        Self::SynchronizeFromJs { data }
+    pub fn synchronize_to_js(data: SynchronizeData) -> Self {
+        Self::SynchronizeToJs { data }
     }
 }
 
@@ -117,12 +116,13 @@ impl JsEngineResponseEvent {
         Self::SpawnedUnit { js_unit }
     }
 
-    pub fn synchronize_from_js(data: SynchronizeDataFromJs) -> Self {
+    pub fn synchronize_from_js(data: SynchronizeData) -> Self {
         match data {
-            SynchronizeDataFromJs::Core(core) => Self::SynchronizeCoreFromJs { data: core },
-            SynchronizeDataFromJs::Movement(movement) => {
+            SynchronizeData::Core(core) => Self::SynchronizeCoreFromJs { data: core },
+            SynchronizeData::Movement(movement) => {
                 Self::SynchronizeMovementFromJs { data: movement }
             }
+            SynchronizeData::Transform(js_transform) => todo!(),
         }
     }
 }

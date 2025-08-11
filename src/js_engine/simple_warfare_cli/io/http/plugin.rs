@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
-pub struct HttpPlugin;
+pub struct SwHttpPlugin;
 
-impl Plugin for HttpPlugin {
+impl Plugin for SwHttpPlugin {
     fn build(&self, app: &mut App) {}
 }

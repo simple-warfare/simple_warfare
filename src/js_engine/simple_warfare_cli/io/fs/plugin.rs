@@ -35,9 +35,9 @@ impl ReadFilesMap for ReadSectionFiles {
         &self.map
     }
 }
-pub struct FsPlugin;
+pub struct SwFsPlugin;
 
-impl Plugin for FsPlugin {
+impl Plugin for SwFsPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<ReadTomlFiles>()
             .init_resource::<ReadSectionFiles>()

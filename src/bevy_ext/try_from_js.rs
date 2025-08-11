@@ -66,8 +66,8 @@ pub fn option_entity_try_from_js(
     if value.is_undefined() {
         JsResult::Ok(None)
     } else {
-        let js_entity = JsEntity::try_from_js(value, context).expect("try_from_js error");
-        Ok(Some(js_entity.to_entity()))
+        let js_entity = entity_try_from_js(value, context)?;
+        Ok(Some(js_entity))
     }
 }
 

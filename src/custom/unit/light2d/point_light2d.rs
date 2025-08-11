@@ -44,7 +44,7 @@ impl JsPointLight2d {
     /// 将从Js中得到的点光源转化成Bevy的点光源
     pub fn to_point_light2d(&self) -> impl Bundle {
         (
-            self.transform.to_transform(),
+            Into::<Transform>::into(self.transform.clone()),
             PointLight2d {
                 color: self.color,
                 intensity: self.intensity,

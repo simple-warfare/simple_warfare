@@ -34,27 +34,41 @@ fn handle_trick_film_player_event(
         return Ok(());
     };
 
+    let animation_clip = |real_parent_path: String, trick_film: String, registion: String| {
+        format!("{}/{}#{}", real_parent_path, trick_film, registion)
+    };
+
     match event {
         SwTrickFilmPlayerRequestEvent::Play {
             entity,
+            real_parent_path,
             trick_film,
             registion,
         } => {
-            let clip = format!("{}#{}", trick_film, registion);
+            let clip = animation_clip(real_parent_path, trick_film, registion);
+            info!("{}", clip);
             let clip_handle = trick_registions
                 .0
                 .entry_ref(&clip)
                 .or_insert(asset_server.load(&clip));
-
             let mut animation_player = trick_film_players.get_mut(entity)?;
-
-            animation_player.play(clip_handle.clone());
+            animation_player.play(clip_handle.clone()).repeat();
         }
         SwTrickFilmPlayerRequestEvent::Start {
             entity,
+            real_parent_path,
             trick_film,
             registion,
-        } => todo!(),
+        } => {
+            let clip = animation_clip(real_parent_path, trick_film, registion);
+            info!("{}", clip);
+            let clip_handle = trick_registions
+                .0
+                .entry_ref(&clip)
+                .or_insert(asset_server.load(&clip));
+            let mut animation_player = trick_film_players.get_mut(entity)?;
+            animation_player.start(clip_handle.clone()).repeat();
+        }
     }
 
     Ok(())

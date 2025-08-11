@@ -1,19 +1,19 @@
 use bevy::prelude::*;
 use boa_engine::object::builtins::JsProxy;
+use boa_engine::value::TryFromJs;
 use serde::{Deserialize, Serialize};
 
 use crate::bevy_ext::try_from_js::*;
 use crate::{
     custom::{
         CustomTypedId,
-        unit::{
-            section::Section,
-            way_point::WayPointQueue,
-        },
+        unit::{section::Section, way_point::WayPointQueue},
     },
     net::shared::UnitId,
 };
 use boa_engine::{JsResult, js_string, prelude::*};
+
+use super::transform::transform::JsTransform;
 
 #[derive(Debug, Default, Component)]
 pub struct Custom;
@@ -26,10 +26,10 @@ pub struct CustomTurrrt;
 #[require(Custom, InheritedVisibility, WayPointQueue)]
 pub struct CustomUnit;
 
-
 #[derive(Debug, Clone, Bundle, Serialize, Deserialize, Reflect)]
 
 pub struct JsUnit {
+    pub transform: JsTransform,
     pub section: Section,
     pub data: JsUnitData,
 }
@@ -52,6 +52,10 @@ impl JsUnit {
         module_path: String,
     ) -> JsResult<Self> {
         Ok(Self {
+            transform: JsTransform::try_from_js(
+                &proxy.get(js_string!("transform"), context)?,
+                context,
+            )?,
             section: Section::try_from_proxy(proxy, context)?,
             data: JsUnitData {
                 unit_id,
