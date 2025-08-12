@@ -10,12 +10,12 @@ members = ["crates/simple_warfare_macros"]
 
 
 [dependencies]
-thiserror = "2"
-rand = "0.9"
+thiserror = "2.0.14"
+rand = "0.9.2"
 bevy-inspector-egui = "0.31.0"
-serde = "1"
-toml = "0.9"
-mlua = { version = "0.11.1", features = [
+serde = "1.0.219"
+toml = "0.9.5"
+mlua = { version = "0.11.2", features = [
     "lua54",
     "async",
     "vendored",
@@ -60,8 +60,8 @@ tokio = { version = "1.46.1", features = ["rt", "rt-multi-thread", "time"] }
 vleue_navigator2d = { git = "https://github.com/simple-warfare/vleue_navigator2d.git", features = [
     "parry2d",
 ] }
-bevy_seedling = { version = "0.4.3", features = ["mp3"] } #audio
-bevy_hanabi = { version = "0.16", default-features = false, features = [
+bevy_seedling = { version = "0.4.4", features = ["mp3"] } #audio
+bevy_hanabi = { version = "0.16.0", default-features = false, features = [
     "2d",
     "serde",
 ] }
@@ -74,7 +74,7 @@ fluent = "0.17.0"
 bevy_ecs_tiled = { version = "0.8.0", features = ["atlas", "physics"] }
 bevy_ecs_tilemap = "0.16.0"
 tiled = { version = "0.14.0", features = ["world"] }
-parry2d = { version = "0.22.0" }
+parry2d = { version = "0.23.0" }
 bevy_quinnet = "0.17.0"
 bevy_webgate = "0.1.1"
 bevy_web_asset = "0.11.0"
@@ -90,13 +90,25 @@ new_mime_guess = "4.0.4"
 bevy_northstar = { git = "https://github.com/simple-warfare/bevy_northstar.git", features = [
     "serde",
 ] }
-bevy_enhanced_input = "0.15.3"
+bevy_enhanced_input = "0.16.0"
 indexmap = "2.10.0"
 
 rayon = "1.10.0"
 dashmap = { version = "6.1.0", features = ["rayon"] }
 
 seldom_state = { git = "https://github.com/simple-warfare/seldom_state.git" }
+moonshine-behavior = "0.3.1"
+
+[dependencies.lightyear]
+version = "0.23.0"
+features = [
+    "netcode",
+    "steam",
+    "udp",
+    "webtransport",
+    "input_bei",
+    "deterministic",
+]
 
 [dependencies.bevy]
 version = "0.16.1"
@@ -134,6 +146,7 @@ features = [
     "wayland",
     "jpeg",
     "serialize",
+    "bevy_dev_tools",
 ]
 
 [dev-dependencies.bevy]

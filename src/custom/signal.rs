@@ -1,6 +1,9 @@
+use std::time::Duration;
+
 use bevy::{
     platform::collections::{HashMap, HashSet},
     prelude::*,
+    time::common_conditions::{on_real_timer, on_timer},
 };
 use boa_engine::{
     JsArgs, JsResult, js_string,
@@ -65,8 +68,11 @@ pub struct JsSignalPlugin;
 impl Plugin for JsSignalPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
-            FixedUpdate,
-            emit_fixed_update_signal.run_if(resource_exists::<JsEngineRequestSender>),
+            Update,
+            emit_fixed_update_signal.run_if(
+                resource_exists::<JsEngineRequestSender>
+                    .and(on_real_timer(Duration::from_secs_f32(0.1))),
+            ),
         );
     }
 }
