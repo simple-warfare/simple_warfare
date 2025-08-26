@@ -1,20 +1,14 @@
+[workspace]
+resolver = "3"
+members = ["crates/*", "simple_warfare_client", "simple_warfare_server", "simple_warfare_shared"]
+
+default-members = ["crates/*", "simple_warfare_server"]
+exclude = []
+
 [workspace.package]
 authors = ["shishanyue"]
 version = "0.1.0"
 edition = "2024"
-
-[workspace]
-resolver = "3"
-members = [
-    "crates/simple_warfare_macros",
-    "simple_warfare_server",
-]
-
-default-members = [
-    "crates/simple_warfare_macros",
-    "simple_warfare_server",
-]
-exclude = []
 
 # Here is a configuration for the most aggressive optimizations possible
 # Read this when trying to optimise WASM build: https://bevy-cheatbook.github.io/platforms/wasm/size-opt.html
@@ -36,32 +30,49 @@ opt-level = 3
 
 
 [workspace.dependencies]
-simple_warfare_server = { path = "./simple_warfare_server", version = "*" }
+simple_warfare_server = { path = "./simple_warfare_server", version = "0.1.0" }
+simple_warfare_shared = { path = "./simple_warfare_shared", version = "0.1.0" }
 
 #utils
 rand = { version = "0.9.2" }
-thiserror = { version = "2.0.14" }
+thiserror = { version = "2.0.16" }
 simple_warfare_macros = { path = "./crates/simple_warfare_macros" }
-
+uuid-simd = "0.8.0"
+crc32fast = "1.5.0"
+clap = "4.5.45"
 
 # serialization
 serde = "1.0.219"
 toml = "0.9.5"
 bincode = { version = "2.0.1", features = ["serde"] }
-serde_json = "1.0.140"
+serde_json = "1.0.143"
 
 
-[workspace.lints.rust]
-dead_code = "allow"
-unused_variables = "allow"
-# mismatched_lifetime_syntaxes = "allow"
+[workspace.dependencies.lightyear]
+version = "0.23.0"
+default-features = false
+features = [
+    "netcode",
+    "steam",
+    "udp",
+    "webtransport",
+    "input_bei",
+    "deterministic",
+    "interpolation",
+    "replication",
+]
 
-[workspace.lints.clippy]
-type_complexity = "allow"
-missing_transmute_annotations = "allow"
-len_without_is_empty = "allow"
-too_many_arguments = "allow"
-module_inception = "allow"
-alloc_instead_of_core = "warn"
-std_instead_of_alloc = "warn"
-std_instead_of_core = "warn"
+[workspace.dependencies.bevy]
+version = "0.16.1"
+default-features = false
+features = [
+    "std",
+    "bevy_log",
+    "async_executor",
+    "bevy_asset",
+    "bevy_state",
+    "multi_threaded",
+    "sysinfo_plugin",
+    "serialize",
+    "bevy_color",
+]

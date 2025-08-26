@@ -1,8 +1,9 @@
 use bevy::{platform::collections::HashMap, prelude::*};
+use oneshot::Sender;
 
 use crate::{
     assets::mods::js::JsAsset,
-    bevy_ext::condition::boa_load_js_asset_has_data,
+    bevy_ext::prelude::{ReadFilesMap, read_files_has_data},
     js_engine::{event::SwModuleLoaderRequestEvent, loader::*},
 };
 
@@ -10,9 +11,17 @@ pub struct SwLoaderPlugin;
 
 #[derive(Default, Resource)]
 pub struct BoaLoadJsAsset {
-    pub map: HashMap<Handle<JsAsset>, Vec<Box<oneshot::Sender<JsAsset>>>>,
+    pub map: HashMap<Handle<JsAsset>, Vec<Box<Sender<JsAsset>>>>,
 }
+impl ReadFilesMap for BoaLoadJsAsset {
+    type K = Handle<JsAsset>;
 
+    type V = Vec<Box<Sender<JsAsset>>>;
+
+    fn get_map(&self) -> &HashMap<Self::K, Self::V> {
+        &self.map
+    }
+}
 impl Plugin for SwLoaderPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<BoaLoadJsAsset>()
@@ -22,7 +31,7 @@ impl Plugin for SwLoaderPlugin {
             )
             .add_systems(
                 Update,
-                module_check_js_asset_ready.run_if(boa_load_js_asset_has_data()),
+                module_check_js_asset_ready.run_if(read_files_has_data::<BoaLoadJsAsset>),
             );
     }
 }

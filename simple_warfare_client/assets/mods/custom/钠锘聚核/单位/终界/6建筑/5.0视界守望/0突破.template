@@ -1,0 +1,42 @@
+[action_A层奇械]
+@copyFromSection:action_A层迭代
+@define tech:A层奇械
+@define before:A层迭代
+price: 数据立方=2
+buildSpeed:10s
+description:进行${tech}突破\n -解锁单位-\n[瘴雾] [猎户] [双子] [天蝎]
+[action_B层奇械]
+@copyFromSection:action_A层迭代
+@define tech:B层奇械
+@define before:A层奇械
+price: 数据立方=8
+buildSpeed:40s
+description:进行${tech}突破\n -解锁单位-\n[织女] [魔方] [辰巳] [弄臣] [幻筑]
+[action_B层分型]
+@copyFromSection:action_A层迭代
+@define tech:B层分型
+@define before:B层迭代
+price: 数据立方=3
+buildSpeed:15s
+description:进行${tech}突破\n -解锁单位-\n[星霜]+[极乐]+[信矢]+[解离]
+[action_B层迭代]
+@copyFromSection:action_A层迭代
+@define tech:B层迭代
+@define before:A层迭代
+price: 数据立方=3
+buildSpeed:15s
+description:进行${tech}突破\n -研究此科技将开放2阶单位与科技-
+[action_B层引擎]
+@copyFromSection:action_A层迭代
+@define tech:B层引擎
+@define before:B层迭代
+price: 数据立方=5
+buildSpeed:25s
+description:进行${tech}突破\n研究新一代引擎, 能够提供更强大的动力, 用于驱动更强大的中重型空军单位\n -解锁单位-\n[墟空] [天雷] [幽灵]
+[action_B层淬炼]
+@copyFromSection:action_A层迭代
+@define tech:B层淬炼
+@define before:B层迭代
+price: 数据立方=4
+buildSpeed:20s
+description:进行${tech}突破\n 允许萃凝熔炉升级至T3

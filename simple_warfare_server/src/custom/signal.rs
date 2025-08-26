@@ -3,11 +3,11 @@ use std::time::Duration;
 use bevy::{
     platform::collections::{HashMap, HashSet},
     prelude::*,
-    time::common_conditions::{on_real_timer, on_timer},
+    time::common_conditions::on_real_timer,
 };
 use boa_engine::{
-    JsArgs, JsResult, js_string,
-    object::{FunctionObjectBuilder, builtins::JsMap},
+    JsResult, js_string,
+    object::builtins::JsMap,
     prelude::*,
     value::TryFromJs,
 };

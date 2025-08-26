@@ -1,15 +1,11 @@
 use crate::{
     assets::js_file::{section::SectionFile, toml::TomlFile},
-    bevy_ext::condition::read_files_has_data,
+    bevy_ext::{condition::read_files_has_data, prelude::ReadFilesMap},
 };
 use bevy::{platform::collections::HashMap, prelude::*};
 
 use super::{SwFsRequestEvent, SwFsRequestReceiver};
-pub trait ReadFilesMap {
-    type K;
-    type V;
-    fn get_map(&self) -> &HashMap<Self::K, Self::V>;
-}
+
 
 #[derive(Default, Resource)]
 pub struct ReadTomlFiles {
@@ -47,11 +43,11 @@ impl Plugin for SwFsPlugin {
             )
             .add_systems(
                 Update,
-                check_read_toml_file.run_if(read_files_has_data::<ReadTomlFiles>()),
+                check_read_toml_file.run_if(read_files_has_data::<ReadTomlFiles>),
             )
             .add_systems(
                 Update,
-                check_read_section_file.run_if(read_files_has_data::<ReadSectionFiles>()),
+                check_read_section_file.run_if(read_files_has_data::<ReadSectionFiles>),
             );
     }
 }

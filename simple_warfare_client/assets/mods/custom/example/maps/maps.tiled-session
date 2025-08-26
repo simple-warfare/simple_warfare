@@ -1,0 +1,731 @@
+{
+    "activeFile": "tsxs/WaterFlow2.tsx",
+    "expandedProjectPaths": [
+        "tiles",
+        ".",
+        "tsxs"
+    ],
+    "file.lastUsedOpenFilter": "全部文件 (*)",
+    "fileStates": {
+        "/home/shishanyue/Downloads/[p2]Small_Island (2p).tmx": {
+            "scale": 3,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 510.8333333333333,
+                "y": 1060.8333333333333
+            }
+        },
+        "/home/shishanyue/Downloads/[p2]Small_Island (2p).tmx#Deep Water": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "/home/shishanyue/Downloads/[p2]Small_Island (2p).tmx#Ice": {
+            "scaleInDock": 1
+        },
+        "/home/shishanyue/Downloads/[p2]Small_Island (2p).tmx#Ice Ice - Flat": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "/home/shishanyue/Downloads/[p2]Small_Island (2p).tmx#Ice ShallowWater - Broken": {
+            "scaleInDock": 1
+        },
+        "/home/shishanyue/Downloads/[p2]Small_Island (2p).tmx#Ice ShallowWater - Ridge": {
+            "scaleInDock": 1
+        },
+        "/home/shishanyue/Downloads/[p2]Small_Island (2p).tmx#Mountain": {
+            "scaleInDock": 1
+        },
+        "/home/shishanyue/Downloads/[p2]Small_Island (2p).tmx#Shallow Water": {
+            "scaleInDock": 1
+        },
+        "/home/shishanyue/Downloads/[p2]Small_Island (2p).tmx#ShallowWater Water - Flat": {
+            "scaleInDock": 1
+        },
+        "/home/shishanyue/Downloads/[p2]Small_Island (2p).tmx#Snow": {
+            "scaleInDock": 1
+        },
+        "/home/shishanyue/Downloads/[p2]Small_Island (2p).tmx#Water": {
+            "scaleInDock": 1
+        },
+        "/home/shishanyue/Downloads/[p2]Small_Island (2p).tmx#misc": {
+            "scaleInDock": 1
+        },
+        "/home/shishanyue/Downloads/[p2]Small_Island (2p).tmx#units": {
+            "scaleInDock": 1
+        },
+        "/home/shishanyue/Downloads/ridges/Dirt ShalowWater - Ridge.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/shishanyue/Downloads/ridges/LongGrass Dirt - Flat.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/shishanyue/Downloads/ridges/LongGrass ShallowWater - Ridge.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/shishanyue/Downloads/ridges/Mountain Mountain - Hill.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/shishanyue/Downloads/ridges/Mountain ShallowWater - Ridge.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/shishanyue/Downloads/ridges/Mountain Snow - Flat.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/shishanyue/Downloads/ridges/Sand ShallowWater - Ridge.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/shishanyue/Downloads/ridges/Snow Ice - Ridge.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/shishanyue/Downloads/ridges/Snow Snow - ridge.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/shishanyue/Downloads/ridges/Stone Snow - ridge.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/shishanyue/Downloads/ridges/Water DeepWater - Flat.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/shishanyue/Downloads/terrain/Dirt.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/shishanyue/Downloads/terrain/Long Grass.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/shishanyue/bevy_ecs_tiled-0.7.3/assets/Magic Market/Tilesets/Tileset water - 16x16.tsx": {
+            "dynamicWrapping": false
+        },
+        "/home/shishanyue/bevy_ecs_tiled-0.7.3/assets/maps/orthogonal/finite.tmx": {
+            "scale": 1.9415625,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 219.66843714791563,
+                "y": 184.6450989859971
+            }
+        },
+        "/home/shishanyue/bevy_ecs_tiled-0.7.3/assets/maps/orthogonal/multiple_layers_with_colliders.tmx": {
+            "scale": 1.304765625,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 348.3384228489312,
+                "y": 319.9808394706904
+            }
+        },
+        "/home/shishanyue/bevy_ecs_tiled-0.7.3/assets/tiles/orthogonal_1.tsx": {
+            "dynamicWrapping": true,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "/home/shishanyue/rust/bevy_ecs_tiled/assets/maps/orthogonal/multiple_layers_with_colliders.tmx": {
+            "scale": 1,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 187,
+                "y": 572.5
+            }
+        },
+        "/home/shishanyue/rust/bevy_ecs_tiled/assets/tiles/orthogonal_1.tsx": {
+            "dynamicWrapping": true,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "Cave.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 8
+        },
+        "Cliffmask.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "Crtr2Lav.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "GrassRDst.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "Grs2CrtB.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "[p2]Small_Island (2p).tmx": {
+            "expandedGroupLayers": [
+                7
+            ],
+            "scale": 5.5,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 1622.0909090909092,
+                "y": 2017.3636363636365
+            }
+        },
+        "tsxs/Cave.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Cliffmask.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Crater.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Crtr2Lav.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Crtr2Wtr.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/CrtrJnt.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/CrtrMisc.tsx": {
+            "scaleInDock": 0.75,
+            "scaleInEditor": 1
+        },
+        "tsxs/CrtrRDst.tsx": {
+            "scaleInDock": 5.5,
+            "scaleInEditor": 1
+        },
+        "tsxs/CrtrRoad.tsx": {
+            "scaleInDock": 23,
+            "scaleInEditor": 2
+        },
+        "tsxs/GrasClif.tsx": {
+            "scaleInDock": 0.75,
+            "scaleInEditor": 1
+        },
+        "tsxs/GrasRoad.tsx": {
+            "scaleInDock": 4,
+            "scaleInEditor": 1
+        },
+        "tsxs/Grass.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Grass2.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Grs2Crtc.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Grs2Crtr.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Grs2Mnt.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Grs2Watr.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Grss2Lav.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/GrssCrtr.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/GrssMisc.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Ice2Snow.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1,
+            "scaleInEditor": 3
+        },
+        "tsxs/Ice2Watr.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 2
+        },
+        "tsxs/IceBrk1.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 2
+        },
+        "tsxs/IceBrk2.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 2
+        },
+        "tsxs/IceDent.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 8
+        },
+        "tsxs/IceRDest.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 4
+        },
+        "tsxs/IceRoad.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 3
+        },
+        "tsxs/Icicle.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Icicle2.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Icicle3.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Lava.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/LavaBubl.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/LavaFlow.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/LavaRDest.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/LavaRoad.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Mnt2Crtb.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Mnt2Crtc.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Mnt2Crtr.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Mnt2Lava.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Mnt2Sand.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Mnt2Watr.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/MntCliff.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/MntMisc.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/MntRDst.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/MntRoad.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Mountains.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Road.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/RoadDest.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/RoadJnt.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/RoadSnw2.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Rock.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Rock2.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Sand.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Sand2Lav.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/SandCrtr.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/SandMisc.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/SandRDst.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/SandRoad.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Sn2-2Crb.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Sn2-2Crc.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Sn2-2Wtr.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Sn2-Clif.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Sn2-RDst.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Sn22Crtr.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Snd2Crtb.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Snd2Crtc.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Snd2Crtr.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Snd2Watr.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 5.5
+        },
+        "tsxs/SndCliff.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Snow.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1,
+            "scaleInEditor": 3
+        },
+        "tsxs/Snow2.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Snw2-Ct2.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Snw2-Ctr.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Snw2-Lav.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Snw2-Rck.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Snw2-Rck2.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Snw2-Rck3.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Snw2Crtb.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Snw2Crtc.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Snw2Crtr.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Snw2Lav.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Snw2Mnt.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Snw2Watr.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/SnwCliff.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/SnwCratr.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Stn2Crtb.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Stn2Crtc.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Stn2Crtr.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Stn2Lav.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Stn2SnwB.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Stn2Watr.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/StnCliff.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/StnCratr.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/StnMisc.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/StnRDst.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/StnRock1.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/StnRock2.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Stne2Snw.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/StneRoad.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Stone.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Swamp.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/SwmpAni.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/SwmpBubl.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/SwmpPlnt.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/SwmpRDst.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/SwmpRoad.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 4
+        },
+        "tsxs/SwmpRock.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Tch2CrtB.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Tch2Crtc.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Tch2Crtr.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Tch2Lava.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Tch2Watr.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/TchCliff.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Tech.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/TechMsc1.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/TechRDst.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/TechRoad.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Tree.tsx": {
+            "dynamicWrapping": true,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/TreeAsh.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/TreeGrs.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Trees.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Trees2.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Water.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/Water2.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1.5
+        },
+        "tsxs/WaterFlow2.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/WatrFlow.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1,
+            "scaleInEditor": 2
+        },
+        "tsxs/WatrRDst.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tsxs/WatrRoad.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 3
+        },
+        "tsxs/units.tsx": {
+            "dynamicWrapping": true,
+            "scaleInDock": 1
+        },
+        "tsxs/水面动画.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 16
+        }
+    },
+    "frame.defaultDuration": 300,
+    "last.imagePath": "/home/shishanyue/simple_warfare/assets/mods/custom/example/maps/tiles",
+    "map.height": 110,
+    "map.lastUsedFormat": "tmx",
+    "map.layerDataFormat": null,
+    "map.tileHeight": 20,
+    "map.tileWidth": 20,
+    "map.width": 110,
+    "openFiles": [
+        "tsxs/Snow.tsx",
+        "[p2]Small_Island (2p).tmx",
+        "tsxs/Ice2Snow.tsx",
+        "tsxs/WaterFlow2.tsx"
+    ],
+    "project": "maps.tiled-project",
+    "property.type": "object",
+    "recentFiles": [
+        "tsxs/Snow.tsx",
+        "[p2]Small_Island (2p).tmx",
+        "tsxs/Ice2Snow.tsx",
+        "tsxs/WaterFlow2.tsx",
+        "/home/shishanyue/bevy_ecs_tiled-0.7.3/assets/tiles/orthogonal_1.tsx",
+        "/home/shishanyue/bevy_ecs_tiled-0.7.3/assets/maps/orthogonal/multiple_layers_with_colliders.tmx",
+        "/home/shishanyue/bevy_ecs_tiled-0.7.3/assets/maps/orthogonal/finite.tmx",
+        "/home/shishanyue/rust/bevy_ecs_tiled/assets/maps/orthogonal/multiple_layers_with_colliders.tmx",
+        "/home/shishanyue/rust/bevy_ecs_tiled/assets/tiles/orthogonal_1.tsx",
+        "tsxs/水面动画.tsx",
+        "tsxs/Snw2-Ct2.tsx",
+        "tsxs/Snw2-Lav.tsx"
+    ],
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.tileSize": {
+        "height": 20,
+        "width": 20
+    },
+    "tileset.transparentColor": "#008a76",
+    "tileset.type": 0,
+    "tileset.useTransparentColor": true
+}

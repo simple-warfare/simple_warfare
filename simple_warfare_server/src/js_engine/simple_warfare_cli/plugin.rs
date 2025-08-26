@@ -12,7 +12,7 @@ use crate::{
     },
 };
 use bevy::prelude::*;
-use bevy_hui::prelude::*;
+//use bevy_hui::prelude::*;
 
 use super::{io::SwIoPlugin, server::SwServerPlugin};
 pub struct SwPlugin;
@@ -53,13 +53,13 @@ fn handle_sw_event(
                     QuickDialogData::Comfirm(data) => {
                         let node_entity = commands.spawn(data.clone()).id();
 
-                        commands.entity(node_entity).insert((
-                            HtmlNode(asset_server.load("mods/std/ui/html/dialog/comfirm.html")),
-                            TemplateProperties::default()
-                                .with("node_entity", &serde_json::ser::to_string(&node_entity)?)
-                                .with("title", &data.title)
-                                .with("context", &data.context),
-                        ));
+                        // commands.entity(node_entity).insert((
+                        //     HtmlNode(asset_server.load("mods/std/ui/html/dialog/comfirm.html")),
+                        //     TemplateProperties::default()
+                        //         .with("node_entity", &serde_json::ser::to_string(&node_entity)?)
+                        //         .with("title", &data.title)
+                        //         .with("context", &data.context),
+                        // ));
                     }
                 },
             },

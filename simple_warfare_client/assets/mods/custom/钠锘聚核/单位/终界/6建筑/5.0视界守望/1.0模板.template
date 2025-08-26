@@ -1,0 +1,11 @@
+[action_模板]
+@copyFromSection:action_A层迭代
+@define tech:模板
+@define before:A层迭代
+price: 数据立方=1
+buildSpeed:10s
+description:研究${tech}科技\n解锁科技: \n[■]\n\n解锁■, ■
+
+[effect_模板]
+@copyFromSection:effect_A层迭代
+@define tech:模板

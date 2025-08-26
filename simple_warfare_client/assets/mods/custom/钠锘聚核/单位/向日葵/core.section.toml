@@ -1,0 +1,8 @@
+name = "向日葵"
+hp = 100
+maxHp = 100
+price = 100
+mass = 500
+buildSpeed = 3
+radius = 50
+enablePhysics = true

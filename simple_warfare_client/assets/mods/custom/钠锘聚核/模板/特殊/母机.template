@@ -1,0 +1,45 @@
+[core]
+transportUnitsRequireTag: ${WingName}
+maxTransportingUnits: ${SlotNum}
+transportUnitsAddUnloadOption: false
+transportUnitsUnloadDelayBetweenEachUnit: 0
+energyMax: ${WingPrice}
+@memory 载机: unit[]
+@memory 控制范围: float
+@global ControlRange: 120
+
+
+[template_升级]
+alsoTriggerAction: 删除载机
+alsoTriggerActionRepeat: ${SlotNum}+1
+[hiddenAction_删除载机]
+sendMessageTo: memory.载机[index]
+sendMessageWithTags: 删除载机
+
+[hiddenAction_载机初始化]
+autoTriggerOnEvent: created, newMessage(withTag="完成升级")
+alsoTriggerAction: 生产载机
+alsoTriggerActionRepeat: ${SlotNum}
+setUnitMemory: 控制范围=${ControlRange}
+[hiddenAction_生产载机]
+autoTrigger: if self.energy>=${WingPrice} and memory.载机.size<${SlotNum}
+requireConditional: if memory.载机.size<${SlotNum}
+produceUnits: ${WingName}
+addEnergy: -${WingPrice}
+[hiddenAction_恢复能量]
+autoTrigger: if memory.载机.size<${SlotNum}
+addEnergy: 0.01
+[hiddenAction_清空能量]
+autoTrigger: if memory.载机.size>=${SlotNum} and self.energy>0
+setResourcesWithLogic: energy=0
+[hiddenAction_群体检测]
+autoTrigger:true
+shrinkArrays: 载机
+takeResources_searchOnly:true
+takeResources_includeUnitsWithinRange_team:own
+takeResources_includeUnitsWithinRange:${int(attack.maxAttackRange*1.5)}
+takeResources_includeParent:true
+takeResources_triggerActionForEach:群体检测添加
+[hiddenAction_群体检测添加]
+requireConditional:if thisActionTarget.readUnitMemory("母机",type='unit') == self and memory.载机.contains(thisActionTarget) == false
+setUnitMemory:载机[memory.载机.size] = thisActionTarget

@@ -39,7 +39,7 @@ use crate::{
 
 use self::{
     io::fs::{Fs, SwFsRequestEvent},
-    server::{init_server_objects, trick_film_player::SwTrickFilmPlayerRequestEvent},
+    server::init_server_objects,
 };
 
 use super::event::{JsEngineRequestEvent, JsEngineResponseEvent};
@@ -129,7 +129,6 @@ impl SimpleWarfareCli {
         sw_cli_request_sender: Arc<Sender<SwCliRequestEvent>>,
         sw_cli_response_receiver: Arc<Mutex<Receiver<SwCliResponseEvent>>>,
         sw_fs_request_sender: Arc<Sender<SwFsRequestEvent>>,
-        sw_trick_film_player_request_sender: Arc<Sender<SwTrickFilmPlayerRequestEvent>>,
     ) -> JsObject {
         // Js传送单位位置的方法
         let teleport = unsafe {
@@ -469,7 +468,7 @@ impl SimpleWarfareCli {
         let fs = Fs::init(context, sw_fs_request_sender.clone());
 
         let server_objects =
-            init_server_objects(context, sw_trick_film_player_request_sender.clone());
+            init_server_objects(context,);
 
         let mut initializer = ObjectInitializer::with_native_data_and_proto(
             Self,

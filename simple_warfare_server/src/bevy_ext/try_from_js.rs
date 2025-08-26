@@ -1,13 +1,8 @@
-use bevy::{
-    platform::collections::{HashMap, HashSet},
-    prelude::*,
-};
+use bevy::prelude::*;
+use bevy_image::TextureAtlasLayout;
 use boa_engine::{
     JsResult, js_string,
-    object::{
-        FunctionObjectBuilder,
-        builtins::{JsArray, JsMap, JsSet, JsTypedArray},
-    },
+    object::builtins::{JsArray, JsFloat32Array},
     prelude::*,
     value::TryFromJs,
 };
@@ -15,14 +10,14 @@ use boa_engine::{
 use crate::js_engine::global::class::entity::JsEntity;
 
 pub fn vec2_try_from_js(value: &JsValue, context: &mut Context) -> JsResult<Vec2> {
-    let vec2_array = JsTypedArray::from_object(value.to_object(context)?)?;
+    let vec2_array = JsFloat32Array::from_object(value.to_object(context)?)?;
     Ok(Vec2::new(
         vec2_array.at(0, context)?.to_f32(context)?,
         vec2_array.at(1, context)?.to_f32(context)?,
     ))
 }
 pub fn uvec2_try_from_js(value: &JsValue, context: &mut Context) -> JsResult<UVec2> {
-    let uvec2_array = JsTypedArray::from_object(value.to_object(context)?)?;
+    let uvec2_array = JsFloat32Array::from_object(value.to_object(context)?)?;
     Ok(UVec2::new(
         uvec2_array.at(0, context)?.to_u32(context)?,
         uvec2_array.at(1, context)?.to_u32(context)?,
@@ -40,7 +35,7 @@ pub fn urect2_try_from_js(value: &JsValue, context: &mut Context) -> JsResult<UR
 }
 
 pub fn vec3_try_from_js(value: &JsValue, context: &mut Context) -> JsResult<Vec3> {
-    let vec3_array = JsTypedArray::from_object(value.to_object(context)?)?;
+    let vec3_array = JsFloat32Array::from_object(value.to_object(context)?)?;
     Ok(Vec3::new(
         vec3_array.at(0, context)?.to_f32(context)?,
         vec3_array.at(1, context)?.to_f32(context)?,
@@ -78,7 +73,7 @@ pub fn option_entity_try_from_js(
 }
 
 pub fn quat_try_from_js(value: &JsValue, context: &mut Context) -> JsResult<Quat> {
-    let quat_array = JsTypedArray::from_object(value.to_object(context)?)?;
+    let quat_array = JsFloat32Array::from_object(value.to_object(context)?)?;
     Ok(Quat::from_xyzw(
         quat_array.at(0, context)?.to_f32(context)?,
         quat_array.at(1, context)?.to_f32(context)?,
@@ -150,6 +145,7 @@ pub fn array_collect_to_vec<T>(
         .map(|v| if v.is_empty() { None } else { Some(v) })
 }
 
+/*
 pub fn hash_map_try_form_js<K, V>(value: &JsValue, context: &mut Context) -> JsResult<HashMap<K, V>>
 where
     K: TryFromJs,
@@ -188,3 +184,4 @@ where
 
     JsResult::Ok(map)
 }
+*/

@@ -44,7 +44,7 @@ impl UserData for ModInfo {
 }
 
 #[derive(Debug, Error)]
-pub enum ModInfoLoaderError {
+pub enum ModInfoTomlLoaderError {
     /// An [IO](std::io) Error
     #[error("Could not load file: {0}")]
     Io(#[from] std::io::Error),
@@ -54,14 +54,14 @@ pub enum ModInfoLoaderError {
 }
 
 #[derive(Default)]
-pub struct ModInfoLoader;
+pub struct ModInfoTomlLoader;
 
-impl AssetLoader for ModInfoLoader {
+impl AssetLoader for ModInfoTomlLoader {
     type Asset = ModInfo;
 
     type Settings = ();
 
-    type Error = ModInfoLoaderError;
+    type Error = ModInfoTomlLoaderError;
 
     async fn load(
         &self,
@@ -71,11 +71,47 @@ impl AssetLoader for ModInfoLoader {
     ) -> Result<Self::Asset, Self::Error> {
         let mut context = String::new();
         reader.read_to_string(&mut context).await?;
-        Ok(toml::from_str(&context).expect("parse mod info error"))
+        Ok(toml::from_str(&context)?)
     }
 
     fn extensions(&self) -> &[&str] {
         &["toml"]
+    }
+}
+
+#[derive(Debug, Error)]
+pub enum ModInfoJsonLoaderError {
+    /// An [IO](std::io) Error
+    #[error("Could not load file: {0}")]
+    Io(#[from] std::io::Error),
+    /// A deserialization error
+    #[error("Could not parse TOML: {0}")]
+    De(#[from] serde_json::error::Error),
+}
+
+#[derive(Default)]
+pub struct ModInfoJsonLoader;
+
+impl AssetLoader for ModInfoJsonLoader {
+    type Asset = ModInfo;
+
+    type Settings = ();
+
+    type Error = ModInfoJsonLoaderError;
+
+    async fn load(
+        &self,
+        reader: &mut dyn Reader,
+        _settings: &(),
+        _load_context: &mut LoadContext<'_>,
+    ) -> Result<Self::Asset, Self::Error> {
+        let mut context = String::new();
+        reader.read_to_string(&mut context).await?;
+        Ok(serde_json::from_str(&context)?)
+    }
+
+    fn extensions(&self) -> &[&str] {
+        &["json"]
     }
 }
 #[derive(Resource, Default)]

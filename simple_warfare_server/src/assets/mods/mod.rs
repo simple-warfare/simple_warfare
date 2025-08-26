@@ -59,7 +59,7 @@ pub struct ModSet {
 }
 
 #[derive(Debug, Error)]
-pub enum ModSetLoaderError {
+pub enum ModSetTomlLoaderError {
     /// An [IO](std::io) Error
     #[error("Could not load file: {0}")]
     Io(#[from] std::io::Error),
@@ -69,14 +69,14 @@ pub enum ModSetLoaderError {
 }
 
 #[derive(Default)]
-pub struct ModSetLoader;
+pub struct ModSetTomlLoader;
 
-impl AssetLoader for ModSetLoader {
+impl AssetLoader for ModSetTomlLoader {
     type Asset = ModSet;
 
     type Settings = ();
 
-    type Error = ModSetLoaderError;
+    type Error = ModSetTomlLoaderError;
 
     async fn load(
         &self,
@@ -86,10 +86,45 @@ impl AssetLoader for ModSetLoader {
     ) -> Result<Self::Asset, Self::Error> {
         let mut context = String::new();
         reader.read_to_string(&mut context).await?;
-        Ok(toml::from_str(&context).unwrap_or_default())
+        Ok(toml::from_str(&context)?)
     }
 
     fn extensions(&self) -> &[&str] {
         &["toml"]
+    }
+}
+#[derive(Debug, Error)]
+pub enum ModSetJsonLoaderError {
+    /// An [IO](std::io) Error
+    #[error("Could not load file: {0}")]
+    Io(#[from] std::io::Error),
+    /// A deserialization error
+    #[error("Could not parse TOML: {0}")]
+    De(#[from] serde_json::error::Error),
+}
+
+#[derive(Default)]
+pub struct ModSetJsonLoader;
+
+impl AssetLoader for ModSetJsonLoader {
+    type Asset = ModSet;
+
+    type Settings = ();
+
+    type Error = ModSetJsonLoaderError;
+
+    async fn load(
+        &self,
+        reader: &mut dyn Reader,
+        _settings: &(),
+        _load_context: &mut LoadContext<'_>,
+    ) -> Result<Self::Asset, Self::Error> {
+        let mut context = String::new();
+        reader.read_to_string(&mut context).await?;
+        Ok(serde_json::from_str(&context)?)
+    }
+
+    fn extensions(&self) -> &[&str] {
+        &["json"]
     }
 }

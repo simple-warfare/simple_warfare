@@ -1,7 +1,6 @@
 use crate::bevy_ext::try_from_js::*;
 use crate::custom::unit::{section::graphic::Graphic, transform::transform::JsTransform};
 use crate::js_engine::global::class::entity::JsEntity;
-use avian2d::math::Scalar;
 use bevy::prelude::*;
 use boa_engine::value::TryFromJs;
 use serde::{Deserialize, Serialize};
@@ -18,7 +17,7 @@ pub struct JsTurret {
     #[boa(rename = "canShoot")]
     pub can_shoot: bool,
     #[boa(from_js_with = "f32_try_from_js", rename = "attackRadius")]
-    pub attack_radius: Scalar,
+    pub attack_radius: f32,
     #[boa(rename = "UnitsInRange")]
     pub units_in_range: Vec<JsEntity>,
     #[boa(

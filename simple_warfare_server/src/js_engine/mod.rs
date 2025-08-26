@@ -24,7 +24,7 @@ use crate::{
         plugin::SwLoaderPlugin,
         simple_warfare_cli::{SwCliRequestReceiver, SwCliResponseSender, plugin::SwPlugin},
     },
-    statistics::AppState,
+    statistics::ServerState,
 };
 use bevy::prelude::*;
 use boa_engine::prelude::*;
@@ -32,9 +32,6 @@ use thiserror::Error;
 
 use self::simple_warfare_cli::{
     io::fs::{SwFsRequestReceiver, SwFsResponseSender},
-    server::trick_film_player::{
-        SwTrickFilmPlayerRequestReceiver, SwTrickFilmPlayerResponseSender,
-    },
 };
 
 #[derive(Error, Debug)]
@@ -53,7 +50,7 @@ impl Plugin for JsEnginePlugin {
         app.add_plugins(SwLoaderPlugin)
             .add_plugins(EventPlugin)
             .add_plugins(SwPlugin)
-            .add_systems(OnEnter(AppState::InitJsContext), init_js_context)
+            .add_systems(OnEnter(ServerState::JsContextInitiating), init_js_context)
             .add_systems(
                 Update,
                 broadcast_js_engine_response_event
@@ -62,7 +59,7 @@ impl Plugin for JsEnginePlugin {
             .add_systems(
                 Update,
                 inited_js_engine.run_if(
-                    in_state(AppState::InitJsContext)
+                    in_state(ServerState::JsContextInitiating)
                         .and(resource_exists::<JsEngineResponseReciver>),
                 ),
             );
@@ -106,17 +103,6 @@ fn init_js_context(mut commands: Commands) -> Result {
         sw_fs_request_receiver,
     ))));
 
-    let (sw_trick_film_player_request_sender, sw_trick_film_player_request_receiver) =
-        mpsc::channel();
-    let (sw_trick_film_player_response_sender, sw_trick_film_player_response_receiver) =
-        mpsc::channel();
-    commands.insert_resource(SwTrickFilmPlayerResponseSender(Arc::new(
-        sw_trick_film_player_response_sender.clone(),
-    )));
-    commands.insert_resource(SwTrickFilmPlayerRequestReceiver(Arc::new(Mutex::new(
-        sw_trick_film_player_request_receiver,
-    ))));
-
     let js_response_sender = Arc::new(js_response_sender.clone());
 
     std::thread::spawn(move || {
@@ -127,7 +113,6 @@ fn init_js_context(mut commands: Commands) -> Result {
             Arc::new(sw_cli_request_sender),
             Arc::new(Mutex::new(sw_cli_response_receiver)),
             Arc::new(sw_fs_request_sender),
-            Arc::new(sw_trick_film_player_request_sender),
         );
         // 开始监听
         // 由bevy的EventWriter写入事件并经js_event_bridge中转到此
@@ -165,12 +150,13 @@ fn broadcast_js_engine_response_event(
 }
 
 fn inited_js_engine(
-    mut next_state: ResMut<NextState<AppState>>,
+    mut next_state: ResMut<NextState<ServerState>>,
     mut event_reader: EventReader<JsEngineResponseEvent>,
 ) {
     for event in event_reader.read() {
         if let JsEngineResponseEvent::EngineInited = event {
-            next_state.set(AppState::ModSetLoading)
+            info!("ModSet Loading");
+            next_state.set(ServerState::ModSetLoading)
         }
     }
 }

@@ -1,0 +1,75 @@
+[package]
+name = "simple_warfare_client"
+version = "0.1.0"
+authors.workspace = true
+edition.workspace = true
+
+[features]
+default = []
+
+[dependencies]
+#simple_warfare
+simple_warfare_shared.workspace = true
+
+#utils
+thiserror.workspace = true
+rand.workspace = true
+simple_warfare_macros.workspace = true
+uuid-simd.workspace = true
+crc32fast.workspace = true
+rustc-hash = "2.1.1"
+
+
+# serialization
+serde.workspace = true
+toml.workspace = true
+serde_json.workspace = true
+
+#map
+tiled = { version = "0.14.0", features = ["world"] }
+
+
+#physics
+parry2d = { version = "0.23.0" }
+
+#bevy_web_asset = "0.11.0"
+axum = "0.8.4"
+
+#bevy utils
+bevy_defer = { version = "0.14.0", default-features = false }
+bevy_async_task = "0.8.1"
+
+#bevy crates
+bevy_image = { version = "0.16.1" }
+
+
+#network
+aeronet = "0.14.0"
+aeronet_websocket = { version = "0.14.0", features = ["server"] }
+
+bevy_webgate = "0.1.1"
+[dependencies.lightyear]
+workspace = true
+
+[dependencies.bevy]
+workspace = true
+default-features = false
+
+
+# Here is a configuration for the most aggressive optimizations possible
+# Read this when trying to optimise WASM build: https://bevy-cheatbook.github.io/platforms/wasm/size-opt.html
+[profile.release]
+lto = true
+opt-level = 3
+codegen-units = 1
+incremental = false
+debug = false
+
+# If your own code does CPU-intensive work, you might want to also enable some optimization for it.
+# Enable only a small amount of optimization in debug mode
+[profile.dev]
+opt-level = 1
+
+# Enable a large amount of optimization in the dev profile for dependencies.
+[profile.dev.package."*"]
+opt-level = 3

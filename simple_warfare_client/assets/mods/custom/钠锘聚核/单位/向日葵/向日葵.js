@@ -1,0 +1,52 @@
+import {
+  CustomUnit,
+  manyFromSectionFiles,
+  CircleCollider,
+  ColliderType,
+} from "std:index.mjs";
+
+export class Sunflower extends CustomUnit {
+  constructor(moduleParentPath) {
+    super(moduleParentPath);
+
+    let core = simpleWarfareCli.fs.readSectionFile(this, "core.section.toml");
+    let main_graphic_file = simpleWarfareCli.fs.readSectionFile(
+      this,
+      "graphics/main.section.toml"
+    );
+    let movement = simpleWarfareCli.fs.readSectionFile(
+      this,
+      "movement.section.toml"
+    );
+
+    this.core = manyFromSectionFiles.core(core);
+
+    let main_graphic = manyFromSectionFiles.graphic(main_graphic_file);
+
+    this.graphics.push(main_graphic);
+    this.movement = manyFromSectionFiles.movement(movement);
+
+    //console.log(this.graphics[0].easyAnimationRegister[0]);
+    this.colliders.push(new CircleCollider(ColliderType.Circle, 25));
+
+    this.activeWayPointChangedFunc = (wayPoint) => {
+      if (wayPoint.type == "move") {
+        let mainTrickFilmPlayer = this.graphics[0].trickFilmPlayer;
+
+        if (this.transform.translation[0] > wayPoint.position[0]) {
+          mainTrickFilmPlayer.start(mainTrickFilmPlayer.registions.run_left);
+        } else {
+          mainTrickFilmPlayer.start(mainTrickFilmPlayer.registions.run_right);
+        }
+      }
+    };
+
+    this.onFixedUpadteFunc = (delta_time) => {
+      console.log(`间隔时间为:${delta_time}s`);
+    };
+
+    this.fixedUpdate.connect(this.onFixedUpadteFunc);
+
+    this.activeWayPointChanged.connect(this.activeWayPointChangedFunc);
+  }
+}

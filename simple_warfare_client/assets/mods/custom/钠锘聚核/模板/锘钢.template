@@ -1,0 +1,45 @@
+[core]
+soundOnNewSelection:ROOT:数据/语音/选中1.wav,ROOT:数据/语音/选中2.wav,ROOT:数据/语音/选中3.wav,ROOT:数据/语音/选中4.wav,ROOT:数据/语音/选中5.wav,ROOT:数据/语音/选中6.wav
+soundOnAttackOrder:ROOT:数据/语音/攻击1.wav,ROOT:数据/语音/攻击2.wav,ROOT:数据/语音/攻击3.wav,ROOT:数据/语音/攻击4.wav,ROOT:数据/语音/攻击5.wav,ROOT:数据/语音/攻击6.wav
+soundOnMoveOrder:ROOT:数据/语音/移动1.wav,ROOT:数据/语音/移动2.wav,ROOT:数据/语音/移动3.wav,ROOT:数据/语音/移动4.wav,ROOT:数据/语音/移动5.wav,ROOT:数据/语音/移动6.wav
+[template_core]
+typeTags:锘钢
+[action_进阶电子战]
+@copyFromSection: template_增益
+description: 视野提升80
+@define buff: 进阶电子战
+setUnitStats: fogOfWarSightRange+=4
+temporarilyAddTags: 进阶电子战
+@define other: not self.tags(includes="进阶电子战")
+[template_增益]
+autoTrigger: if self.globalTeamTags(includes="${buff}buff") and ${other}
+@define other: self.hp==self.hp
+isVisible: if self.globalTeamTags(includes="${buff}buff")
+price:0
+text: ${buff}
+iconImage:ROOT:单位/1锘钢/6建筑/5.3脉石熔炉/${buff}.png
+isActive:false
+displayType:infoOnlyNoBox
+pos:20
+buildSpeed:0s
+[template_一次性增益]
+@copyFromSection: template_增益
+autoTrigger: false
+autoTriggerOnEvent: created
+requireConditional: if self.globalTeamTags(includes="${buff}buff")
+
+[template_科技锁]
+isLockedAlt:if not self.globalTeamTags(includes="${lock}tech")
+isLockedAltMessage:-锁定-\n需要科技[${lock}]
+iconExtraImage:ROOT:数据/贴图/图标/锘钢.png
+iconExtraIsVisible:if not self.globalTeamTags(includes="${lock}tech") or not self.globalTeamTags(includes="${lock_2}tech")
+isLockedAlt2:if not self.globalTeamTags(includes="${lock_2}tech")
+isLockedAlt2Message:-锁定-\n需要科技[${lock_2}]
+iconExtraImage:ROOT:数据/贴图/图标/锘钢.png
+iconExtraColor: #44FFFFFF
+iconExtraIsVisible: if not self.globalTeamTags(includes="${lock}tech")
+@define lock_2:NONE
+[template_科技锁2]
+isLocked: if not self.globalTeamTags(includes="${lock}tech")
+isLockedMessage:-锁定-\n需要科技[${lock}]
+@define lock:NONE

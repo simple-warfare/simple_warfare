@@ -3,7 +3,7 @@ use std::collections::VecDeque;
 use bevy::prelude::*;
 use boa_engine::{
     JsResult, js_string,
-    object::{ObjectInitializer, builtins::JsMap},
+    object::ObjectInitializer,
     prelude::*,
     property::Attribute,
     value::TryIntoJs,

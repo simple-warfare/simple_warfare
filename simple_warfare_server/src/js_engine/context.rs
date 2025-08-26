@@ -50,12 +50,11 @@ pub(super) fn process_js_event(
         JsEngineRequestEvent::LoadMod(custom_mod_asset) => {
             let custom_typed_id = *custom_typed_id_generator;
             *custom_typed_id_generator += 1;
-
-            let mod_info = custom_mod_asset.info.clone();
+            let mod_info = &custom_mod_asset.info;
             for CustomModEnableJs {
                 js_asset,
                 enable_class,
-            } in custom_mod_asset.custom_mod_enable_js
+            } in custom_mod_asset.custom_mod_enable_js.iter()
             {
                 let module = Module::parse(
                     Source::from_reader(
@@ -83,7 +82,7 @@ pub(super) fn process_js_event(
                 module_map
                     .entry_ref(&mod_info.name)
                     .or_default()
-                    .push(ModModule::new(module.clone(), enable_class));
+                    .push(ModModule::new(module.clone(), enable_class.clone()));
                 let module_path = module.path().unwrap().to_string_lossy().into_owned();
                 context
                     .realm()
@@ -95,7 +94,7 @@ pub(super) fn process_js_event(
                     .insert(module_path, custom_typed_id);
             }
         }
-        JsEngineRequestEvent::SpawnUnit { unit_id, unit_str } => {
+        JsEngineRequestEvent::SpawnUnit { unit_str } => {
             let unit_from: Vec<&str> = unit_str.split(':').collect();
             if let Some(modules) = module_map.get(unit_from[0]) {
                 for mod_module in modules {
@@ -157,7 +156,6 @@ pub(super) fn process_js_event(
                         let js_unit = JsUnit::try_from_proxy(
                             &unit_proxy,
                             context,
-                            unit_id,
                             custom_typed_id,
                             module_path,
                         )?;

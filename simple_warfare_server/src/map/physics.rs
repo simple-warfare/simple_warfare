@@ -22,7 +22,7 @@ use parry2d::{
     math::{Isometry, Point, Real},
     shape::SharedShape,
 };
-use vleue_navigator2d::prelude::*;
+use vleue_navigator::prelude::*;
 
 /// The [`TiledPhysicsBackend`] to use for Parry 2D integration.
 ///
@@ -67,9 +67,9 @@ impl TiledPhysicsBackend for TiledPhysicsParryBackend {
                     out.push(
                         commands
                             .spawn((
-                                Name::from("Avian[Triangulation]"),
-                                CachedObstacle::<SharedShapeStorage>::new(
-                                    SharedShapeStorage::from(shared_shape),
+                                Name::from("Parry[Triangulation]"),
+                                CachedObstacle::<SharedShapeObstacle>::new(
+                                    SharedShapeObstacle::from(shared_shape),
                                 ),
                                 CachableObstacle,
                             ))
@@ -89,9 +89,9 @@ impl TiledPhysicsBackend for TiledPhysicsParryBackend {
                         out.push(
                             commands
                                 .spawn((
-                                    Name::from(format!("Avian[LineStrip {i}]")),
-                                    CachedObstacle::<SharedShapeStorage>::new(
-                                        SharedShapeStorage::from(shared_shape),
+                                    Name::from(format!("Parry[LineStrip {i}]")),
+                                    CachedObstacle::<SharedShapeObstacle>::new(
+                                        SharedShapeObstacle::from(shared_shape),
                                     ),
                                     CachableObstacle,
                                 ))
@@ -118,9 +118,9 @@ impl TiledPhysicsBackend for TiledPhysicsParryBackend {
                     out.push(
                         commands
                             .spawn((
-                                Name::from("Avian[Polyline]"),
-                                CachedObstacle::<SharedShapeStorage>::new(
-                                    SharedShapeStorage::from(shared_shape),
+                                Name::from("Parry[Polyline]"),
+                                CachedObstacle::<SharedShapeObstacle>::new(
+                                    SharedShapeObstacle::from(shared_shape),
                                 ),
                                 CachableObstacle,
                             ))

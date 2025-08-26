@@ -1,0 +1,23 @@
+{
+  "include": [
+    "./**/*"
+  ],
+  "compilerOptions": {
+    "paths": {
+      "package:*": [
+        "./package/*"
+      ],
+      "std:*": [
+        "./std/*"
+      ],
+      "custom:*": [
+        "./custom/*"
+      ],
+    },
+    "allowJs": true,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "declarationMap": true,
+    "outDir": "../dist"
+  }
+}

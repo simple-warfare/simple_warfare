@@ -1,7 +1,6 @@
-use std::{path::Path, sync::Arc};
+use std::sync::Arc;
 
 use crate::{
-    bevy_ext::error::CommonBevyError,
     custom::{
         CustomTypedIdStorage,
         unit::{
@@ -21,15 +20,10 @@ use crate::{
         JsEngineRequestSender,
         event::{JsEngineRequestEvent, JsEngineResponseEvent},
     },
-    net::shared::UnitMapping,
-    shared::SharedCutomHandleMapping,
     spatial::Spatial,
     statistics::*,
 };
-use avian2d::prelude::*;
 use bevy::prelude::*;
-use bevy_northstar::prelude::*;
-use bevy_trickfilm::prelude::*;
 
 pub struct UnitSystemPlugin;
 impl Plugin for UnitSystemPlugin {
@@ -54,13 +48,11 @@ fn check_new_unit(
     asset_server: Res<AssetServer>,
     mut reader: EventReader<JsEngineResponseEvent>,
     mut writer: EventWriter<NewSpawnedUnit>,
-    mut unit_mapping: ResMut<UnitMapping>,
     js_engine_request_sender: Res<JsEngineRequestSender>,
 ) -> Result {
     for event in reader.read() {
         if let JsEngineResponseEvent::SpawnedUnit { js_unit } = event {
             let ref js_unit_data = js_unit.data;
-            unit_mapping.add_entity(js_unit_data.unit_id, js_unit_data.entity);
 
             let custom_unit_inner_info = Arc::new(CustomInnerInfo::new(&js_unit_data.module_path));
             let custom_inner_info_storage =
@@ -91,18 +83,11 @@ fn check_new_unit(
 
                     let image_path = custom_unit_inner_info.get_real_path(&turret_image.path);
 
-                    let anchor = turret.image.anchor();
-                    let sprite = Sprite {
-                        image: asset_server.load(image_path),
-                        anchor,
-                        ..Default::default()
-                    };
                     commands
                         .entity(turret.entity)
                         .insert((
                             Spatial,
                             CustomTurrrt,
-                            sprite,
                             turret.clone(),
                             Into::<Transform>::into(turret.transform.clone()),
                         ))
@@ -132,25 +117,11 @@ fn check_new_unit(
                 EnablePhysics,
                 Selectable,
                 Spatial,
-                RigidBody::Dynamic,
-                MaxLinearSpeed(40.),
-                AngularDamping(0.8),
-                LinearDamping(0.8),
-                ExternalForce::default().with_persistence(false),
-                ComputedMass::new(core.mass),
             ));
 
             unit_commands
                 .add_children(&turret_entities)
-                .add_children(&graphic_entities)
-                .with_children(|parent| {
-                    for collider in colliders.to_avian2d().drain(..) {
-                        parent.spawn(collider);
-                    }
-                    for point_light in point_lights.to_point_light2d().drain(..) {
-                        parent.spawn(point_light);
-                    }
-                });
+                .add_children(&graphic_entities);
 
             writer.write(NewSpawnedUnit(unit_entity));
         }
@@ -162,48 +133,12 @@ fn check_new_graphic(
     mut commands: Commands,
     graphic_query: Query<(Entity, &Graphic), Added<Graphic>>,
     asset_server: Res<AssetServer>,
-    mut shared_cutom_handle_mapping: ResMut<SharedCutomHandleMapping>,
-    mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
 ) -> Result {
     for (entity, graphic) in graphic_query {
         let mut entity_commands = commands.entity(entity);
         let Some(real_parent_path) = &graphic.real_parent_path else {
             continue;
         };
-
-        let image_path = Path::new(real_parent_path).join(&graphic.path);
-
-        let sprite = if let (Some(frame_width), Some(frame_height)) =
-            (graphic.frame_width, graphic.frame_height)
-        {
-            let layout = TextureAtlasLayout::from_grid(
-                UVec2::new(frame_width, frame_height),
-                graphic.width / frame_width,
-                graphic.height / frame_height,
-                None,
-                None,
-            );
-            let texture_atlas_layout = texture_atlas_layouts.add(layout);
-            Sprite {
-                image: asset_server.load(image_path),
-                texture_atlas: Some(TextureAtlas {
-                    layout: texture_atlas_layout.clone(),
-                    index: 0,
-                }),
-                ..Default::default()
-            }
-        } else {
-            Sprite {
-                image: asset_server.load(image_path),
-                ..Default::default()
-            }
-        };
-
-        entity_commands.insert(sprite);
-
-        if graphic.trick_film_player.is_some() {
-            entity_commands.insert(AnimationPlayer2D::default());
-        }
     }
 
     Ok(())

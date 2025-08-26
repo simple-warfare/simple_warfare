@@ -7,17 +7,17 @@ use bevy::prelude::*;
 use crate::{
     assets::custom::map::grid_layers::CustomGridLayers,
     custom::map::navigator_layer::northstar::CustomGridLayersServer,
-    statistics::{AppState, SomeAsyncWorkCalculator},
+    statistics::{ServerState, SomeAsyncWorkCalculator},
 };
 
 pub struct NavigatorLayerPlugin;
 
 impl Plugin for NavigatorLayerPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(OnEnter(AppState::SomeAsyncWork), load_custom_layers)
+        app.add_systems(OnEnter(ServerState::SomeAsyncWork), load_custom_layers)
             .add_systems(
                 Update,
-                check_custom_layers_ready.run_if(in_state(AppState::SomeAsyncWork)),
+                check_custom_layers_ready.run_if(in_state(ServerState::SomeAsyncWork)),
             );
     }
 }

@@ -1,7 +1,7 @@
+use crate::custom::unit::light2d::point_light2d::JsPointLight2d;
 use bevy::prelude::*;
 use boa_engine::value::TryFromJs;
 use serde::{Deserialize, Serialize};
-use crate::custom::unit::light2d::point_light2d::JsPointLight2d;
 
 /// mod单位拥有一个Array来存储点光源,在rust中我们将使用Vec
 #[derive(Debug, Default, Clone, Serialize, Deserialize, Component, Reflect, TryFromJs)]
@@ -14,12 +14,5 @@ impl JsPointLights2d {
         Self {
             data: js_point_light2d,
         }
-    }
-    /// 将所有点光源收集到一起
-    pub fn to_point_light2d(&self) -> Vec<impl Bundle> {
-        self.data
-            .iter()
-            .map(|js_point_light2d| js_point_light2d.to_point_light2d())
-            .collect()
     }
 }

@@ -1,5 +1,4 @@
 use bevy::prelude::*;
-use bevy_light_2d::light::PointLight2d;
 use boa_engine::value::TryFromJs;
 
 use crate::bevy_ext::try_from_js::*;
@@ -37,21 +36,5 @@ impl Default for JsPointLight2d {
             falloff: 0.0,
             cast_shadows: false,
         }
-    }
-}
-
-impl JsPointLight2d {
-    /// 将从Js中得到的点光源转化成Bevy的点光源
-    pub fn to_point_light2d(&self) -> impl Bundle {
-        (
-            Into::<Transform>::into(self.transform.clone()),
-            PointLight2d {
-                color: self.color,
-                intensity: self.intensity,
-                radius: self.radius,
-                falloff: self.falloff,
-                cast_shadows: self.cast_shadows,
-            },
-        )
     }
 }

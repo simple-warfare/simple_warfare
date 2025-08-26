@@ -16,16 +16,14 @@ use crate::{
     js_engine::{
         global::class::entity::JsEntity,
         simple_warfare_cli::{LookType, TeleportType},
-        synchronize::{SynchronizeData, SynchronizeDataType},
+        synchronize::SynchronizeData,
     },
-    net::shared::UnitId,
 };
 
 #[derive(Event)]
 pub enum JsEngineRequestEvent {
     LoadMod(CustomModAsset),
     SpawnUnit {
-        unit_id: UnitId,
         unit_str: String,
     },
     ToTeleport(TeleportType),
@@ -67,8 +65,8 @@ pub enum JsEngineRequestEvent {
 }
 
 impl JsEngineRequestEvent {
-    pub fn spawn_unit(unit_id: UnitId, unit_str: String) -> Self {
-        Self::SpawnUnit { unit_id, unit_str }
+    pub fn spawn_unit(unit_str: String) -> Self {
+        Self::SpawnUnit { unit_str }
     }
 
     pub fn on_unit_enter_signal_entity(

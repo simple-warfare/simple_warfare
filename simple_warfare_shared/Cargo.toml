@@ -1,0 +1,18 @@
+[package]
+name = "simple_warfare_shared"
+authors.workspace = true
+version.workspace = true
+edition.workspace = true
+
+
+[dependencies]
+# serialization
+serde.workspace = true
+
+[dependencies.lightyear]
+workspace = true
+
+[dependencies.bevy]
+workspace = true
+default-features = false
+

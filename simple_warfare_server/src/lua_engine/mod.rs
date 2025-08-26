@@ -16,7 +16,7 @@ use crate::{
         map::navigator_layer::northstar::CustomGridLayersServer,
     },
     lua_engine::user_data::{MapManager, ModManager, NavigatorLayerManager},
-    statistics::AppState,
+    statistics::ServerState,
 };
 
 #[derive(Resource)]
@@ -44,20 +44,20 @@ impl Plugin for LuaEnginePlugin {
         app.init_resource::<LuaRuntime>()
             .add_systems(
                 Update,
-                check_mod_set.run_if(in_state(AppState::ModSetLoading)),
+                check_mod_set.run_if(in_state(ServerState::ModSetLoading)),
             )
             .add_systems(
                 Update,
-                check_custom_mods.run_if(in_state(AppState::CustomModLoading)),
+                check_custom_mods.run_if(in_state(ServerState::CustomModLoading)),
             )
-            .add_systems(OnEnter(AppState::MainLuaExecuting), exec_mod_main_lua);
+            .add_systems(OnEnter(ServerState::MainLuaExecuting), exec_mod_main_lua);
     }
 }
 
 fn check_mod_set(
     asset_server: Res<AssetServer>,
     mut game_asset: ResMut<GameAsset>,
-    mut next_state: ResMut<NextState<AppState>>,
+    mut next_state: ResMut<NextState<ServerState>>,
     mod_sets: Res<Assets<ModSet>>,
 ) -> Result {
     let mod_set_id = game_asset.enable_mod_set.mod_set_handle.id();
@@ -88,7 +88,8 @@ fn check_mod_set(
                 .mod_handles
                 .push(CustomModHandle::new(info_handle, main_lua_handle));
         });
-        next_state.set(AppState::CustomModLoading);
+        info!("CustomMod Loading");
+        next_state.set(ServerState::CustomModLoading);
     }
 
     Ok(())
@@ -97,7 +98,7 @@ fn check_mod_set(
 fn check_custom_mods(
     mut game_asset: ResMut<GameAsset>,
     asset_server: Res<AssetServer>,
-    mut next_state: ResMut<NextState<AppState>>,
+    mut next_state: ResMut<NextState<ServerState>>,
 ) {
     game_asset
         .custom_mod_handles
@@ -105,7 +106,8 @@ fn check_custom_mods(
         .retain(|handle| !asset_server.is_loaded_with_dependencies(handle.id()));
 
     if game_asset.custom_mod_handles.untyped_handles.is_empty() {
-        next_state.set(AppState::MainLuaExecuting);
+        info!("MainLua Executing");
+        next_state.set(ServerState::MainLuaExecuting);
     }
 }
 
@@ -114,7 +116,7 @@ fn exec_mod_main_lua(
     lua_assets: Res<Assets<LuaAsset>>,
     mod_infos: Res<Assets<ModInfo>>,
     mut game_asset: ResMut<GameAsset>,
-    mut next_state: ResMut<NextState<AppState>>,
+    mut next_state: ResMut<NextState<ServerState>>,
     lua_runtime: Res<LuaRuntime>,
     mut custom_grid_layers_server: ResMut<CustomGridLayersServer>,
 ) -> Result {
@@ -162,23 +164,23 @@ fn exec_mod_main_lua(
                     });
 
                 let map_manager = global.get::<MapManager>(MapManager::LUA_GLOBAL_NAME)?;
-                map_manager.map_paths.iter().try_for_each(|map_path| {
-                    let binding = get_real_path(mod_name, map_path);
-                    let real_map_path = binding.as_path();
+                // map_manager.map_paths.iter().try_for_each(|map_path| {
+                //     let binding = get_real_path(mod_name, map_path);
+                //     let real_map_path = binding.as_path();
 
-                    if let Some(ext) = real_map_path.extension() {
-                        let (map, untyped) = match ext.to_string_lossy().trim() {
-                            "tmx" => {
-                                let map = asset_server.load(real_map_path);
-                                (map.clone(), map.untyped())
-                            }
-                            _ => return Err(BevyError::from("undefine map type")),
-                        };
-                        custom_mod.maps.push(map);
-                        custom_mods.untyped_handles.push(untyped);
-                    }
-                    Ok(())
-                })?;
+                //     if let Some(ext) = real_map_path.extension() {
+                //         let (map, untyped) = match ext.to_string_lossy().trim() {
+                //             "tmx" => {
+                //                 let map = asset_server.load(real_map_path);
+                //                 (map.clone(), map.untyped())
+                //             }
+                //             _ => return Err(BevyError::from("undefine map type")),
+                //         };
+                //         custom_mod.maps.push(map);
+                //         custom_mods.untyped_handles.push(untyped);
+                //     }
+                //     Ok(())
+                // })?;
 
                 let navigator_layer_manager =
                     global.get::<NavigatorLayerManager>(NavigatorLayerManager::LUA_GLOBAL_NAME)?;
@@ -188,7 +190,8 @@ fn exec_mod_main_lua(
             }
             Ok(())
         })?;
-    next_state.set(AppState::JsLoading);
+        info!("JsFile Loading");
+    next_state.set(ServerState::JsFileLoading);
     Ok(())
 }
 

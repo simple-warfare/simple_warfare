@@ -3,10 +3,7 @@ use std::sync::{Arc, atomic::AtomicU8};
 use bevy::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    assets::map::tiled::SimpleWarfareMap,
-    consts::{GAME_VERSION, GAME_VERSION_TYPE},
-};
+use crate::consts::{GAME_VERSION, GAME_VERSION_TYPE};
 
 #[derive(Default, Debug, Resource)]
 pub struct Statistics {
@@ -25,22 +22,22 @@ pub const SOME_ASYNC_WORK_NUM: u8 = 1;
 pub struct SomeAsyncWorkCalculator(pub Arc<AtomicU8>);
 
 #[derive(States, Debug, Hash, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Default, Reflect)]
-pub enum AppState {
+pub enum ServerState {
     #[default]
+    StartServerWaiting,
     AssetsLoading,
-    AssetsProcessing,
-    InitJsContext,
+    JsContextInitiating,
     ModSetLoading,
     CustomModLoading,
     MainLuaExecuting,
-    JsLoading,
-    ModLoading,
-    ModLoaded,
+    JsFileLoading,
     SomeAsyncWork,
-    AllReady,
+    Waiting,
+    OnLobby,
+    Gaming,
 }
 #[derive(States, Debug, Hash, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Default, Reflect)]
-pub enum MapState {
+pub enum MapBackendState {
     #[default]
     None,
     CreatingMap,
@@ -74,8 +71,6 @@ pub enum NetServerState {
     Ready,
 }
 
-#[derive(Debug, Resource)]
-pub struct SelectedMap(pub Handle<SimpleWarfareMap>);
 
 #[derive(Resource, Default, Debug)]
 pub struct SelectionState {
@@ -138,9 +133,9 @@ impl Plugin for StatistcsPlugin {
             .init_resource::<SomeAsyncWorkCalculator>()
             .init_state::<MouseState>()
             .init_state::<NetState>()
-            .init_state::<AppState>()
+            .init_state::<ServerState>()
             .init_state::<NetClientState>()
             .init_state::<NetServerState>()
-            .init_state::<MapState>();
+            .init_state::<MapBackendState>();
     }
 }

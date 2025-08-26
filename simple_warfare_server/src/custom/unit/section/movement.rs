@@ -1,5 +1,4 @@
 use crate::bevy_ext::{try_from_js::*, try_into_js::*};
-use avian2d::math::Scalar;
 use bevy::prelude::*;
 use boa_engine::{
     JsResult, js_string,
@@ -24,56 +23,56 @@ pub struct Movement {
         into_js_with = "f32_try_into_js",
         rename = "maxMoveSpeed"
     )]
-    pub max_move_speed: Scalar,
+    pub max_move_speed: f32,
     #[boa(
         from_js_with = "f32_try_from_js",
         into_js_with = "f32_try_into_js",
         rename = "moveAcceleration"
     )]
-    pub move_acceleration: Scalar,
+    pub move_acceleration: f32,
     #[boa(
         from_js_with = "f32_try_from_js",
         into_js_with = "f32_try_into_js",
         rename = "moveDeceleration"
     )]
-    pub move_deceleration: Scalar,
+    pub move_deceleration: f32,
     #[boa(
         from_js_with = "f32_try_from_js",
         into_js_with = "f32_try_into_js",
         rename = "reversePercentage"
     )]
-    pub reverse_percentage: Scalar,
+    pub reverse_percentage: f32,
     #[boa(
         from_js_with = "f32_try_from_js",
         into_js_with = "f32_try_into_js",
         rename = "maxTurnSpeed"
     )]
-    pub max_turn_speed: Scalar,
+    pub max_turn_speed: f32,
     #[boa(
         from_js_with = "f32_try_from_js",
         into_js_with = "f32_try_into_js",
         rename = "turnAcceleration"
     )]
-    pub turn_acceleration: Scalar,
+    pub turn_acceleration: f32,
     #[boa(
         from_js_with = "f32_try_from_js",
         into_js_with = "f32_try_into_js",
         rename = "turnDeceleration"
     )]
-    pub turn_deceleration: Scalar,
+    pub turn_deceleration: f32,
 }
 
 impl Movement {
     pub fn new(
         entity: Entity,
         movement_type: MovementType,
-        max_move_speed: Scalar,
-        move_acceleration: Scalar,
-        move_deceleration: Scalar,
-        reverse_percentage: Scalar,
-        max_turn_speed: Scalar,
-        turn_acceleration: Scalar,
-        turn_deceleration: Scalar,
+        max_move_speed: f32,
+        move_acceleration: f32,
+        move_deceleration: f32,
+        reverse_percentage: f32,
+        max_turn_speed: f32,
+        turn_acceleration: f32,
+        turn_deceleration: f32,
     ) -> Self {
         Self {
             entity,

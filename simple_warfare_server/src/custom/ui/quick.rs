@@ -1,11 +1,6 @@
-use crate::js_engine::{
-    JsEngineRequestSender, event::JsEngineRequestEvent, global::class::entity::JsEntity,
-};
+use crate::js_engine::global::class::entity::JsEntity;
 use bevy::prelude::*;
-use bevy_hui::prelude::*;
 use boa_engine::{JsResult, js_string, prelude::*, value::TryFromJs};
-
-pub mod html_path {}
 
 #[derive(Clone, PartialEq, Eq, Hash, Component, Reflect)]
 pub enum QuickUi {
@@ -81,81 +76,4 @@ impl TryFromJs for QuickUi {
                 .into()),
         }
     }
-}
-
-pub struct CustomQuickUiPlugin;
-
-impl Plugin for CustomQuickUiPlugin {
-    fn build(&self, app: &mut App) {
-        app.add_systems(PreStartup, setup_quick_ui);
-    }
-}
-
-fn setup_quick_ui(mut html_funcs: HtmlFunctions) {
-    html_funcs.register(
-        "quick_ui_comfirm_dialog_comfirm",
-        quick_ui_comfirm_dialog_comfirm,
-    );
-
-    html_funcs.register(
-        "quick_ui_comfirm_dialog_cancel",
-        quick_ui_comfirm_dialog_cancel,
-    );
-}
-
-fn quick_ui_comfirm_dialog_comfirm(
-    In(entity): In<Entity>,
-    button_tags: Query<&Tags>,
-    dialog_query: Query<&QuickComfirmDialog>,
-    js_engine_request_sender: Res<JsEngineRequestSender>,
-) {
-    let Some(node_entity) = button_tags.get(entity).ok().and_then(|tags| {
-        tags.get("node_entity").map(|node_entity_str| {
-            serde_json::from_str::<Entity>(node_entity_str)
-                .expect("couldn't parse the entity in html's tags")
-        })
-    }) else {
-        return;
-    };
-
-    let Ok(dialog) = dialog_query.get(node_entity) else {
-        return;
-    };
-
-    js_engine_request_sender
-        .0
-        .send(JsEngineRequestEvent::emit_empty_signal(
-            dialog.on_press_comfirm_signal.to_entity(),
-        ))
-        .unwrap();
-}
-
-fn quick_ui_comfirm_dialog_cancel(
-    In(entity): In<Entity>,
-    mut commands: Commands,
-    button_tags: Query<&Tags>,
-    dialog_query: Query<&QuickComfirmDialog>,
-    js_engine_request_sender: Res<JsEngineRequestSender>,
-) {
-    let Some(node_entity) = button_tags.get(entity).ok().and_then(|tags| {
-        tags.get("node_entity").map(|node_entity_str| {
-            serde_json::from_str::<Entity>(node_entity_str)
-                .expect("couldn't parse the entity in html's tags")
-        })
-    }) else {
-        return;
-    };
-
-    let Ok(dialog) = dialog_query.get(node_entity) else {
-        return;
-    };
-
-    js_engine_request_sender
-        .0
-        .send(JsEngineRequestEvent::emit_empty_signal(
-            dialog.on_press_cancel_signal.to_entity(),
-        ))
-        .unwrap();
-
-    commands.entity(node_entity).despawn();
 }

@@ -1,12 +1,11 @@
-use avian2d::{math::Scalar, prelude::Collider};
 use bevy::prelude::*;
 use boa_engine::{JsResult, js_string, prelude::*, value::TryFromJs};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Component, Reflect)]
 pub enum JsCollider {
-    Circle(Scalar),
-    Rectangle(Scalar, Scalar),
+    Circle { radius: f32 },
+    Rectangle { width: f32, hright: f32 },
 }
 
 impl TryFromJs for JsCollider {
@@ -18,12 +17,12 @@ impl TryFromJs for JsCollider {
             .to_std_string_lossy()
             .as_str()
         {
-            "Circle" => Ok(Self::Circle(
+            "Circle" => Ok(Self::circle(
                 collider_object
                     .get(js_string!("radius"), context)?
                     .to_f32(context)?,
             )),
-            "Rectangle" => Ok(Self::Rectangle(
+            "Rectangle" => Ok(Self::rectangle(
                 collider_object
                     .get(js_string!("width"), context)?
                     .to_f32(context)?,
@@ -39,11 +38,10 @@ impl TryFromJs for JsCollider {
 }
 
 impl JsCollider {
-    /// 将从Js中得到的碰撞体转化成Bevy的碰撞体
-    pub fn to_avian2d(&self) -> Collider {
-        match self {
-            JsCollider::Circle(radius) => Collider::circle(*radius),
-            JsCollider::Rectangle(x_length, y_length) => Collider::rectangle(*x_length, *y_length),
-        }
+    pub fn circle(radius: f32) -> Self {
+        Self::Circle { radius }
+    }
+    pub fn rectangle(width: f32, hright: f32) -> Self {
+        Self::Rectangle { width, hright }
     }
 }

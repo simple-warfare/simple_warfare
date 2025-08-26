@@ -1,5 +1,4 @@
-use avian2d::prelude::{AngularVelocity, LinearVelocity};
-use bevy::{pbr::graph, prelude::*};
+use bevy::prelude::*;
 
 use crate::{
     custom::{
@@ -12,7 +11,7 @@ use crate::{
         },
     },
     js_engine::{JsEngineRequestSender, event::JsEngineRequestEvent, signal::JsSignalType},
-    scenes::SceneState,
+    statistics::ServerState,
 };
 
 pub struct WayPointSystemPlugin;
@@ -25,33 +24,27 @@ impl Plugin for WayPointSystemPlugin {
         app.add_systems(
             PostUpdate,
             handle_move_way_point
-                .run_if(in_state(SceneState::GameScene))
+                .run_if(in_state(ServerState::Gaming))
                 .in_set(HandleWayPointSystem),
         )
         .add_systems(
             PostUpdate,
             lock_rotation
                 .after(TransformSystem::TransformPropagate)
-                .run_if(in_state(SceneState::GameScene)),
+                .run_if(in_state(ServerState::Gaming)),
         )
         .add_systems(
             PostUpdate,
             check_active_way_point_changed
                 .after(HandleWayPointSystem)
-                .run_if(in_state(SceneState::GameScene)),
+                .run_if(in_state(ServerState::Gaming)),
         );
     }
 }
 
 fn handle_move_way_point(
     time: Res<Time>,
-    way_point_queue: Query<(
-        &mut WayPointQueue,
-        &Transform,
-        &Movement,
-        &mut AngularVelocity,
-        &mut LinearVelocity,
-    )>,
+    way_point_queue: Query<(&mut WayPointQueue, &Transform, &Movement)>,
 ) {
     use std::f32::consts::*;
 
@@ -60,15 +53,7 @@ fn handle_move_way_point(
     const ANGLE_THRESHOLD_MIN: f32 = FRAC_PI_8 / 10.0;
     const ANGLE_THRESHOLD_MAX: f32 = FRAC_PI_4;
     let delta_time = time.delta_secs();
-    for (
-        mut queue,
-        transform,
-        movement,
-        //mut external_force,
-        mut angular_velocity,
-        mut linear_velocity,
-    ) in way_point_queue
-    {
+    for (mut queue, transform, movement) in way_point_queue {
         if let Some(WayPoint::Move(target)) = queue.data.front() {
             let direction = target - transform.translation.xy();
             let distance = direction.length();
@@ -84,26 +69,20 @@ fn handle_move_way_point(
             angle_diff = (angle_diff + PI).rem_euclid(TWO_PI) - PI;
 
             if angle_diff.abs() > ANGLE_THRESHOLD_MAX {
-                angular_velocity.0 += angle_diff.signum() * movement.turn_acceleration * delta_time;
+                //angular_velocity.0 += angle_diff.signum() * movement.turn_acceleration * delta_time;
                 continue;
             } else if angle_diff.abs() > ANGLE_THRESHOLD_MIN {
-                angular_velocity.0 += angle_diff.signum() * movement.turn_deceleration * delta_time;
+                //angular_velocity.0 += angle_diff.signum() * movement.turn_deceleration * delta_time;
             } else {
-                angular_velocity.0 = 0.;
+                //angular_velocity.0 = 0.;
             }
-            linear_velocity.0 += direction.normalize() * movement.move_acceleration * delta_time;
+            //linear_velocity.0 += direction.normalize() * movement.move_acceleration * delta_time;
         }
     }
 }
 
 fn handle_turret_attack_way_point(
-    way_point_queue: Query<(
-        &mut WayPointQueue,
-        &Transform,
-        &JsTurret,
-        &mut AngularVelocity,
-        &mut LinearVelocity,
-    )>,
+    way_point_queue: Query<(&mut WayPointQueue, &Transform, &JsTurret)>,
 ) {
 }
 

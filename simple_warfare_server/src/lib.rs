@@ -6,65 +6,42 @@ pub mod debug;
 pub mod helpers;
 pub mod js_engine;
 pub mod lua_engine;
-pub mod map;
 pub mod mod_engine;
-pub mod net;
-pub mod panel;
-pub mod scenes;
+pub mod server;
 pub mod shared;
 pub mod spatial;
+pub mod states;
 pub mod statistics;
 pub mod system;
 pub mod utils;
+pub mod lightyear;
 
-use crate::{
+use bevy::{app::PluginGroupBuilder, prelude::*};
+use js_engine::JsEnginePlugin;
+
+use self::{
     assets::AssetsPlugin,
     custom::{CustomPlugin, ui::CustomUiPlugin, unit::CustomUnitPlugin},
     debug::DebugPlugin,
     js_engine::synchronize::SynchronizePlugin,
     lua_engine::LuaEnginePlugin,
-    map::MapPlugin,
     mod_engine::ModEnginePlugin,
-    net::NetPlugin,
-    panel::PanelPlugin,
-    scenes::{ScenePlugin, SceneState},
     shared::SharedCustomPlugin,
     spatial::SpatialPlugin,
-    statistics::{AppState, StatistcsPlugin},
+    states::ServerStatePlugin,
+    statistics::StatistcsPlugin,
     system::SystemPlugin,
 };
-use avian2d::prelude::*;
-use bevy::{
-    app::PluginGroupBuilder,
-    prelude::*,
-    remote::{RemotePlugin, http::RemoteHttpPlugin},
-};
-use bevy_aseprite_ultra::AsepriteUltraPlugin;
-use bevy_ecs_tiled::tiled::TiledPlugin;
-use bevy_fly_camera::FlyCameraPlugin;
-use bevy_hui::prelude::*;
-use bevy_inspector_egui::{
-    bevy_egui::EguiPlugin,
-    quick::{StateInspectorPlugin, WorldInspectorPlugin},
-};
-use bevy_light_2d::prelude::*;
 
-//use bevy_panic_handler::PanicHandler;
-use bevy_seedling::SeedlingPlugin;
-use bevy_trickfilm::prelude::*;
-use js_engine::JsEnginePlugin;
+pub struct SimpleWarfareServerPlugins;
 
-pub struct SimpleWarfarePlugins;
-
-impl PluginGroup for SimpleWarfarePlugins {
+impl PluginGroup for SimpleWarfareServerPlugins {
     fn build(self) -> PluginGroupBuilder {
         let mut group = PluginGroupBuilder::start::<Self>();
         group = group
             .add(AssetsPlugin)
             .add(JsEnginePlugin)
             .add(LuaEnginePlugin)
-            .add(ScenePlugin)
-            .add(PanelPlugin)
             .add(ModEnginePlugin)
             .add(SystemPlugin)
             .add(StatistcsPlugin)
@@ -73,43 +50,9 @@ impl PluginGroup for SimpleWarfarePlugins {
             .add(DebugPlugin)
             .add(CustomUiPlugin)
             .add(SynchronizePlugin)
-            .add(NetPlugin)
-            .add(MapPlugin)
             .add(CustomPlugin)
-            .add(SharedCustomPlugin);
+            .add(SharedCustomPlugin)
+            .add(ServerStatePlugin);
         group
     }
 }
-
-pub struct SimpleWarfarePlugin;
-
-impl Plugin for SimpleWarfarePlugin {
-    fn build(&self, app: &mut App) {
-        app.register_type::<AppState>()
-            .register_type::<SceneState>()
-            .add_plugins((
-                RemotePlugin::default(),
-                RemoteHttpPlugin::default(),
-                HuiPlugin,
-            ))
-            .add_plugins(PhysicsPlugins::default())
-            .add_plugins(PhysicsDebugPlugin::default())
-            .add_plugins(EguiPlugin {
-                enable_multipass_for_primary_context: true,
-            })
-            .add_plugins(WorldInspectorPlugin::new())
-            .add_plugins(StateInspectorPlugin::<AppState>::default())
-            .add_plugins(StateInspectorPlugin::<SceneState>::default())
-            .add_plugins(FlyCameraPlugin)
-            //.add_plugins(PanicHandler::new().build())
-            .add_plugins(AsepriteUltraPlugin)
-            .add_plugins(TiledPlugin::default())
-            .add_plugins(Light2dPlugin)
-            .add_plugins(SeedlingPlugin::default())
-            .add_plugins(SimpleWarfarePlugins)
-            .insert_resource(Gravity(Vec2::ZERO))
-            .add_plugins(Animation2DPlugin);
-    }
-}
-
-

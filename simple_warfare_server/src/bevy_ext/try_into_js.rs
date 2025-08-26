@@ -1,10 +1,5 @@
 use bevy::prelude::*;
-use boa_engine::{
-    JsResult,
-    object::builtins::{JsFloat32Array, JsTypedArray},
-    prelude::*,
-    value::TryIntoJs,
-};
+use boa_engine::{JsResult, object::builtins::JsFloat32Array, prelude::*, value::TryIntoJs};
 
 use crate::js_engine::global::class::entity::JsEntity;
 pub fn f32_try_into_js(value: &f32, _context: &mut Context) -> JsResult<JsValue> {
