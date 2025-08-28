@@ -6,7 +6,7 @@ use boa_engine::{
     value::{TryFromJs, TryIntoJs},
 };
 use serde::{Deserialize, Serialize};
-use simple_warfare_macros::TryFromAndIntoJs;
+use simple_warfare_server_macros::TryFromAndIntoJs;
 #[derive(
     Debug, Clone, Serialize, Deserialize, PartialEq, Copy, Component, TryFromAndIntoJs, Reflect,
 )]

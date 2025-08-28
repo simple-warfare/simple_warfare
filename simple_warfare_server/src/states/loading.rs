@@ -75,6 +75,6 @@ fn check_some_async_works_completed(
 ) {
     if some_async_work_calculator.0.load(Ordering::Relaxed) == SOME_ASYNC_WORK_NUM {
         info!("Waiting");
-        server_state.set(ServerState::Waiting);
+        server_state.set(ServerState::Starting);
     }
 }

@@ -85,7 +85,7 @@ pub enum ModInfoJsonLoaderError {
     #[error("Could not load file: {0}")]
     Io(#[from] std::io::Error),
     /// A deserialization error
-    #[error("Could not parse TOML: {0}")]
+    #[error("Could not parse Json: {0}")]
     De(#[from] serde_json::error::Error),
 }
 

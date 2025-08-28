@@ -1,7 +1,7 @@
 use crate::bevy_ext::{try_from_js::*, try_into_js::*};
 use bevy::prelude::*;
 use serde::{Deserialize, Serialize};
-use simple_warfare_macros::TryFromAndIntoJs;
+use simple_warfare_server_macros::TryFromAndIntoJs;
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Component, Reflect, TryFromAndIntoJs)]
 pub struct Core {
     #[boa(

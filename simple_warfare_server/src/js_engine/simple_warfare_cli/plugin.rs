@@ -1,8 +1,5 @@
 use crate::{
-    custom::{
-        ui::quick::{QuickDialogData, QuickUi},
-        unit::unit::Custom,
-    },
+    custom::unit::unit::Custom,
     js_engine::{
         event::JsEngineResponseEvent,
         simple_warfare_cli::{
@@ -48,21 +45,6 @@ fn handle_sw_event(
                     .0
                     .send(SwCliResponseEvent::RegisteredEntity(entity))?;
             }
-            SwCliRequestEvent::CreateQuickUi(quick_ui) => match quick_ui {
-                QuickUi::Dialog(quick_dialog) => match quick_dialog {
-                    QuickDialogData::Comfirm(data) => {
-                        let node_entity = commands.spawn(data.clone()).id();
-
-                        // commands.entity(node_entity).insert((
-                        //     HtmlNode(asset_server.load("mods/std/ui/html/dialog/comfirm.html")),
-                        //     TemplateProperties::default()
-                        //         .with("node_entity", &serde_json::ser::to_string(&node_entity)?)
-                        //         .with("title", &data.title)
-                        //         .with("context", &data.context),
-                        // ));
-                    }
-                },
-            },
         }
     }
     Ok(())

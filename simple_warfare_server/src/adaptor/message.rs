@@ -1,10 +1,15 @@
 use bevy::prelude::*;
 use serde::{Deserialize, Serialize};
+use simple_warfare_shared_macros::{MessageDecode, MessageEncode};
+use thiserror::Error;
+
+use crate::consts::GAME_VERSION;
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub enum ClientMessageKind {
+    ContentDecodeKind,
     StartServer,
-    StartLobby,
+    CrateRoom,
     GetServerInfo,
 }
 
@@ -13,16 +18,27 @@ pub enum ServerMessageKind {
     ServerInfo,
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone, MessageDecode, MessageEncode)]
 pub struct ClientMessage {
     pub kind: ClientMessageKind,
-    pub content: Option<ClientMessageContent>,
+    pub content: Option<ServerMessageContent>,
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone, MessageDecode, MessageEncode)]
 pub struct ServerMessage {
     pub kind: ServerMessageKind,
     pub content: Option<ServerMessageContent>,
+}
+
+impl ServerMessage {
+    pub fn server_info() -> Self {
+        Self {
+            kind: ServerMessageKind::ServerInfo,
+            content: Some(ServerMessageContent::ServerInfo {
+                game_version: GAME_VERSION.to_string(),
+            }),
+        }
+    }
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone)]

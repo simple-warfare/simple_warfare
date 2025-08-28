@@ -10,7 +10,6 @@ use serde::{Deserialize, Serialize};
 
 use lightyear::prelude::*;
 
-
 #[derive(Component, Serialize, Deserialize, Clone, Debug, PartialEq, Default, Reflect)]
 pub struct Lobbies {
     pub lobbies: Vec<Lobby>,
@@ -51,24 +50,20 @@ impl Lobbies {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Reflect)]
 pub struct Lobby {
     pub players: Vec<PeerId>,
-    /// Which client is selected to be the host for the next game (if None, the server will be the host)
-    pub host: Option<PeerId>,
     pub room: Entity,
     /// If true, the lobby is in game. If not, it is still in lobby mode
     pub in_game: bool,
 }
 
 impl Lobby {
-    pub(crate) fn new(room: Entity) -> Self {
+    pub fn new(room: Entity) -> Self {
         Self {
             players: vec![],
-            host: None,
             room,
             in_game: false,
         }
     }
 }
-
 
 // Channels
 pub struct Channel1;
@@ -90,8 +85,6 @@ pub struct ExitLobby {
 pub struct JoinLobby {
     pub(crate) lobby_id: usize,
 }
-
-
 
 // Protocol
 pub(crate) struct ProtocolPlugin;

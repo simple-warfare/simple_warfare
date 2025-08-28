@@ -32,9 +32,7 @@ pub enum ServerState {
     MainLuaExecuting,
     JsFileLoading,
     SomeAsyncWork,
-    Waiting,
-    OnLobby,
-    Gaming,
+    Starting,
 }
 #[derive(States, Debug, Hash, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Default, Reflect)]
 pub enum MapBackendState {
@@ -46,52 +44,12 @@ pub enum MapBackendState {
     BuildingFlowField,
 }
 
-#[derive(States, Debug, Hash, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Default, Reflect)]
-pub enum NetState {
-    #[default]
-    None,
-    Client,
-    Server,
-    HostServer,
-}
-
-#[derive(States, Debug, Hash, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Default, Reflect)]
-pub enum NetClientState {
-    #[default]
-    None,
-    VerifyMods,
-    FetchMods,
-    Ready,
-}
-
-#[derive(States, Debug, Hash, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Default, Reflect)]
-pub enum NetServerState {
-    #[default]
-    None,
-    Ready,
-}
-
-
-#[derive(Resource, Default, Debug)]
-pub struct SelectionState {
-    pub viewport_start: Vec2,
-    pub viewport_end: Vec2,
-    pub world_2d_start: Vec2,
-    pub world_2d_end: Vec2,
-    pub is_selecting: bool,
-}
-
 #[derive(Debug, Component)]
 pub struct Selectable;
 
 #[derive(Debug, Component)]
 pub struct Selected;
 
-impl SelectionState {
-    pub fn clear(&mut self) {
-        *self = Self::default();
-    }
-}
 #[derive(Clone, Default, Resource)]
 pub struct MousePosition {
     pub viewport: Option<Vec2>,
@@ -132,10 +90,7 @@ impl Plugin for StatistcsPlugin {
             .init_resource::<GameInfo>()
             .init_resource::<SomeAsyncWorkCalculator>()
             .init_state::<MouseState>()
-            .init_state::<NetState>()
             .init_state::<ServerState>()
-            .init_state::<NetClientState>()
-            .init_state::<NetServerState>()
             .init_state::<MapBackendState>();
     }
 }

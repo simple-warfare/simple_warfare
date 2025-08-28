@@ -1,5 +1,6 @@
 pub mod statistics;
 pub mod consts;
+pub mod adaptor;
 
 use bevy::{app::PluginGroupBuilder, prelude::*};
 

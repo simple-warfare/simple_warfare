@@ -1,0 +1,24 @@
+[package]
+name = "simple_warfare_shared_macros"
+version = "0.1.0"
+edition = "2024"
+
+
+[lib]
+name = "simple_warfare_shared_macros"
+path = "src/lib.rs"
+proc-macro = true
+
+[dependencies]
+simple_warfare_shared.workspace = true
+
+[dependencies.proc-macro2]
+version = "1.0"
+
+[dependencies.quote]
+version = "1.0.37"
+
+[dependencies.syn]
+version = "2.0.90"
+features = ["full"]
+default-features = false

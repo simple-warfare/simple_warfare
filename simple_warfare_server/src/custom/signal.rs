@@ -11,7 +11,7 @@ use boa_engine::{
     prelude::*,
     value::TryFromJs,
 };
-use simple_warfare_macros::TryFromAndIntoJs;
+use simple_warfare_server_macros::TryFromAndIntoJs;
 
 use crate::{
     bevy_ext::prelude::*,

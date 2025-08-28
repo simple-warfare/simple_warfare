@@ -1,6 +1,6 @@
 use crate::bevy_ext::prelude::*;
 use bevy::prelude::*;
-use simple_warfare_macros::TryFromAndIntoJs;
+use simple_warfare_server_macros::TryFromAndIntoJs;
 
 use serde::{Deserialize, Serialize};
 #[derive(Debug, Component, Clone, Deserialize, Serialize, PartialEq, Reflect, TryFromAndIntoJs)]

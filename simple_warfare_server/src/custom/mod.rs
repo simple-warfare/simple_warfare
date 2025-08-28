@@ -14,7 +14,6 @@ use self::signal::{JsSignalPlugin, JsSignalStorage};
 
 pub mod map;
 pub mod signal;
-pub mod ui;
 pub mod unit;
 
 pub type CustomTypedId = i32;

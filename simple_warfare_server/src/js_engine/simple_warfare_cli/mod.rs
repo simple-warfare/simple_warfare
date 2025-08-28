@@ -24,10 +24,7 @@ use std::{
 use crate::{
     assets::js_file::{section::SectionFile, toml::TomlFile},
     bevy_ext::try_from_js::vec2_try_from_js,
-    custom::{
-        ui::quick::QuickUi,
-        unit::section::{core::Core, movement::Movement},
-    },
+    custom::unit::section::{core::Core, movement::Movement},
     js_engine::{
         context::emit_signal,
         global::class::entity::JsEntity,
@@ -56,7 +53,6 @@ pub struct SimpleWarfareCli;
 #[derive(Event)]
 pub enum SwCliRequestEvent {
     RegisterEntity,
-    CreateQuickUi(QuickUi),
 }
 
 #[derive(Event, Clone)]
@@ -343,11 +339,6 @@ impl SimpleWarfareCli {
             let sw_cli_request_sender = sw_cli_request_sender.clone();
             NativeFunction::from_closure(move |_referrer, args, ctx| {
                 let quick_ui = args.first().unwrap();
-                sw_cli_request_sender
-                    .send(SwCliRequestEvent::CreateQuickUi(QuickUi::try_from_js(
-                        quick_ui, ctx,
-                    )?))
-                    .unwrap();
                 Ok(JsValue::Undefined)
             })
         };
@@ -467,8 +458,7 @@ impl SimpleWarfareCli {
 
         let fs = Fs::init(context, sw_fs_request_sender.clone());
 
-        let server_objects =
-            init_server_objects(context,);
+        let server_objects = init_server_objects(context);
 
         let mut initializer = ObjectInitializer::with_native_data_and_proto(
             Self,

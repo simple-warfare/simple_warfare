@@ -1,10 +1,13 @@
+pub mod adaptor;
 pub mod assets;
 pub mod bevy_ext;
+pub mod cli;
 pub mod consts;
 pub mod custom;
 pub mod debug;
 pub mod helpers;
 pub mod js_engine;
+pub mod lightyear;
 pub mod lua_engine;
 pub mod mod_engine;
 pub mod server;
@@ -14,14 +17,14 @@ pub mod states;
 pub mod statistics;
 pub mod system;
 pub mod utils;
-pub mod lightyear;
 
 use bevy::{app::PluginGroupBuilder, prelude::*};
 use js_engine::JsEnginePlugin;
 
 use self::{
+    adaptor::AdaptorServerPlugin,
     assets::AssetsPlugin,
-    custom::{CustomPlugin, ui::CustomUiPlugin, unit::CustomUnitPlugin},
+    custom::{CustomPlugin, unit::CustomUnitPlugin},
     debug::DebugPlugin,
     js_engine::synchronize::SynchronizePlugin,
     lua_engine::LuaEnginePlugin,
@@ -48,11 +51,11 @@ impl PluginGroup for SimpleWarfareServerPlugins {
             .add(CustomUnitPlugin)
             .add(SpatialPlugin)
             .add(DebugPlugin)
-            .add(CustomUiPlugin)
             .add(SynchronizePlugin)
             .add(CustomPlugin)
             .add(SharedCustomPlugin)
-            .add(ServerStatePlugin);
+            .add(ServerStatePlugin)
+            .add(AdaptorServerPlugin);
         group
     }
 }

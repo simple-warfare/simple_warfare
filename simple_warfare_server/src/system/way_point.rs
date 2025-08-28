@@ -24,20 +24,20 @@ impl Plugin for WayPointSystemPlugin {
         app.add_systems(
             PostUpdate,
             handle_move_way_point
-                .run_if(in_state(ServerState::Gaming))
+                .run_if(in_state(ServerState::Starting))
                 .in_set(HandleWayPointSystem),
         )
         .add_systems(
             PostUpdate,
             lock_rotation
                 .after(TransformSystem::TransformPropagate)
-                .run_if(in_state(ServerState::Gaming)),
+                .run_if(in_state(ServerState::Starting)),
         )
         .add_systems(
             PostUpdate,
             check_active_way_point_changed
                 .after(HandleWayPointSystem)
-                .run_if(in_state(ServerState::Gaming)),
+                .run_if(in_state(ServerState::Starting)),
         );
     }
 }

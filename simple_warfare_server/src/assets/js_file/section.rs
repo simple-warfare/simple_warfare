@@ -4,7 +4,7 @@ use bevy::{
     asset::{AssetLoader, AsyncReadExt, LoadContext, io::Reader},
     prelude::*,
 };
-use simple_warfare_macros::TryFromAndIntoJs;
+use simple_warfare_server_macros::TryFromAndIntoJs;
 use thiserror::Error;
 
 #[derive(Debug, Default, Asset, TypePath, Clone, TryFromAndIntoJs)]

@@ -14,7 +14,6 @@ simple_warfare_shared.workspace = true
 #utils
 thiserror.workspace = true
 rand.workspace = true
-simple_warfare_macros.workspace = true
 uuid-simd.workspace = true
 crc32fast.workspace = true
 rustc-hash = "2.1.1"

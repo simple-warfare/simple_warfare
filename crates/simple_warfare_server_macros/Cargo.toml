@@ -1,11 +1,11 @@
 [package]
-name = "simple_warfare_macros"
+name = "simple_warfare_server_macros"
 version = "0.1.0"
 edition = "2024"
 
 
 [lib]
-name = "simple_warfare_macros"
+name = "simple_warfare_server_macros"
 path = "src/lib.rs"
 proc-macro = true
 
