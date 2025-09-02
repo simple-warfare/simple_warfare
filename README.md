@@ -3,3 +3,4 @@ SimpleWarfare is a real-time strategy game. Set in the distant future where mega
 # Mod support
 What's important,it supports to use 
 `ECMAScript` and `Lua` to create your own mod.
+# Licensing
