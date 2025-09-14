@@ -1,5 +1,5 @@
 use bevy::{
-    asset::{AssetLoader, AsyncReadExt, LoadContext, io::Reader},
+    asset::{AssetLoader, AsyncReadExt, LoadContext, io::Reader, uuid::Uuid},
     prelude::*,
 };
 use serde::{Deserialize, Serialize};
@@ -8,7 +8,7 @@ use thiserror::Error;
 use crate::custom::map::navigator_layer::northstar::CustomGridLayer;
 
 #[derive(Debug, Error)]
-pub enum CustomGridLayersLoaderError {
+pub enum CustomGridLayersTomlLoaderError {
     /// An [IO](std::io) Error
     #[error("Could not load file: {0}")]
     Io(#[from] std::io::Error),
@@ -23,14 +23,14 @@ pub struct CustomGridLayers {
 }
 
 #[derive(Default)]
-pub struct CustomGridLayersLoader;
+pub struct CustomGridLayersTomlLoader;
 
-impl AssetLoader for CustomGridLayersLoader {
+impl AssetLoader for CustomGridLayersTomlLoader {
     type Asset = CustomGridLayers;
 
     type Settings = ();
 
-    type Error = CustomGridLayersLoaderError;
+    type Error = CustomGridLayersTomlLoaderError;
 
     async fn load(
         &self,

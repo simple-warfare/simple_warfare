@@ -1,8 +1,0 @@
-movementType = "Land"
-maxMoveSpeed = 40.0
-moveAcceleration = 20.0
-moveDeceleration = 3.0
-reversePercentage = 10.0
-maxTurnSpeed = 10.0
-turnAcceleration = 10.0
-turnDeceleration = 10.0

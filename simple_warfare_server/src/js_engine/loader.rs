@@ -129,7 +129,7 @@ impl ModuleLoader for SimpleWarfareModuleLoader {
             if let Some(module) = self.get(&specifier) {
                 return Ok(module);
             }
-
+            info!("加载中: {}", specifier);
             let real_path = self.get_real_path(&specifier_url)?;
             let js_asset = self.load(real_path)?;
 

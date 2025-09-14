@@ -13,7 +13,7 @@ use crate::{
                 movement::Movement,
             },
             turret::JsTurret,
-            unit::{CustomTurrrt, CustomUnit},
+            data::{CustomTurrrt, CustomUnit},
         },
     },
     js_engine::{

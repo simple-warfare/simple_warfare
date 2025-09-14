@@ -2,19 +2,21 @@ use bevy::{
     asset::{AssetLoader, AsyncReadExt, LoadContext, LoadedFolder, io::Reader, uuid::Uuid},
     prelude::*,
 };
+use boa_engine::value::TryIntoJs;
 use mlua::{FromLua, MetaMethod, UserData, UserDataFields, UserDataMethods};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use crate::{add_field_function_fields, add_field_method_fields};
+use crate::{add_field_function_fields, add_field_method_fields, bevy_ext::try_into_js::*};
 
-#[derive(Debug, Deserialize, Serialize, Default, Asset, TypePath, Clone, FromLua)]
+#[derive(Debug, Deserialize, Serialize, Default, Asset, TypePath, Clone, FromLua, TryIntoJs)]
 pub struct ModInfo {
     pub name: String,
     pub version: String,
     pub game_version: String,
     pub author: Vec<String>,
     pub description: String,
+    #[boa(into_js_with = "uuid_try_into_js")]
     pub uuid: Uuid,
 }
 

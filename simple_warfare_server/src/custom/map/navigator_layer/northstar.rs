@@ -12,6 +12,7 @@ use crate::{assets::custom::map::grid_layers::CustomGridLayers, custom::map::Cus
 
 #[derive(Debug, Default, Clone, Deserialize, Serialize)]
 pub struct CustomGridLayer {
+    pub uuid: Uuid,
     pub movement_type: String,
     pub merge_with: HashSet<Uuid>,
     pub custom_tile: Vec<CustomTile>,
@@ -42,7 +43,22 @@ impl CustomGridLayer {
 pub struct CustomGridLayersServer {
     pub new_layer: Vec<PathBuf>,
     pub handles: Option<Vec<Handle<CustomGridLayers>>>,
-    pub layer: IndexMap<Vec<Uuid>, CustomGridLayerStorage>,
+    pub layer: IndexMap<CustomGridLayersIndex, CustomGridLayerStorage>,
+}
+
+#[derive(Debug, Eq, Hash, PartialEq)]
+pub struct CustomGridLayersIndex {
+    pub movement_type: String,
+    pub merge_with: Vec<Uuid>,
+}
+
+impl CustomGridLayersIndex {
+    pub fn new(movement_type: String, merge_with: Vec<Uuid>) -> Self {
+        Self {
+            movement_type,
+            merge_with,
+        }
+    }
 }
 
 #[derive(Debug, Default, Resource)]
@@ -58,7 +74,10 @@ impl CustomGridLayersServer {
                 self.merge_layer_at_index(index, layer);
             } else {
                 self.layer.insert(
-                    layer.merge_with.iter().map(|m| *m).collect(),
+                    CustomGridLayersIndex::new(
+                        layer.movement_type.clone(),
+                        layer.merge_with.iter().map(|m| *m).collect(),
+                    ),
                     layer.storage(),
                 );
             }

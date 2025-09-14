@@ -1,4 +1,3 @@
-use aeronet_websocket::server::WebSocketServerPlugin;
 use bevy::prelude::*;
 
 use simple_warfare_server::SimpleWarfareServerPlugins;

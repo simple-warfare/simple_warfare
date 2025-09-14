@@ -1,7 +1,7 @@
 use crate::{
     custom::{
         CustomModEnableJs,
-        unit::{section::Section, unit::JsUnit},
+        unit::{data::JsUnit, section::Section},
     },
     js_engine::{
         engine::JsEngine,
@@ -34,6 +34,8 @@ pub enum JsEngineError {
     Js(#[from] boa_engine::error::JsError),
     #[error("Std Error: {0}")]
     Std(#[from] Box<dyn std::error::Error>),
+    #[error("Sender Error: {0}")]
+    Sender(#[from] std::sync::mpsc::SendError<JsEngineResponseEvent>),
 }
 
 pub(super) fn process_js_event(
@@ -41,13 +43,15 @@ pub(super) fn process_js_event(
     event: JsEngineRequestEvent,
     _request_sender: Arc<Sender<JsEngineRequestEvent>>,
     response_sender: Arc<Sender<JsEngineResponseEvent>>,
-) -> JsResult<()> {
+) -> Result<(), JsEngineError> {
     let context = &mut engine.context;
     let module_map = &mut engine.module_map;
     let custom_typed_id_generator = &mut engine.custom_typed_id_generator;
 
     match event {
         JsEngineRequestEvent::LoadMod(custom_mod_asset) => {
+            info!("加载Mod中: {}", custom_mod_asset.info.name);
+
             let custom_typed_id = *custom_typed_id_generator;
             *custom_typed_id_generator += 1;
             let mod_info = &custom_mod_asset.info;
@@ -56,6 +60,7 @@ pub(super) fn process_js_event(
                 enable_class,
             } in custom_mod_asset.custom_mod_enable_js.iter()
             {
+                info!("加载 {} 的单位 \n{:#?}", js_asset.path, enable_class);
                 let module = Module::parse(
                     Source::from_reader(
                         js_asset.context.as_bytes(),
@@ -92,6 +97,10 @@ pub(super) fn process_js_event(
                     .map
                     .borrow_mut()
                     .insert(module_path, custom_typed_id);
+
+                response_sender.send(JsEngineResponseEvent::loaded_custom_unit_number(
+                    enable_class.len(),
+                ))?;
             }
         }
         JsEngineRequestEvent::SpawnUnit { unit_str } => {

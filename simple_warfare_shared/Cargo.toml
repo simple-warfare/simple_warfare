@@ -14,6 +14,10 @@ serde.workspace = true
 toml.workspace = true
 serde_json.workspace = true
 
+
+#bytes
+bytes.workspace = true
+
 [dependencies.lightyear]
 workspace = true
 features = ["server"]
@@ -21,3 +25,10 @@ features = ["server"]
 [dependencies.bevy]
 workspace = true
 default-features = false
+
+
+[lints.clippy]
+unused_imports = "allow"
+
+[lints.rust]
+unused_imports = "allow"

@@ -6,7 +6,7 @@ use crate::{
         unit::{
             section::{graphic::Graphic, movement::Movement},
             turret::JsTurret,
-            unit::JsUnit,
+            data::JsUnit,
             way_point::{WayPoint, WayPointQueue},
         },
     },

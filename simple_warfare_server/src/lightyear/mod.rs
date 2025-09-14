@@ -2,12 +2,12 @@ pub mod server;
 
 use bevy::prelude::*;
 
-use self::server::SimpleWarfareServerPlugin;
+use self::server::ServerPlugin;
 
-pub struct SimpleWarfareLightyearPlugin;
+pub struct LightyearPlugin;
 
-impl Plugin for SimpleWarfareLightyearPlugin {
+impl Plugin for LightyearPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins(SimpleWarfareServerPlugin);
+        app.add_plugins(ServerPlugin);
     }
 }

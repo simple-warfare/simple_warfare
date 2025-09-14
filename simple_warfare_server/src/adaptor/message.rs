@@ -1,7 +1,6 @@
 use bevy::prelude::*;
 use serde::{Deserialize, Serialize};
 use simple_warfare_shared_macros::{MessageDecode, MessageEncode};
-use thiserror::Error;
 
 use crate::consts::GAME_VERSION;
 
@@ -11,11 +10,15 @@ pub enum ClientMessageKind {
     StartServer,
     CrateRoom,
     GetServerInfo,
+    GetMapInfos,
+    GetMapPaths,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub enum ServerMessageKind {
     ServerInfo,
+    ServerStarted,
+    MapPaths,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, MessageDecode, MessageEncode)]
@@ -39,18 +42,43 @@ impl ServerMessage {
             }),
         }
     }
+
+    pub fn started_server() -> Self {
+        Self {
+            kind: ServerMessageKind::ServerStarted,
+            content: None,
+        }
+    }
+
+    pub fn map_paths(map_paths: &Vec<String>) -> Self {
+        Self {
+            kind: ServerMessageKind::MapPaths,
+            content: Some(ServerMessageContent::map_paths(map_paths)),
+        }
+    }
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub enum ServerMessageContent {
     ServerInfo { game_version: String },
+    CrateRoom {},
+    MapPaths { map_paths: Vec<String> },
+}
+
+impl ServerMessageContent {
+    pub fn map_paths(map_paths: &Vec<String>) -> Self {
+        Self::MapPaths {
+            map_paths: map_paths.clone(),
+        }
+    }
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
-pub enum ClientMessageContent {}
+pub enum ClientMessageContent {
+    GetMapPaths { mod_uuid: String },
+}
 
 #[derive(Debug, Event, Clone)]
 pub struct ClientMessageEvent {
-    pub client: Entity,
     pub message: ClientMessage,
 }

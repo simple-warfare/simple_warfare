@@ -8,8 +8,8 @@ use crate::{
         CustomModAsset, CustomTypedId,
         unit::{
             CustomInnerInfo,
+            data::JsUnit,
             section::{core::Core, movement::Movement},
-            unit::JsUnit,
             way_point::WayPoint,
         },
     },
@@ -129,6 +129,8 @@ pub enum JsEngineResponseEvent {
 
     SynchronizeCoreFromJs { data: Core },
     SynchronizeMovementFromJs { data: Movement },
+
+    LoadedCustomUnits { loaded_number: usize },
 }
 
 impl JsEngineResponseEvent {
@@ -144,6 +146,10 @@ impl JsEngineResponseEvent {
             }
             SynchronizeData::Transform(js_transform) => todo!(),
         }
+    }
+
+    pub fn loaded_custom_unit_number(loaded_number: usize) -> Self {
+        Self::LoadedCustomUnits { loaded_number }
     }
 }
 

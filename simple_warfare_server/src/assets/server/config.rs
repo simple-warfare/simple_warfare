@@ -86,5 +86,3 @@ impl AssetLoader for ModInfoJsonLoader {
         &["json"]
     }
 }
-#[derive(Resource, Default)]
-pub struct ModSetsFolderHandle(pub Handle<LoadedFolder>);

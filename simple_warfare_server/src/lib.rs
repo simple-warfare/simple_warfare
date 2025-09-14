@@ -10,7 +10,6 @@ pub mod js_engine;
 pub mod lightyear;
 pub mod lua_engine;
 pub mod mod_engine;
-pub mod server;
 pub mod shared;
 pub mod spatial;
 pub mod states;
@@ -27,6 +26,7 @@ use self::{
     custom::{CustomPlugin, unit::CustomUnitPlugin},
     debug::DebugPlugin,
     js_engine::synchronize::SynchronizePlugin,
+    lightyear::LightyearPlugin,
     lua_engine::LuaEnginePlugin,
     mod_engine::ModEnginePlugin,
     shared::SharedCustomPlugin,
@@ -55,7 +55,8 @@ impl PluginGroup for SimpleWarfareServerPlugins {
             .add(CustomPlugin)
             .add(SharedCustomPlugin)
             .add(ServerStatePlugin)
-            .add(AdaptorServerPlugin);
+            .add(AdaptorServerPlugin)
+            .add(LightyearPlugin);
         group
     }
 }

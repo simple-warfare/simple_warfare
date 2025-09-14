@@ -4,6 +4,7 @@ use std::path::{Path, PathBuf};
 
 use bevy::prelude::*;
 use mlua::{Lua, ObjectLike, Table};
+use simple_warfare_shared::prelude::info::ModInfoKind;
 
 use crate::{
     assets::{
@@ -18,6 +19,8 @@ use crate::{
     lua_engine::user_data::{MapManager, ModManager, NavigatorLayerManager},
     statistics::ServerState,
 };
+
+use self::user_data::ResourceManager;
 
 #[derive(Resource)]
 pub struct LuaRuntime {
@@ -59,20 +62,24 @@ fn check_mod_set(
     mut game_asset: ResMut<GameAsset>,
     mut next_state: ResMut<NextState<ServerState>>,
     mod_sets: Res<Assets<ModSet>>,
+    mod_info_kind: Res<ModInfoKind>,
 ) -> Result {
     let mod_set_id = game_asset.enable_mod_set.mod_set_handle.id();
     if asset_server.is_loaded_with_dependencies(mod_set_id) {
         let now_mod_set = mod_sets
             .get(mod_set_id)
             .ok_or(BevyError::from("Could not get the ModSet Asset"))?;
-        now_mod_set.enable_mods.iter().for_each(|mod_name| {
+
+        info!("使用的ModSet为: {}", now_mod_set.name);
+
+        now_mod_set.enable_mods.iter().for_each(|mod_root| {
             let info_handle = asset_server.load(
                 Path::new(CUSTOM_MOD_PATH)
-                    .join(mod_name)
-                    .join("mod_info.toml"),
+                    .join(mod_root)
+                    .join(mod_info_kind.get_name()),
             );
             let main_lua_handle =
-                asset_server.load(Path::new(CUSTOM_MOD_PATH).join(mod_name).join("main.lua"));
+                asset_server.load(Path::new(CUSTOM_MOD_PATH).join(mod_root).join("main.lua"));
 
             game_asset
                 .custom_mod_handles
@@ -86,9 +93,13 @@ fn check_mod_set(
             game_asset
                 .custom_mod_handles
                 .mod_handles
-                .push(CustomModHandle::new(info_handle, main_lua_handle));
+                .push(CustomModHandle::new(
+                    mod_root.clone(),
+                    info_handle,
+                    main_lua_handle,
+                ));
         });
-        info!("CustomMod Loading");
+        info!("Mod加载中....");
         next_state.set(ServerState::CustomModLoading);
     }
 
@@ -106,7 +117,7 @@ fn check_custom_mods(
         .retain(|handle| !asset_server.is_loaded_with_dependencies(handle.id()));
 
     if game_asset.custom_mod_handles.untyped_handles.is_empty() {
-        info!("MainLua Executing");
+        info!("初始化 LuaContext 中....");
         next_state.set(ServerState::MainLuaExecuting);
     }
 }
@@ -134,7 +145,8 @@ fn exec_mod_main_lua(
                 mod_infos.get(custom_mod.info.id()),
             ) {
                 let mod_name = &mod_info.name;
-
+                let mod_root = &custom_mod.mod_root;
+                info!("加载Mod中: {}", mod_name);
                 add_global_value(context, global, mod_info).expect("add global value error");
                 context.load(lua_asset.context.clone()).exec()?;
 
@@ -163,7 +175,9 @@ fn exec_mod_main_lua(
                         custom_mods.untyped_handles.push(js_handle.untyped());
                     });
 
-                let map_manager = global.get::<MapManager>(MapManager::LUA_GLOBAL_NAME)?;
+                let mut map_manager = global.get::<MapManager>(MapManager::LUA_GLOBAL_NAME)?;
+
+                custom_mod.map_paths.append(&mut map_manager.map_paths);
                 // map_manager.map_paths.iter().try_for_each(|map_path| {
                 //     let binding = get_real_path(mod_name, map_path);
                 //     let real_map_path = binding.as_path();
@@ -185,12 +199,11 @@ fn exec_mod_main_lua(
                 let navigator_layer_manager =
                     global.get::<NavigatorLayerManager>(NavigatorLayerManager::LUA_GLOBAL_NAME)?;
                 navigator_layer_manager.layers_path.iter().for_each(|path| {
-                    custom_grid_layers_server.new_layer(get_real_path(mod_name, path))
+                    custom_grid_layers_server.new_layer(get_real_path(mod_root, path))
                 });
             }
             Ok(())
         })?;
-        info!("JsFile Loading");
     next_state.set(ServerState::JsFileLoading);
     Ok(())
 }
@@ -200,6 +213,8 @@ fn add_global_value(context: &Lua, global: &Table, mod_info: &ModInfo) -> Result
     let mod_manager = context.create_ser_userdata(ModManager::default())?;
     let map_manager = context.create_ser_userdata(MapManager::default())?;
     let navigator_layer_manager = context.create_ser_userdata(NavigatorLayerManager::default())?;
+    let resource_manager = context.create_ser_userdata(ResourceManager::default())?;
+
     global.set("mod_info", mod_info)?;
     global.set(ModManager::LUA_GLOBAL_NAME, mod_manager)?;
     global.set(MapManager::LUA_GLOBAL_NAME, map_manager)?;
@@ -207,12 +222,13 @@ fn add_global_value(context: &Lua, global: &Table, mod_info: &ModInfo) -> Result
         NavigatorLayerManager::LUA_GLOBAL_NAME,
         navigator_layer_manager,
     )?;
+    global.set(ResourceManager::LUA_GLOBAL_NAME, resource_manager)?;
     Ok(())
 }
 
-pub fn get_real_path<P>(mod_name: P, small_path: P) -> PathBuf
+pub fn get_real_path<P>(mod_root: P, small_path: P) -> PathBuf
 where
     P: AsRef<Path>,
 {
-    Path::new(CUSTOM_MOD_PATH).join(mod_name).join(small_path)
+    Path::new(CUSTOM_MOD_PATH).join(mod_root).join(small_path)
 }

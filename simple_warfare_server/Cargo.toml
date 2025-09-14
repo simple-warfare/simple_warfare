@@ -55,7 +55,7 @@ boa_gc = "0.20.0"
 boa_profiler = "0.20.0"
 
 #map
-tiled = { version = "0.14.0", features = ["world"] }
+tiled = { version = "0.15.0", features = ["world"] }
 
 #navigation
 vleue_navigator = { git = "https://github.com/simple-warfare/vleue_navigator.git", features = [
@@ -69,7 +69,7 @@ bevy_northstar = { git = "https://github.com/simple-warfare/bevy_northstar.git",
 fluent = "0.17.0"
 
 #physics
-parry2d = { version = "0.23.0" }
+parry2d.workspace = true
 
 #bevy_web_asset = "0.11.0"
 axum = "0.8.4"
@@ -83,8 +83,8 @@ bevy_image = { version = "0.16.1" }
 
 
 #network
-aeronet = "0.14.0"
-aeronet_websocket = { version = "0.14.0", features = ["server"] }
+aeronet = "0.16.0"
+aeronet_websocket = { version = "0.16.0", features = ["server"] }
 
 bevy_webgate = "0.1.1"
 [dependencies.lightyear]

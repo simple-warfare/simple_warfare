@@ -1,8 +1,11 @@
 use std::sync::atomic::Ordering;
 
+use aeronet::io::Session;
 use bevy::prelude::*;
+use simple_warfare_shared::prelude::{MessageDecode, MessageDecodeKind};
 
 use crate::{
+    adaptor::message::ServerMessage,
     assets::{
         GameAsset,
         mods::{info::ModInfo, js::JsAsset, lua::LuaAsset},
@@ -30,7 +33,7 @@ fn check_js_and_map(
     mut game_asset: ResMut<GameAsset>,
     asset_server: Res<AssetServer>,
     mut server_state: ResMut<NextState<ServerState>>,
-    mod_server: Res<ModServer>,
+    mut mod_server: ResMut<ModServer>,
     js_assets: Res<Assets<JsAsset>>,
     lua_assets: Res<Assets<LuaAsset>>,
     mod_infos: Res<Assets<ModInfo>>,
@@ -52,19 +55,7 @@ fn check_js_and_map(
                 mod_server.load_mod(custom_mod_asset)?;
                 Ok(())
             })?;
-
-        // let mut all_maps: Vec<_> = game_asset
-        //     .custom_mod_handles
-        //     .mod_handles
-        //     .iter()
-        //     .flat_map(|custom_mod| custom_mod.maps.iter())
-        //     .cloned()
-        //     .collect();
-
-        //game_asset.maps.append(&mut all_maps);
-        info!("SomeAsyncWork");
         server_state.set(ServerState::SomeAsyncWork);
-        //scene_state.set(SceneState::MainScene);
     }
     Ok(())
 }
@@ -72,9 +63,16 @@ fn check_js_and_map(
 fn check_some_async_works_completed(
     some_async_work_calculator: Res<SomeAsyncWorkCalculator>,
     mut server_state: ResMut<NextState<ServerState>>,
-) {
+    mut session: Single<&mut Session, With<ChildOf>>,
+    message_decode_kind: Res<MessageDecodeKind>,
+) -> Result {
     if some_async_work_calculator.0.load(Ordering::Relaxed) == SOME_ASYNC_WORK_NUM {
-        info!("Waiting");
+        info!("SimpleWarfare启动完成");
         server_state.set(ServerState::Starting);
+
+        session
+            .send
+            .push(ServerMessage::started_server().to_bytes(*message_decode_kind)?);
     }
+    Ok(())
 }

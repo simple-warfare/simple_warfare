@@ -1,5 +1,6 @@
 use crate::{add_field_function_fields, add_field_method_fields, assets::mods::js::JsAsset};
 use bevy::ecs::resource::Resource;
+use bevy_northstar::path;
 use mlua::{FromLua, MetaMethod, UserData, UserDataFields, UserDataMethods};
 use serde::{Deserialize, Serialize};
 
@@ -52,7 +53,7 @@ impl UserData for ModManager {
     }
     fn add_methods<M: UserDataMethods<Self>>(methods: &mut M) {
         methods.add_method_mut(
-            "add_js",
+            "add_units",
             |_, ud, (js_file_path, classes): (String, Vec<String>)| {
                 ud.enables
                     .push(ModEnableClassesDefine::new(js_file_path, classes));
@@ -82,8 +83,10 @@ impl UserData for MapManager {
         add_field_function_fields!(fields { map_paths });
     }
     fn add_methods<M: UserDataMethods<Self>>(methods: &mut M) {
-        methods.add_method_mut("add_map", |_, ud, map_path: String| {
-            ud.map_paths.push(map_path);
+        methods.add_method_mut("add_maps", |_, ud, map_paths: Vec<String>| {
+            map_paths.into_iter().for_each(|map_path| {
+                ud.map_paths.push(map_path);
+            });
             Ok(())
         });
         // Constructor
@@ -117,6 +120,38 @@ impl UserData for NavigatorLayerManager {
         methods.add_meta_function(MetaMethod::Call, |_, ()| {
             Ok(NavigatorLayerManager::default())
         });
+        methods.add_meta_method(MetaMethod::ToString, |lua, this, ()| {
+            lua.create_string(format!("{this:#?}"))
+        });
+    }
+}
+
+#[derive(Debug, Resource, Default, Deserialize, Serialize, Clone, FromLua)]
+pub struct ResourceManager {
+    pub resources_path: Vec<String>,
+}
+
+impl ResourceManager {
+    pub const LUA_GLOBAL_NAME: &'static str = "resource_manager";
+}
+
+impl UserData for ResourceManager {
+    fn add_fields<F: UserDataFields<Self>>(fields: &mut F) {
+        add_field_method_fields!(fields { resources_path });
+        add_field_function_fields!(fields { resources_path });
+    }
+    fn add_methods<M: UserDataMethods<Self>>(methods: &mut M) {
+        methods.add_method_mut("add_resources", |_, ud, path: Option<String>| {
+            match path {
+                Some(path) => ud.resources_path.push(path),
+
+                None => ud.resources_path.push("resources.toml".to_string()),
+            }
+            Ok(())
+        });
+
+        // Constructor
+        methods.add_meta_function(MetaMethod::Call, |_, ()| Ok(ResourceManager::default()));
         methods.add_meta_method(MetaMethod::ToString, |lua, this, ()| {
             lua.create_string(format!("{this:#?}"))
         });

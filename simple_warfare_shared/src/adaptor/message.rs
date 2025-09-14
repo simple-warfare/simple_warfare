@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bytes::Bytes;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
@@ -21,15 +22,15 @@ pub enum MessageError {
 #[derive(Default, Debug, Resource, Clone, Copy, PartialEq, Eq)]
 pub enum MessageDecodeKind {
     #[default]
-    Toml,
     Json,
+    Toml,
 }
 
 #[derive(Default, Debug, Resource, Clone, Copy, PartialEq, Eq)]
 pub enum MessageEncodeKind {
     #[default]
-    Toml,
     Json,
+    Toml,
 }
 
 pub trait MessageEncode<'de> {
@@ -53,5 +54,11 @@ pub trait MessageDecode {
             MessageDecodeKind::Toml => Ok(toml::to_string(self)?),
             MessageDecodeKind::Json => Ok(serde_json::to_string(self)?),
         }
+    }
+    fn to_bytes(&self, kind: MessageDecodeKind) -> Result<Bytes, MessageError>
+    where
+        Self: Sized + Serialize,
+    {
+        Ok(Bytes::from(self.decode(kind)?))
     }
 }

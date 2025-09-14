@@ -2,7 +2,7 @@ use bevy::{platform::collections::HashSet, prelude::*};
 use bevy_spatial::SpatialAccess;
 
 use crate::{
-    custom::unit::{turret::JsTurret, unit::CustomUnit},
+    custom::unit::{turret::JsTurret, data::CustomUnit},
     js_engine::{
         JsEngineRequestSender, event::JsEngineRequestEvent, global::class::entity::JsEntity,
     },

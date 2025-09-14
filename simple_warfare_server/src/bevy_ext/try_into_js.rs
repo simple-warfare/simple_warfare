@@ -1,5 +1,7 @@
-use bevy::prelude::*;
-use boa_engine::{JsResult, object::builtins::JsFloat32Array, prelude::*, value::TryIntoJs};
+use bevy::{asset::uuid::Uuid, prelude::*};
+use boa_engine::{
+    JsResult, js_string, object::builtins::JsFloat32Array, prelude::*, value::TryIntoJs,
+};
 
 use crate::js_engine::global::class::entity::JsEntity;
 pub fn f32_try_into_js(value: &f32, _context: &mut Context) -> JsResult<JsValue> {
@@ -37,4 +39,8 @@ pub fn quat_try_into_js(value: &Quat, context: &mut Context) -> JsResult<JsValue
     JsResult::Ok(JsValue::Object(
         JsFloat32Array::from_iter(quat_xyzw, context)?.into(),
     ))
+}
+
+pub fn uuid_try_into_js(value: &Uuid, context: &mut Context) -> JsResult<JsValue> {
+    JsResult::Ok(JsValue::String(js_string!(value.to_string())))
 }
