@@ -16,7 +16,7 @@ pub enum GameType {
     SandBox,
 }
 
-pub const SOME_ASYNC_WORK_NUM: u8 = 1;
+pub const SOME_ASYNC_WORK_NUM: u8 = 2;
 
 #[derive(Debug, Default, Resource)]
 pub struct SomeAsyncWorkCalculator(pub Arc<AtomicU8>);

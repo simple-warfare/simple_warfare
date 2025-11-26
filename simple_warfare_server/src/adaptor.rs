@@ -5,13 +5,18 @@ use aeronet::io::{
     server::{Closed, Server},
 };
 use aeronet_websocket::server::{ServerConfig, WebSocketServer, WebSocketServerPlugin};
+use bevy::asset::uuid::Uuid;
 use bevy::prelude::*;
 
 use simple_warfare_shared::prelude::*;
 
+use crate::assets::GameAsset;
+use crate::assets::mods::info::ModInfo;
 use crate::statistics::ServerState;
 
-use self::message::{ClientMessage, ClientMessageEvent, ClientMessageKind, ServerMessage};
+use self::message::{
+    ClientMessage, ClientMessageContent, ClientMessageEvent, ClientMessageKind, ServerMessage,
+};
 pub mod message;
 
 pub struct AdaptorServerPlugin;
@@ -42,6 +47,7 @@ fn open_server(mut commands: Commands) {
     let config = server_config();
     commands.spawn_empty().queue(WebSocketServer::open(config));
 }
+
 
 fn on_closed(trigger: Trigger<Closed>) {
     panic!("server closed: {:?}", trigger.event());
@@ -117,6 +123,8 @@ fn operation_message(
     mut session: Single<&mut Session, With<ChildOf>>,
     mut server_state: ResMut<NextState<ServerState>>,
     message_decode_kind: Res<MessageDecodeKind>,
+    game_asset: Res<GameAsset>,
+    mod_infos: Res<Assets<ModInfo>>,
 ) -> Result {
     let ClientMessageEvent { message } = &*trigger;
     match message.kind {
@@ -130,7 +138,33 @@ fn operation_message(
         ClientMessageKind::CrateRoom => {}
         ClientMessageKind::ContentDecodeKind => todo!(),
         ClientMessageKind::GetMapInfos => todo!(),
-        ClientMessageKind::GetMapPaths => todo!(),
+        ClientMessageKind::GetMapPaths => {
+            if let Some(content) = &message.content {
+                if let ClientMessageContent::GetMapPaths { mod_uuid } = content {
+                    if let Ok(mod_uuid) = Uuid::parse_str(&mod_uuid) {
+                        if let Some(mod_handle) = game_asset
+                            .custom_mod_handles
+                            .mod_handles
+                            .iter()
+                            .find(|mod_handle| {
+                                if let Some(mod_info) = mod_infos.get(&mod_handle.info)
+                                    && mod_info.uuid == mod_uuid
+                                {
+                                    return true;
+                                } else {
+                                    return false;
+                                }
+                            })
+                        {
+                            let map_paths = ServerMessage::map_paths(&mod_handle.map_paths);
+                            session.send.push(map_paths.to_bytes(*message_decode_kind)?)
+                        }
+                    }
+                } else {
+                    todo!()
+                }
+            }
+        }
     }
     Ok(())
 }

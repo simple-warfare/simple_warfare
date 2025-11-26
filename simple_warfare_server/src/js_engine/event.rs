@@ -15,7 +15,7 @@ use crate::{
     },
     js_engine::{
         global::class::entity::JsEntity,
-        simple_warfare_cli::{LookType, TeleportType},
+        cli::{LookType, TeleportType},
         synchronize::SynchronizeData,
     },
 };

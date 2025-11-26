@@ -26,14 +26,6 @@ pub(crate) struct ProtocolPlugin;
 impl Plugin for ProtocolPlugin {
     fn build(&self, app: &mut App) {
         // messages
-        app.add_message::<StartGame>()
-            .add_direction(NetworkDirection::Bidirectional);
-
-        // channels
-        app.add_channel::<Channel1>(ChannelSettings {
-            mode: ChannelMode::OrderedReliable(ReliableSettings::default()),
-            ..default()
-        })
-        .add_direction(NetworkDirection::Bidirectional);
+        app.add_message::<StartGame>();
     }
 }

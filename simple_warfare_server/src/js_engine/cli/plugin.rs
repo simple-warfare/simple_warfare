@@ -1,11 +1,11 @@
 use crate::{
     custom::unit::data::Custom,
     js_engine::{
-        event::JsEngineResponseEvent,
-        simple_warfare_cli::{
+        cli::{
             LookType, SwCliRequestEvent, SwCliRequestReceiver, SwCliResponseEvent,
             SwCliResponseSender, TeleportType,
         },
+        event::JsEngineResponseEvent,
     },
 };
 use bevy::prelude::*;

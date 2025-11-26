@@ -19,12 +19,13 @@ pub enum ServerMessageKind {
     ServerInfo,
     ServerStarted,
     MapPaths,
+    ErrorClientMessage
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, MessageDecode, MessageEncode)]
 pub struct ClientMessage {
     pub kind: ClientMessageKind,
-    pub content: Option<ServerMessageContent>,
+    pub content: Option<ClientMessageContent>,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, MessageDecode, MessageEncode)]
@@ -76,6 +77,7 @@ impl ServerMessageContent {
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub enum ClientMessageContent {
     GetMapPaths { mod_uuid: String },
+    GerAllMapPaths
 }
 
 #[derive(Debug, Event, Clone)]

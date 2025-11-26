@@ -35,7 +35,6 @@ pub struct GameAsset {
     //pub maps: Vec<Handle<SimpleWarfareMap>>,
     pub enable_mod_set: EnableModSet,
     pub custom_mod_handles: CustomModHandles,
-    pub custom_mods: Option<Vec<CustomModAsset>>,
     pub assets_untyped_handle: Vec<UntypedHandle>,
 }
 

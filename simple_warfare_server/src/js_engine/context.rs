@@ -4,12 +4,12 @@ use crate::{
         unit::{data::JsUnit, section::Section},
     },
     js_engine::{
+        cli::{LookType, TeleportType},
         engine::JsEngine,
         event::*,
         global::class::entity::JsEntity,
         host_defined::*,
         module::ModModule,
-        simple_warfare_cli::{LookType, TeleportType},
         synchronize::SynchronizeData,
     },
 };
@@ -138,12 +138,15 @@ pub(super) fn process_js_event(
                             .to_string();
                         let class_obj = class
                             .to_object(context)?
-                            .construct(
-                                &[JsValue::String(js_string!(module_parent_path))],
-                                None,
-                                context,
-                            )
+                            .construct(&[], None, context)
                             .expect("construct error");
+
+                        class_obj.set(
+                            js_string!("moduleParentPath"),
+                            JsValue::String(js_string!(module_parent_path)),
+                            false,
+                            context,
+                        )?;
 
                         class_obj.set(
                             js_string!("typedId"),
@@ -154,12 +157,8 @@ pub(super) fn process_js_event(
 
                         let unit_proxy = JsProxy::from_object(
                             class_obj
-                                .get(js_string!("getSynchronizeProxy"), context)?
-                                .as_function()
-                                .unwrap()
-                                .call(&JsValue::Object(class_obj), &[], context)?
-                                .to_object(context)?
-                                .clone(),
+                                .get(js_string!("synchronizeProxy"), context)?
+                                .to_object(context)?,
                         )?;
 
                         let js_unit = JsUnit::try_from_proxy(

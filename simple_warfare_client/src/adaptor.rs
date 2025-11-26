@@ -75,7 +75,11 @@ fn on_connected(trigger: Trigger<OnAdd, Session>, clients: Query<&ChildOf>) {
     info!("{client} connected to {server}");
 }
 
-fn on_disconnected(trigger: Trigger<Disconnected>, clients: Query<&ChildOf>) {
+fn on_disconnected(
+    trigger: Trigger<Disconnected>,
+    clients: Query<&ChildOf>,
+    mut writer: EventWriter<AppExit>,
+) {
     let client = trigger.target();
     let Ok(&ChildOf(server)) = clients.get(client) else {
         return;
@@ -92,6 +96,8 @@ fn on_disconnected(trigger: Trigger<Disconnected>, clients: Query<&ChildOf>) {
             info!("{client} disconnected from {server} due to error: {err:?}");
         }
     }
+
+    writer.write(AppExit::Success);
 }
 
 fn receiver_message(

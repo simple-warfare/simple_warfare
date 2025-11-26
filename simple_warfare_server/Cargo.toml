@@ -83,8 +83,8 @@ bevy_image = { version = "0.16.1" }
 
 
 #network
-aeronet = "0.16.0"
-aeronet_websocket = { version = "0.16.0", features = ["server"] }
+aeronet.workspace = true
+aeronet_websocket = { version = "0.16.1", features = ["server"] }
 
 bevy_webgate = "0.1.1"
 [dependencies.lightyear]

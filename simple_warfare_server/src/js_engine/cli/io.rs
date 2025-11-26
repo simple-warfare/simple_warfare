@@ -3,7 +3,7 @@ pub mod http;
 
 use bevy::prelude::*;
 
-use crate::js_engine::simple_warfare_cli::io::{fs::plugin::SwFsPlugin, http::plugin::SwHttpPlugin};
+use crate::js_engine::cli::io::{fs::plugin::SwFsPlugin, http::plugin::SwHttpPlugin};
 
 pub struct SwIoPlugin;
 

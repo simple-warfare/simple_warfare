@@ -1,12 +1,10 @@
 pub mod graphic;
 pub mod light2d;
 pub mod physics;
-pub mod section;
 pub mod transform;
 pub mod turret;
 pub mod data;
 pub mod way_point;
-pub mod animation;
 pub mod commpont;
 
 use std::{

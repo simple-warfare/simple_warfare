@@ -116,7 +116,7 @@ impl TryFromJs for JsTargetType {
 
 /// 创建Sw这个Js端的全局对象
 impl SimpleWarfareCli {
-    pub const NAME: JsString = js_string!("simpleWarfareCli");
+    pub const NAME: JsString = js_string!("cli");
 
     pub fn init(
         context: &mut Context,

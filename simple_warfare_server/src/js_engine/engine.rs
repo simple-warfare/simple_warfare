@@ -18,7 +18,7 @@ use super::{
     host_defined::*,
     loader::SimpleWarfareModuleLoader,
     module::ModModule,
-    simple_warfare_cli::{
+    cli::{
         SimpleWarfareCli, SwCliRequestEvent, SwCliResponseEvent, io::fs::SwFsRequestEvent,
     },
 };
@@ -80,7 +80,7 @@ fn egister_global_property(
     ctx.register_global_property(Console::NAME, console, Attribute::all())
         .expect("the console builtin shouldn't exist");
 
-    let simple_warfare_cli = SimpleWarfareCli::init(
+    let cli = SimpleWarfareCli::init(
         ctx,
         js_engine_request_sender,
         js_engine_response_sender,
@@ -89,7 +89,7 @@ fn egister_global_property(
         sw_fs_request_sender,
     );
 
-    ctx.register_global_property(SimpleWarfareCli::NAME, simple_warfare_cli, Attribute::all())
+    ctx.register_global_property(SimpleWarfareCli::NAME, cli, Attribute::all())
         .expect("the sw builtin shouldn't exist");
 }
 

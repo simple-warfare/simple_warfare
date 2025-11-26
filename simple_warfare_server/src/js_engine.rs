@@ -7,7 +7,7 @@ pub mod loader;
 pub mod module;
 pub mod plugin;
 pub mod signal;
-pub mod simple_warfare_cli;
+pub mod cli;
 pub mod synchronize;
 
 use std::sync::{
@@ -23,7 +23,7 @@ use crate::{
         event::{EventPlugin, JsEngineRequestEvent, JsEngineResponseEvent},
         loader::{SimpleWarfareModuleLoader, SwModuleLoaderRequestReceiver},
         plugin::SwLoaderPlugin,
-        simple_warfare_cli::{SwCliRequestReceiver, SwCliResponseSender, plugin::SwPlugin},
+        cli::{SwCliRequestReceiver, SwCliResponseSender, plugin::SwPlugin},
     },
     statistics::ServerState,
 };
@@ -31,7 +31,7 @@ use bevy::prelude::*;
 use boa_engine::prelude::*;
 use thiserror::Error;
 
-use self::simple_warfare_cli::io::fs::{SwFsRequestReceiver, SwFsResponseSender};
+use self::cli::io::fs::{SwFsRequestReceiver, SwFsResponseSender};
 
 #[derive(Error, Debug)]
 pub enum JsEngineError {
